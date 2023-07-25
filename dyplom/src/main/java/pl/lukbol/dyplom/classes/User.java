@@ -11,15 +11,15 @@ import java.util.Collection;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id")Long id;
     public String name;
     @Column(unique=true)
     @NotNull
     @NotEmpty
     public String email;
     public String password;
+
+    private boolean enabled;
 
     @ManyToMany
     @JoinTable(
@@ -38,6 +38,11 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+    }
+    public User(String name, String email, String password) {
+        this.email = email;
+        this.name = name;
+        this.password=password;
     }
     public Long getId() {
         return id;
@@ -61,6 +66,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public void setEmail(String email) {

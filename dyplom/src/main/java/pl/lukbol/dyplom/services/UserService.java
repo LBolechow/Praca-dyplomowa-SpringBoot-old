@@ -1,5 +1,7 @@
 package pl.lukbol.dyplom.services;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +15,7 @@ import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,42 +34,10 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> displayAllUsers() {
-        return userRepository.findAll();
-    }
 
-    public User saveUser(@RequestBody User newUser) {
-        return userRepository.save(newUser);
-    }
 
-    public  User GetUserById(@PathVariable Long id) {
 
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
-    }
 
-    public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        User user = GetUserById(id);
-        user.setName(updatedUser.getName());
-        user.setEmail(updatedUser.getEmail());
-        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        return saveUser(user);
-    }
-
-    public void DeleteUserById(@PathVariable Long id) {
-        userRepository.deleteById(id);
-    }
-
-    public ResponseEntity<String> registerUser(@RequestBody User newUser) {
-        Role clientRole = roleRepository.findByName("ROLE_CLIENT");
-        User client = new User();
-        client.setName(newUser.getName());
-        client.setEmail(newUser.getEmail());
-        client.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        client.setRoles(Arrays.asList(clientRole));
-        saveUser(client);
-        return ResponseEntity.ok("Pomyślnie zarejestrowano użytkownika.");
-    }
 
 
 
