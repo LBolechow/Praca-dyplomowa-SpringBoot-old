@@ -44,25 +44,34 @@ public class UserController {
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
-
-    @GetMapping(value ="/user/add", consumes = {"*/*"})
+    @GetMapping("/users")
+    List<User> displayAllUsers()
+    {
+        return userRepository.findAll();
+    }
+    @PostMapping(value ="/register", consumes = {"*/*"})
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
         User newUsr = new User(name,email, passwordEncoder.encode(password));
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
         if (emailExists(newUsr.getEmail())) {
-            req.getSession().setAttribute("message", "Użytkownik o takim adresie email już instnieje.");
+            req.getSession().setAttribute("message", "Użytkownik o takim adresie email już istnieje.");
         } else {
             userRepository.save(newUsr);
             req.getSession().setAttribute("message", "Poprawnie utworzono użytkownika.");
         }
+
         try {
-            resp.sendRedirect(req.getContextPath() + "/");
+            resp.sendRedirect(req.getContextPath() + "/register");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
-
+    @GetMapping("/get_message")
+    @ResponseBody
+    public String getMessageFromSession(HttpServletRequest request) {
+        return (String) request.getSession().getAttribute("message");
+    }
 
 
 }
