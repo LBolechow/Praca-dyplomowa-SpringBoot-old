@@ -10,18 +10,18 @@
     <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
 </head>
 
-<body class="bg-gradient-primary" style="background: #F08080;">
+<body class="bg-gradient-primary" style="background: #F0F8FF" >
 <div class="container">
     <div class="card shadow-lg o-hidden border-0 my-5">
         <div class="card-body p-0">
             <div class="row">
-                <div class="col-lg-5 d-none d-lg-flex" style="background: #FFF0F5;">
-                    <div class="flex-grow-1 bg-register-image" style="background-image: url('/static/img/pictures/image2.jpg');"></div>
+                <div class="col-lg-5 d-none d-lg-flex" style="background: #F5FFFA;">
+                    <div class="flex-grow-1 bg-register-image" style="background-image: url('/static/img/pictures/image1.jpg');"></div>
                 </div>
-                <div class="col-lg-7" style="background: #FFF0F5;">
-                    <div class="p-5" style="background: #FFF0F5;">
+                <div class="col-lg-7" style="background: #F5FFFA;">
+                    <div class="p-5" style="background: #F5FFFA;">
                         <div class="text-center">
-                            <h4 class="text-dark mb-4">Stwórz konto!</h4>
+                            <h2 class="text-dark mb-4">Stwórz konto!</h2>
                         </div>
                         <form action="/register" method="post" id="registrationForm">
                             <div class="row mb-3">
@@ -43,14 +43,49 @@
             </div>
         </div>
     </div>
+    <section class="py-4 py-xl-5">
+        <div class="container">
+            <div class="text-white bg-dark border rounded border-0 p-4 p-md-5">
+                <h2 class="fw-bold text-white mb-3">Witamy w zakładzie krawieckim!</h2>
+                <p class="mb-4">Ponieżej możesz sprawdzić oferowane usługi wraz z cennikiem.</p>
+                <div class="my-3"><a class="btn btn-primary btn-lg me-2" role="button" href="#">Sprawdź ofertę</a>
+                <a class="btn btn-light btn-lg" role="button" href="#">Sprawdź swoje zlecenia!</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="text-white bg-dark"></footer>
 </div>
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/js/theme.js"></script>
 </body>
 <script>
+    // Function to validate the email address format
+    function validateEmail(email) {
+        // Regular expression for validating the email format
+        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        // Test the email against the pattern
+        return emailPattern.test(email);
+    }
+
+    function validatePassword() {
+        // ... (your existing password validation function) ...
+    }
+
+    // ... (rest of your script code) ...
+</script>
+<script>
     function validatePassword() {
         var password = document.getElementById("password").value;
         var repeatPassword = document.getElementById("repeatPassword").value;
+        var email = document.getElementById("email").value;
+
+        // Validate email format
+        if (!validateEmail(email)) {
+            alert("Wprowadź poprawny adres email.");
+            return false;
+        }
 
         if (password !== repeatPassword) {
             alert("Hasła nie pasują do siebie. Proszę wprowadzić identyczne hasła.");
@@ -61,6 +96,7 @@
         }
     }
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var messageDiv = document.getElementById("messageDiv");
