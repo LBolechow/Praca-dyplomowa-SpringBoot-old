@@ -62,13 +62,12 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users", "/user", "/profile/**").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/users", "/user", "/profile/**", "/panel_administratora").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/adminpanelusers", "/adminpanelbonuses").hasRole("ADMIN")
                         //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
 
                         .requestMatchers("/index.html", "/register.html", "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
-                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/user/add", "/ruleta", "/coinflip",
-                                "/bonuses", "/profile", "/table", "/favicon", "/sock/**", "/chathistory/**", "/usersonline", "/user/profile/{id}", "/get_message").permitAll()
+                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/user/add", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message").permitAll()
                         // .anyRequest().authenticated()
                         .and()
                 )

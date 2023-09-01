@@ -24,6 +24,10 @@ public class UrlController {
     public ModelAndView getProfile() {
         return new ModelAndView("profile");
     }
+    @RequestMapping(value="/panel_administratora")
+    public ModelAndView getAdmin() {
+        return new ModelAndView("admin");
+    }
 
 }
 
