@@ -62,7 +62,7 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users").hasAnyRole("CLIENT")
+                        .requestMatchers("/users", "/user", "/profile/**").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/adminpanelusers", "/adminpanelbonuses").hasRole("ADMIN")
                         //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
 

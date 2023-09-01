@@ -20,5 +20,10 @@ public class UrlController {
         return new ModelAndView("index");
     }
 
+    @RequestMapping(value="/profile")
+    public ModelAndView getProfile() {
+        return new ModelAndView("profile");
+    }
+
 }
 
