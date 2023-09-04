@@ -17,95 +17,95 @@
     <link rel="stylesheet" href="/static/css/Table-With-Search.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
+
 </head>
 
 <body id="page-top">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: var(--bs-gray-900);">
             <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
-                    <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
-                    <div class="sidebar-brand-text mx-3"><span>Brand</span></div>
-                </a>
+                <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
+                <div class="sidebar-brand-text mx-3"><span>Brand</span></div>
+            </a>
                 <hr class="sidebar-divider my-0">
                 <ul class="navbar-nav text-light" id="accordionSidebar"></ul>
-                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
         </nav>
         <div class="d-flex flex-column" id="content-wrapper">
             <div id="content">
                 <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
-                <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
-                    <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group"></div>
-                    </form>
-                    <ul class="navbar-nav flex-nowrap ms-auto">
-                        <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><i class="fas fa-search"></i></a>
-                            <div class="dropdown-menu dropdown-menu-end p-3 animated--grow-in" aria-labelledby="searchDropdown">
-                                <form class="me-auto navbar-search w-100">
-                                    <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
-                                        <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
-                                <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
-                                    <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-primary icon-circle"><i class="fas fa-file-alt text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 12, 2019</span>
-                                        <p>A new monthly report is ready to download!</p>
-                                    </div>
-                                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 7, 2019</span>
-                                        <p>$290.29 has been deposited into your account!</p>
-                                    </div>
-                                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 2, 2019</span>
-                                        <p>Spending Alert: We've noticed unusually high spending for your account.</p>
-                                    </div>
-                                </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group"></div>
+                        </form>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><i class="fas fa-search"></i></a>
+                                <div class="dropdown-menu dropdown-menu-end p-3 animated--grow-in" aria-labelledby="searchDropdown">
+                                    <form class="me-auto navbar-search w-100">
+                                        <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
+                                            <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
+                                        </div>
+                                    </form>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <div class="shadow dropdown-list dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown"></div>
-                        </li>
-                        <div class="d-none d-sm-block topbar-divider"></div>
-                        <li class="nav-item dropdown no-arrow">
-                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
-                                <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profile</a>
-                                    <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Logout</a>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                                        <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
+                                        <div class="me-3">
+                                            <div class="bg-primary icon-circle"><i class="fas fa-file-alt text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 12, 2019</span>
+                                            <p>A new monthly report is ready to download!</p>
+                                        </div>
+                                    </a><a class="dropdown-item d-flex align-items-center" href="#">
+                                        <div class="me-3">
+                                            <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 7, 2019</span>
+                                            <p>$290.29 has been deposited into your account!</p>
+                                        </div>
+                                    </a><a class="dropdown-item d-flex align-items-center" href="#">
+                                        <div class="me-3">
+                                            <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 2, 2019</span>
+                                            <p>Spending Alert: We've noticed unusually high spending for your account.</p>
+                                        </div>
+                                    </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="shadow dropdown-list dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown"></div>
+                            </li>
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profile</a>
+                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
                 <div class="container-fluid">
                     <h3 class="text-dark mb-1">Lista użytkowników</h3>
                 </div>
                 <h1></h1>
                 <div class="row">
-                    <div class="col d-xxl-flex justify-content-xxl-end"><button class="btn btn-outline-primary text-truncate float-none float-sm-none add-another-btn" data-bss-hover-animate="pulse" type="button" data-bs-target="#modal-1" data-bs-toggle="modal" style="width: 300px;/*float: right;*/font-size: 18px;display: block;">Dodaj użytkownika<i class="fas fa-plus-circle edit-icon"></i></button></div>
+                    <div class="col d-xxl-flex justify-content-xxl-end"><button class="btn btn-outline-primary text-truncate float-none float-sm-none add-another-btn" data-bss-hover-animate="pulse" type="button" data-bs-target="#addUserModal" data-bs-toggle="modal" style="width: 300px;/*float: right;*/font-size: 18px;display: block;">Dodaj użytkownika<i class="fas fa-plus-circle edit-icon"></i></button></div>
                 </div>
                 <div class="col-md-12 search-table-col" style="margin-top: 40px;">
-                    <div class="form-group pull-right col-lg-4"><input type="text" class="search form-control" placeholder="Szukaj po nazwisku" style="display: block;"></div><span class="counter pull-right"></span>
+                    <div class="form-group pull-right col-lg-4"><input type="text" class="search form-control" placeholder="Szukaj po emailu" style="display: block;"></div><span class="counter pull-right"></span>
                     <div class="table-responsive table table-hover table-bordered results">
-                        <table class="table table-hover table-bordered">
+                        <table id="myTable" class="table table-hover table-bordered">
                             <thead class="bill-header cs">
                                 <tr>
                                     <th id="trs-hd-1" class="col-lg-1" style="width: 10%;">ID</th>
-                                    <th id="trs-hd-2" class="col-lg-2" style="width: 25%;">Imie</th>
-                                    <th id="trs-hd-5" class="col-lg-2" style="width: 25%;">Nazwisko</th>
+                                    <th id="trs-hd-2" class="col-lg-2" style="width: 20%;">Nazwa</th>
+                                    <th id="trs-hd-5" class="col-lg-2" style="width: 30%;">Email</th>
                                     <th id="trs-hd-3" class="col-lg-3" style="width: 20%;">Rola</th>
                                     <th id="trs-hd-6" class="col-lg-2" style="width: 5%;min-width: 10%;">Akcje</th>
                                 </tr>
@@ -114,12 +114,16 @@
                                 <tr class="warning no-result">
                                     <td colspan="12"><i class="fa fa-warning"></i>&nbsp; No Result !!!</td>
                                 </tr>
-                                <tr>
-                                    <td>01</td>
-                                    <td>Łukasz</td>
-                                    <td>Bolechów</td>
-                                    <td>Admin</td>
-                                    <td style="width: 6%;"><button class="btn btn-success" style="margin-left: 5px;" type="submit"><i class="fa fa-check" style="font-size: 15px;"></i></button><button class="btn btn-danger" style="margin-left: 5px;position: static;" type="submit" data-bs-target="#modal-2" data-bs-toggle="modal"><i class="fa fa-trash" style="font-size: 15px;"></i></button></td>
+
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.id}"></td>
+                                    <td th:text="${user.name}"></td>
+                                    <td th:text="${user.email}"></td>
+                                    <td th:each="role : ${user.roles}" th:text="${role.name}"></td>
+                                    <td style="width: 6%;"><button class="btn btn-success" style="margin-left: 5px;" type="submit"><i class="fa fa-check" style="font-size: 15px;"></i></button>
+                                        <button class="btn btn-danger confirm-delete" style="margin-left: 5px;position: static;" type="button" th:attr="data-user-id=${user.id}" data-bs-toggle="modal" data-bs-target="#modal-2" data-action="delete">
+                                            <i class="fa fa-trash" style="font-size: 15px;"></i>
+                                        </button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -129,18 +133,34 @@
                     <div class="col d-xxl-flex justify-content-xxl-center">
                         <nav>
                             <ul class="pagination">
-                                <li class="page-item"><a class="page-link" aria-label="Previous" href="#"><span aria-hidden="true">«</span></a></li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                <li class="page-item"><a class="page-link" aria-label="Next" href="#"><span aria-hidden="true">»</span></a></li>
+                                <li class="page-item" th:if="${currentPage > 0}">
+                                    <a class="page-link" th:href="@{/panel_administratora?page=0}" aria-label="First">
+                                        <span aria-hidden="true">««</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:if="${currentPage > 0}">
+                                    <a class="page-link" th:href="@{${'/panel_administratora?page=' + (currentPage - 1)}}" aria-label="Previous">
+                                        <span aria-hidden="true">«</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:each="pageItem : ${#numbers.sequence(0, totalPages - 1)}" th:class="${pageItem == currentPage} ? 'active' : ''">
+                                    <a class="page-link" th:href="@{/panel_administratora(page=${pageItem})}" th:text="${pageItem + 1}"></a>
+                                </li>
+                                <li class="page-item" th:if="${currentPage < totalPages - 1}">
+                                    <a class="page-link" th:href="@{${'/panel_administratora?page=' + (currentPage + 1)}}" aria-label="Next">
+                                        <span aria-hidden="true">»</span>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:if="${currentPage < totalPages - 1}">
+                                    <a class="page-link" th:href="@{${'/panel_administratora?page=' + (totalPages - 1)}}" aria-label="Last">
+                                        <span aria-hidden="true">»»</span>
+                                    </a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
                 </div>
-                <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
+                <div class="modal fade"  role="dialog" tabindex="-1" id="modal-2">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -149,24 +169,47 @@
                             <div class="modal-body">
                                 <p>Zmiana jest nieodwracalna.</p>
                             </div>
-                            <div class="modal-footer d-xxl-flex justify-content-xxl-center"><button class="btn btn-light d-xxl-flex" type="button" data-bs-dismiss="modal">Nie</button><button class="btn btn-primary" type="button">Tak</button></div>
+                            <div class="modal-footer d-xxl-flex justify-content-xxl-center"><button class="btn btn-light d-xxl-flex" type="button" data-bs-dismiss="modal">Nie</button><button id="confirmDeleteButton" class="btn btn-primary" type="button" data-bs-dismiss="modal">Tak</button></div>
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
-                    <div class="modal-dialog" role="document">
+                <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h4 class="modal-title">Dodaj użytkownika</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title" id="addUserModalLabel">Dodaj nowego użytkownika</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body"><label class="form-label" style="font-size: 18px;margin-bottom: 5px;">Imie</label><input class="d-xxl-flex" type="text" style="width: 100%;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;color: var(--bs-body-color);border-style: solid;border-color: var(--bs-body-color);padding-bottom: 0px;height: 35px;margin-bottom: 5px;"><label class="form-label" style="font-size: 18px;margin-bottom: 5px;">Nazwisko</label><input class="d-xxl-flex" type="text" style="width: 100%;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;color: var(--bs-body-color);border-style: solid;border-color: var(--bs-body-color);padding-bottom: 0px;margin-bottom: 5px;height: 35px;"><label class="form-label" style="margin-right: 308px;font-size: 18px;margin-bottom: 5px;">Rola</label><label class="form-label"></label><select style="text-align: left;padding-left: 0px;margin-left: 2px;width: 100%;margin-right: 0px;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;color: var(--bs-body-color);margin-bottom: 5px;height: 35px;border: 2px solid var(--bs-body-color) ;">
-                                    <optgroup label="This is a group">
-                                        <option value="12" selected="">Klient</option>
-                                        <option value="13">Pracownik</option>
-                                        <option value="14">Administrator</option>
-                                    </optgroup>
-                                </select><label class="form-label" style="padding-top: 0px;font-size: 18px;">Hasło</label><input type="password" style="width: 100%;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 5px;border-bottom-left-radius: 5px;color: var(--bs-body-color);border-style: solid;border-color: var(--bs-body-color);height: 35px;"></div>
-                            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button><button class="btn btn-primary" type="button">Dodaj</button></div>
+                            <div class="modal-body">
+                                <form id="addUserForm">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Nazwa</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Hasło</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="role" class="form-label">Rola</label>
+                                        <select class="form-select" id="role" name="role" required>
+                                            <option value="ROLE_CLIENT">Klient</option>
+                                            <option value="ROLE_EMPLOYEE">Pracownik</option>
+                                            <option value="ROLE_ADMIN">Administrator</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                                <button type="button" class="btn btn-primary" id="addUserButton">Dodaj</button>
+                            </div>
+                            <div id="successMessage" style="display: none; color: green;" class="d-flex justify-content-center">Użytkownik został dodany pomyślnie.</div>
+                            <div id="errorMessage" style="display: none; color: red;" class="d-flex justify-content-center">Podany E-mail znajduje się już w bazie lub jest nieprawidłowy.</div>
                         </div>
                     </div>
                 </div>
@@ -177,13 +220,106 @@
     <script src="/static/js/bs-init.js"></script>
     <script src="/static/js/Table-With-Search.js"></script>
     <script src="/static/js/theme.js"></script>
-    <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 </body>
 <script>
     $.get("/user", function(data) {
         $("#user").html(data.name);
+    });
+</script>
+<script>
+    $("#addUserButton").click(function () {
+        // Pobierz dane z formularza
+        var name = $("#name").val();
+        var email = $("#email").val();
+        var password = $("#password").val();
+        var role = $("#role").val();
+        // Przygotuj dane do przesłania na serwer jako obiekt JSON
+        var userData = {
+            name: name,
+            email: email,
+            password: password,
+            role: role
+        };
+
+        // Wyślij żądanie POST do kontrolera
+        $.post("/users/add", userData, function (data) {
+            if (data.success) {
+                // Pomyślnie dodano użytkownika, możesz wykonać odpowiednie akcje, np. zamknąć modal
+                // Pokaż komunikat o sukcesie
+                $("#successMessage").show();
+                $("#errorMessage").hide();
+            } else {
+                // Obsłuż błąd, np. wyświetl komunikat o błędzie
+                console.error("Wystąpił błąd podczas dodawania użytkownika: " + data.message);
+                // Pokaż komunikat o błędzie
+                $("#successMessage").hide();
+                $("#errorMessage").show();
+            }
+        }).fail(function (error) {
+            console.error("Wystąpił błąd: " + error.statusText);
+            // Pokaż komunikat o błędzie
+            $("#successMessage").hide();
+            $("#errorMessage").show();
+        });
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        // Obsługa kliknięcia przycisku "Tak" w modalu potwierdzenia
+        $(".confirm-delete").click(function () {
+            var userId = $(this).data("user-id"); // Pobierz ID użytkownika z atrybutu data
+
+            // Wyślij żądanie DELETE na kontroler
+            $.ajax({
+                url: "/users/" + userId,
+                type: "DELETE",
+                success: function () {
+                    // Usunięto użytkownika, możesz wykonać odpowiednie akcje, np. odświeżyć stronę
+                    window.location.reload();
+                },
+                error: function () {
+                    console.error("Wystąpił błąd podczas usuwania użytkownika.");
+                }
+            });
+
+            // Zamknij modal potwierdzenia
+            $("#confirmDeleteModal").modal("hide");
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        var userIdToDelete; // Initialize the variable here
+
+        // When the delete button is clicked, set the userIdToDelete variable
+        $(".confirm-delete").click(function () {
+            userIdToDelete = $(this).data("user-id");
+        });
+
+        // When the "Tak" (Yes) button in the confirmation modal is clicked
+        $("#confirmDeleteButton").click(function () {
+            if (userIdToDelete) {
+                // Send a DELETE request to delete the user
+                $.ajax({
+                    url: "/users/delete/" + userIdToDelete, // Adjust the URL to match your endpoint
+                    type: "DELETE",
+                    success: function () {
+                        // User deleted successfully
+                        // You can add a success message or reload the page
+                        console.log("User deleted successfully");
+                        window.location.reload();
+                    },
+                    error: function (error) {
+                        // Handle error, display an error message, or log it
+                        console.error("Error deleting user: " + error.responseText);
+                    }
+                });
+            } else {
+                console.error("User ID to delete is not set.");
+            }
+        });
     });
 </script>
 </html>

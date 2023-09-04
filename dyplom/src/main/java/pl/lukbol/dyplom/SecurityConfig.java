@@ -62,8 +62,8 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users", "/user", "/profile/**", "/panel_administratora").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
-                        .requestMatchers("/admin/**", "/adminpanelusers", "/adminpanelbonuses").hasRole("ADMIN")
+                        .requestMatchers("/users", "/user", "/profile/**", "/panel_administratora", "/users/add", "/users/delete/**").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
 
                         .requestMatchers("/index.html", "/register.html", "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
@@ -84,7 +84,7 @@ public class SecurityConfig  {
                 .failureHandler(failureHandler())
                 .and()
                 .formLogin((form) -> form
-                        .loginPage("/index")
+                        .loginPage("/login")
                         .loginProcessingUrl("/index")
                         .defaultSuccessUrl("/index")
                         .permitAll()

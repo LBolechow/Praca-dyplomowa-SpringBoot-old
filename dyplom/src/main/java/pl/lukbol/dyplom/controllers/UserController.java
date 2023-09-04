@@ -4,6 +4,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,14 +22,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import pl.lukbol.dyplom.classes.Role;
 import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.UserService;
 
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -48,10 +52,46 @@ public class UserController {
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
-    @GetMapping("/users")
-    List<User> displayAllUsers()
-    {
-        return userRepository.findAll();
+
+    @PostMapping("/users/add")
+    public ResponseEntity<Map<String, Object>> addUser(@RequestParam("name") String name,
+                                                       @RequestParam("email") String email,
+                                                       @RequestParam("password") String password,
+                                                       @RequestParam("role") String roleName) {
+        User newUser = new User(name, email, passwordEncoder.encode(password));
+
+        Role role = roleRepository.findByName(roleName);
+
+        if (emailExists(newUser.getEmail())) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Użytkownik o takim adresie email już istnieje.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        newUser.setRoles(Arrays.asList(role));
+        userRepository.save(newUser);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Poprawnie utworzono użytkownika.");
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("/panel_administratora")
+    public ModelAndView displayAllUsers(Authentication authentication, @RequestParam(name = "page", defaultValue = "0") int page,
+                                        @RequestParam(name = "size", defaultValue = "10") int size) {
+        ModelAndView modelAndView = new ModelAndView("admin"); // Your HTML file name without the extension
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        modelAndView.addObject("users", userPage.getContent());
+        modelAndView.addObject("currentPage", userPage.getNumber());
+        modelAndView.addObject("totalPages", userPage.getTotalPages());
+
+        return modelAndView;
     }
     @PostMapping(value ="/register", consumes = {"*/*"})
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
@@ -121,6 +161,19 @@ public class UserController {
         userRepository.save(usr);
         return "Zmiany zostały zapisane pomyślnie";
     }
+    @DeleteMapping("/users/delete/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Ustaw status odpowiedzi na "204 No Content"
+    public void deleteUser(@PathVariable Long id) {
+        // Sprawdź, czy użytkownik istnieje
+        Optional<User> userOptional = userRepository.findById(id);
 
+        if (userOptional.isPresent()) {
+            // Jeśli użytkownik istnieje, usuń go
+            userRepository.delete(userOptional.get());
+        } else {
+            // Jeśli użytkownik o danym id nie istnieje, można obsłużyć to odpowiednio
+            throw new UserNotFoundException(id);
+        }
+    }
 
 }
