@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Profile - Brand</title>
+    <title>Profil</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web:400,600,700">
@@ -22,11 +22,6 @@
     <link rel="stylesheet" href="/static/css/Ludens---1-Dark-mode-Index-Table-with-Search-Filters.css">
     <link rel="stylesheet" href="/static/css/Navbar-With-Button-icons.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <style>
-        #accordionSidebar {
-            display: none;
-        }
-    </style>
 </head>
 
 <body id="page-top">
@@ -34,10 +29,13 @@
     <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: var(--bs-gray-900);">
         <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
             <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
-            <div class="sidebar-brand-text mx-3"><span>Brand</span></div>
+            <div class="sidebar-brand-text mx-3"><span>Tailor</span></div>
         </a>
             <hr class="sidebar-divider my-0">
-            <ul class="navbar-nav text-light" id="accordionSidebar"></ul>
+            <ul class="navbar-nav text-light" id="accordionSidebar">
+                <li class="nav-item"><a class="nav-link" href="http://localhost:8080/panel_administratora" style="font-weight: bold;">Panel administratora</a><a class="nav-link" href="http://localhost:8080/orders" style="font-weight: bold;">Zalecenia</a></li>
+            </ul>
+            <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
         </div>
     </nav>
     <div class="d-flex flex-column" id="content-wrapper">
@@ -91,8 +89,8 @@
                         <div class="d-none d-sm-block topbar-divider"></div>
                         <li class="nav-item dropdown no-arrow">
                             <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
-                                <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profile</a>
-                                    <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Logout</a>
+                                <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profil</a>
+                                    <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Wyloguj</a>
                                 </div>
                             </div>
                         </li>
@@ -126,7 +124,9 @@
                                         </div>
                                     </div>
                                     <div class="mb-3"><button id="savechanges" class="btn btn-primary btn-sm" type="submit">Zapisz ustawienia</button></div>
+                                    <div id="password-message"></div>
                                 </form>
+
                             </div>
                         </div>
                         <div class="card shadow"></div>
@@ -135,11 +135,7 @@
                 <div class="card shadow mb-5"></div>
             </div>
         </div>
-        <footer class="bg-white sticky-footer">
-            <div class="container my-auto">
-                <div class="text-center my-auto copyright"><span>Copyright © Brand 2023</span></div>
-            </div>
-        </footer>
+
     </div>
 </div>
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
@@ -159,17 +155,28 @@
         $("#user").html(data.name);
         $("#username").attr("placeholder", data.name);
         $("#email").attr("placeholder", data.email);
+
+        var enabled = data.enabled;
+
+        if (!enabled) {
+            $("#password-message").html("<p style='color: red;'>Po pierwszym logowaniu należy zmienić hasło!</p>");
+        }
     });
 </script>
 <script>
     $(document).ready(function() {
         $('#savechanges').click(function(e) {
             e.preventDefault();
+
+            // Pobierz wartość pola username lub jego placeholder, jeśli jest puste
+            var usernameValue = $('#username').val() || $('#username').attr('placeholder');
+
             var formData = {
-                "username": $('#username').val(),
+                "username": usernameValue,
                 "password": $('#password').val(),
                 "repeatPassword": $('#repeatPassword').val()
             };
+
             $.post('/profile/apply', formData, function(response) {
                 alert(response);
                 location.reload();

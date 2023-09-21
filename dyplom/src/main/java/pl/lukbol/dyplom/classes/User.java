@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 import java.util.Collection;
 
@@ -19,6 +20,8 @@ public class User {
     public String email;
     public String password;
 
+    boolean enabled;
+
     @ManyToMany
     @JoinTable(
             name = "users_roles",
@@ -31,19 +34,28 @@ public class User {
 
     public User() {}
 
-    public User(Long id, String name, String email, String password) {
+    public User(Long id, String name, String email, String password, Boolean enabled) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.enabled=enabled;
     }
-    public User(String name, String email, String password) {
+
+
+
+    public User(String name, String email, String password, Boolean enabled) {
         this.email = email;
         this.name = name;
         this.password=password;
+        this.enabled=enabled;
     }
-    public Long getId() {
-        return id;
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getName() {

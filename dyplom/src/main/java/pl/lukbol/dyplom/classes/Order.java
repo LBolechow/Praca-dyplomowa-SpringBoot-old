@@ -16,12 +16,60 @@ public class Order {
 
 
     public String clientName;
+    public String employeeName;
 
     public Date startDate;
 
     public Date endDate;
 
     public boolean status;
+
+    public int price;
+
+    public Order() {}
+
+    public Order(Long id, String description, String clientName, String employeeName, Date startDate, Date endDate, boolean status, int price) {
+        this.id = id;
+        this.description = description;
+        this.clientName = clientName;
+        this.employeeName = employeeName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.price=price;
+    }
+
+    public Order(String description, String clientName, String employeeName, Date startDate, Date endDate, boolean status, int price) {
+        this.description = description;
+        this.clientName = clientName;
+        this.employeeName = employeeName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.price=price;
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
 
     public void setId(Long id) {
         this.id = id;

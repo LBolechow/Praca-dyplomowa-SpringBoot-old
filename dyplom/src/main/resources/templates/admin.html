@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Blank Page - Brand</title>
+    <title>Panel administratora</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
@@ -25,10 +25,13 @@
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: var(--bs-gray-900);">
             <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
                 <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
-                <div class="sidebar-brand-text mx-3"><span>Brand</span></div>
+                <div class="sidebar-brand-text mx-3"><span>Tailor</span></div>
             </a>
                 <hr class="sidebar-divider my-0">
-                <ul class="navbar-nav text-light" id="accordionSidebar"></ul>
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link" href="http://localhost:8080/orders" style="font-weight: bold;">Zalecenia</a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
         </nav>
         <div class="d-flex flex-column" id="content-wrapper">
@@ -82,8 +85,8 @@
                             <div class="d-none d-sm-block topbar-divider"></div>
                             <li class="nav-item dropdown no-arrow">
                                 <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
-                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profile</a>
-                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Logout</a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profil</a>
+                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Wyloguj</a>
                                     </div>
                                 </div>
                             </li>
@@ -97,8 +100,31 @@
                 <div class="row">
                     <div class="col d-xxl-flex justify-content-xxl-end"><button class="btn btn-outline-primary text-truncate float-none float-sm-none add-another-btn" data-bss-hover-animate="pulse" type="button" data-bs-target="#addUserModal" data-bs-toggle="modal" style="width: 300px;/*float: right;*/font-size: 18px;display: block;">Dodaj użytkownika<i class="fas fa-plus-circle edit-icon"></i></button></div>
                 </div>
-                <div class="col-md-12 search-table-col" style="margin-top: 40px;">
-                    <div class="form-group pull-right col-lg-4"><input type="text" class="search form-control" placeholder="Szukaj po emailu" style="display: block;"></div><span class="counter pull-right"></span>
+                <div class="col-md-12 search-table-col" style="margin-top: 40px; display: flex; justify-content: flex-end;">
+                    <!-- Dropdown lista -->
+                    <div class="form-group col-lg-4" style="margin-right: 10px;">
+                        <select class="form-control" id="searchCategory">
+                            <option value="name">Nazwa</option>
+                            <option value="role">Rola</option>
+                            <option value="email">Email</option>
+                        </select>
+                    </div>
+
+                    <!-- Input do wyszukiwania -->
+                    <div class="form-group col-lg-4" style="margin-right: 10px;">
+                        <input type="text" class="search form-control" placeholder="Szukaj..." style="display: block;">
+                    </div>
+
+                    <!-- Przycisk do potwierdzenia -->
+                    <div class="form-group col-lg-2">
+                        <button class="btn btn-primary" id="searchButton">Szukaj</button>
+                    </div>
+
+                    <span class="counter pull-right"></span>
+                </div>
+
+                    <span class="counter pull-right"></span>
+
                     <div class="table-responsive table table-hover table-bordered results">
                         <table id="myTable" class="table table-hover table-bordered">
                             <thead class="bill-header cs">
@@ -120,7 +146,7 @@
                                     <td th:text="${user.name}"></td>
                                     <td th:text="${user.email}"></td>
                                     <td th:each="role : ${user.roles}" th:text="${role.name}"></td>
-                                    <td style="width: 6%;"><button class="btn btn-success" style="margin-left: 5px;" type="submit"><i class="fa fa-check" style="font-size: 15px;"></i></button>
+                                    <td style="width: 6%;"><button class="edit-btn btn btn-success" th:attr="data-user-id=${user.id}" style="margin-left: 0px;"><i class="far fa-edit" style="font-size: 15px;"></i></button>
                                         <button class="btn btn-danger confirm-delete" style="margin-left: 5px;position: static;" type="button" th:attr="data-user-id=${user.id}" data-bs-toggle="modal" data-bs-target="#modal-2" data-action="delete">
                                             <i class="fa fa-trash" style="font-size: 15px;"></i>
                                         </button></td>
@@ -208,8 +234,8 @@
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
                                 <button type="button" class="btn btn-primary" id="addUserButton">Dodaj</button>
                             </div>
-                            <div id="successMessage" style="display: none; color: green;" class="d-flex justify-content-center">Użytkownik został dodany pomyślnie.</div>
-                            <div id="errorMessage" style="display: none; color: red;" class="d-flex justify-content-center">Podany E-mail znajduje się już w bazie lub jest nieprawidłowy.</div>
+                            <div id="successMessage" style="color: green;" class="d-flex justify-content-center"></div>
+                            <div id="errorMessage" style="color: red;" class="d-flex justify-content-center"></div>
                         </div>
                     </div>
                 </div>
@@ -223,18 +249,72 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 </body>
 <script>
+    $("#searchButton").click(function () {
+        var searchText = $(".search").val();
+        var searchCategory = $("#searchCategory").val();
+
+        // Check if the search input is empty
+        if (searchText.trim() === "") {
+            // If empty, reload the table with all records
+            window.location.reload();
+            return;
+        }
+
+        $.ajax({
+            url: "/search-users",
+            method: "GET",
+            data: {
+                category: searchCategory,
+                searchText: searchText
+            },
+            success: function (data) {
+                // Clear the existing table body
+                $("#myTable tbody").empty();
+
+                // Add the results to the table
+                $.each(data, function (index, user) {
+                    console.log(user);
+                    var row = $("<tr>").append(
+                        $("<td>").text(user.id),
+                        $("<td>").text(user.name),
+                        $("<td>").text(user.email),
+                        $("<td>").text(user.role), // Display role name or 'No Role' if undefined
+                        $("<td>").append(
+                            $('<button class="edit-btn btn btn-success">')
+                                .attr("data-user-id", user.id)
+                                .html('<i class="far fa-edit" style="font-size: 15px;"></i>'),
+                            $('<button class="btn btn-danger confirm-delete">')
+                                .attr("data-user-id", user.id)
+                                .attr("data-bs-toggle", "modal")
+                                .attr("data-bs-target", "#modal-2")
+                                .attr("data-action", "delete")
+                                .html('<i class="fa fa-trash" style="font-size: 15px;"></i>')
+                        )
+                    );
+
+                    // Append the row to the table
+                    $("#myTable tbody").append(row);
+                });
+            },
+            error: function (error) {
+                console.error("Wystąpił błąd: " + error.statusText);
+            }
+        });
+    });
+
+</script>
+<script>
     $.get("/user", function(data) {
         $("#user").html(data.name);
     });
 </script>
+
 <script>
     $("#addUserButton").click(function () {
-        // Pobierz dane z formularza
         var name = $("#name").val();
         var email = $("#email").val();
         var password = $("#password").val();
         var role = $("#role").val();
-        // Przygotuj dane do przesłania na serwer jako obiekt JSON
         var userData = {
             name: name,
             email: email,
@@ -242,20 +322,20 @@
             role: role
         };
 
-        // Wyślij żądanie POST do kontrolera
         $.post("/users/add", userData, function (data) {
+            var successMessage = $("#successMessage");
+            var errorMessage = $("#errorMessage");
+
             if (data.success) {
-                // Pomyślnie dodano użytkownika, możesz wykonać odpowiednie akcje, np. zamknąć modal
-                // Pokaż komunikat o sukcesie
-                $("#successMessage").show();
-                $("#errorMessage").hide();
+                successMessage.text("Użytkownik został dodany pomyślnie.");
+                errorMessage.text("");
             } else {
-                // Obsłuż błąd, np. wyświetl komunikat o błędzie
-                console.error("Wystąpił błąd podczas dodawania użytkownika: " + data.message);
-                // Pokaż komunikat o błędzie
-                $("#successMessage").hide();
-                $("#errorMessage").show();
+                errorMessage.text("Wystąpił błąd podczas dodawania użytkownika: " + data.message);
+                successMessage.text("");
             }
+
+            successMessage.show();
+            errorMessage.show();
         }).fail(function (error) {
             console.error("Wystąpił błąd: " + error.statusText);
             // Pokaż komunikat o błędzie
@@ -266,53 +346,63 @@
 
 </script>
 <script>
-    $(document).ready(function () {
-        // Obsługa kliknięcia przycisku "Tak" w modalu potwierdzenia
-        $(".confirm-delete").click(function () {
-            var userId = $(this).data("user-id"); // Pobierz ID użytkownika z atrybutu data
+    $(document).ready(function() {
+        // Event delegation for edit and delete buttons
+        $('#myTable').on('click', '.edit-btn', function() {
+            var btn = $(this);
+            var id = btn.attr('data-user-id');
+            var row = btn.closest('tr');
+            var name = row.find('td:eq(1)').text();
+            var email = row.find('td:eq(2)').text();
+            var role = row.find('td:eq(3)').text();
 
-            // Wyślij żądanie DELETE na kontroler
-            $.ajax({
-                url: "/users/" + userId,
-                type: "DELETE",
-                success: function () {
-                    // Usunięto użytkownika, możesz wykonać odpowiednie akcje, np. odświeżyć stronę
-                    window.location.reload();
-                },
-                error: function () {
-                    console.error("Wystąpił błąd podczas usuwania użytkownika.");
-                }
-            });
-
-            // Zamknij modal potwierdzenia
-            $("#confirmDeleteModal").modal("hide");
-        });
-    });
-</script>
-<script>
-    $(document).ready(function () {
-        var userIdToDelete; // Initialize the variable here
-
-        // When the delete button is clicked, set the userIdToDelete variable
-        $(".confirm-delete").click(function () {
-            userIdToDelete = $(this).data("user-id");
-        });
-
-        // When the "Tak" (Yes) button in the confirmation modal is clicked
-        $("#confirmDeleteButton").click(function () {
-            if (userIdToDelete) {
-                // Send a DELETE request to delete the user
+            if (btn.hasClass('btn-success')) {
+                // Edit button logic
+                btn.removeClass('btn-success').addClass('btn-primary').html('<i class="fas fa-check"></i>');
+                row.find('td:eq(1)').html('<input type="text" class="form-control" value="'+name+'" />');
+                row.find('td:eq(2)').html('<input type="text" class="form-control" value="'+email+'" />');
+                // Create a dropdown list for roles
+                var roleSelect = $('<select class="form-control"><option value="ROLE_CLIENT">Klient</option><option value="ROLE_EMPLOYEE">Pracownik</option><option value="ROLE_ADMIN">Administrator</option></select>');
+                roleSelect.val(role);
+                row.find('td:eq(3)').html(roleSelect);
+            } else {
+                // Save button logic
+                btn.removeClass('btn-primary').addClass('btn-success').html('<i class="far fa-edit"></i>');
+                var newName = row.find('td:eq(1) input').val();
+                var newEmail = row.find('td:eq(2) input').val();
+                var newRole = row.find('td:eq(3) select').val();
                 $.ajax({
-                    url: "/users/delete/" + userIdToDelete, // Adjust the URL to match your endpoint
+                    url: '/users/update/' + id,
+                    type: 'PUT',
+                    data: {
+                        name: newName,
+                        email: newEmail,
+                        role: newRole,
+                    },
+                    success: function() {
+                        row.find('td:eq(1)').html(newName);
+                        row.find('td:eq(2)').html(newEmail);
+                        row.find('td:eq(3)').html(newRole);
+                    },
+                    error: function() {
+                        alert('Wystąpił błąd przy zapisywaniu zmian.');
+                    }
+                });
+            }
+        });
+
+        // Event delegation for delete confirmation button
+        $('#myTable').on('click', '.confirm-delete', function() {
+            var userIdToDelete = $(this).data("user-id");
+            if (userIdToDelete) {
+                $.ajax({
+                    url: "/users/delete/" + userIdToDelete,
                     type: "DELETE",
                     success: function () {
-                        // User deleted successfully
-                        // You can add a success message or reload the page
                         console.log("User deleted successfully");
                         window.location.reload();
                     },
                     error: function (error) {
-                        // Handle error, display an error message, or log it
                         console.error("Error deleting user: " + error.responseText);
                     }
                 });
@@ -322,4 +412,6 @@
         });
     });
 </script>
+
+
 </html>

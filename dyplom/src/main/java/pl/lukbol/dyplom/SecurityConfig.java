@@ -35,6 +35,10 @@ import pl.lukbol.dyplom.classes.User;
 import pl.lukbol.dyplom.configs.CustomUserDetailsService;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
+import java.security.SecureRandom;
+import java.util.Base64;
+
+
 
 import java.util.*;
 
@@ -46,7 +50,8 @@ public class SecurityConfig  {
     private final CustomUserDetailsService customerUserDetailsService ;
     private final CustomOAuth2UserService customOAuth2UserService ;
 
-    @Value("/")
+    String generatedPassword = generateRandomPassword();
+    @Value("/profile")
     private String successUrl;
     @Value("/login")
     private String failureUrl;
@@ -62,12 +67,12 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users", "/user", "/profile/**", "/panel_administratora", "/users/add", "/users/delete/**").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/users", "/user", "/profile/**", "/caldendar", "/currentDate","/orders").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add"  ).hasRole("ADMIN")
                         //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
 
                         .requestMatchers("/index.html", "/register.html", "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
-                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/user/add", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message").permitAll()
+                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/user/add", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked").permitAll()
                         // .anyRequest().authenticated()
                         .and()
                 )
@@ -85,8 +90,8 @@ public class SecurityConfig  {
                 .and()
                 .formLogin((form) -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/index")
-                        .defaultSuccessUrl("/index")
+                        .loginProcessingUrl("/profile")
+                        .defaultSuccessUrl("/profile")
                         .permitAll()
                 ).
                 httpBasic().and()
@@ -124,8 +129,8 @@ public class SecurityConfig  {
                     .filter(u -> u.getEmail().equals(email))
                     .findFirst()
                     .orElseGet(() -> {
-                        User newUser = new User(finalOidcUser.getFullName(), email, passwordEncoder().encode("password"));
-                        newUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
+                        User newUser = new User(finalOidcUser.getFullName(), email, passwordEncoder().encode(generatedPassword), false);
+                        newUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_ADMIN")));
                         userRepository.save(newUser);
                         return newUser;
                     });
@@ -173,6 +178,20 @@ public class SecurityConfig  {
     @Bean
     SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
+    }
+
+    private String generateRandomPassword() {
+        int passwordLength = 12; // Długość hasła
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[passwordLength];
+        random.nextBytes(bytes);
+
+        // Zamiana losowych bajtów na ciąg znaków w formie Base64
+        String password = Base64.getEncoder().encodeToString(bytes);
+
+        // Możesz też dopasować wygenerowane hasło do swoich wymagań, na przykład usuwając znaki specjalne, itp.
+
+        return password;
     }
 
 }

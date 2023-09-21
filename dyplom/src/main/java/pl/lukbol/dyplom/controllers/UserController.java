@@ -58,7 +58,7 @@ public class UserController {
                                                        @RequestParam("email") String email,
                                                        @RequestParam("password") String password,
                                                        @RequestParam("role") String roleName) {
-        User newUser = new User(name, email, passwordEncoder.encode(password));
+        User newUser = new User(name, email, passwordEncoder.encode(password), false);
 
         Role role = roleRepository.findByName(roleName);
 
@@ -95,7 +95,7 @@ public class UserController {
     }
     @PostMapping(value ="/register", consumes = {"*/*"})
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
-        User newUsr = new User(name,email, passwordEncoder.encode(password));
+        User newUsr = new User(name,email, passwordEncoder.encode(password), true);
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
         if (emailExists(newUsr.getEmail())) {
             req.getSession().setAttribute("message", "Użytkownik o takim adresie email już istnieje.");
@@ -146,34 +146,85 @@ public class UserController {
             return "notfound";
         }
     }
-    @PostMapping(value="/profile/apply", consumes = {"*/*"})
+    @PostMapping(value = "/profile/apply", consumes = {"*/*"})
     public String changeProfile(Authentication authentication,
                                 @RequestParam("username") String username,
                                 @RequestParam("password") String password,
                                 @RequestParam("repeatPassword") String repeatPassword) {
 
-        if(!password.equals(repeatPassword)){
+        if (!password.equals(repeatPassword)) {
             return "Hasła nie są zgodne";
         }
+
         User usr = userRepository.findByEmail(checkmail(authentication.getPrincipal()));
         usr.setPassword(passwordEncoder.encode(password));
         usr.setName(username);
+
+        // Set the 'enabled' property to true
+        usr.setEnabled(true);
+
         userRepository.save(usr);
         return "Zmiany zostały zapisane pomyślnie";
     }
     @DeleteMapping("/users/delete/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // Ustaw status odpowiedzi na "204 No Content"
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
-        // Sprawdź, czy użytkownik istnieje
+
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isPresent()) {
-            // Jeśli użytkownik istnieje, usuń go
             userRepository.delete(userOptional.get());
         } else {
-            // Jeśli użytkownik o danym id nie istnieje, można obsłużyć to odpowiednio
             throw new UserNotFoundException(id);
         }
     }
+    @PutMapping("/users/update/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable Long id,
+                                             @RequestParam("name") String newName,
+                                             @RequestParam("email") String newEmail,
+                                             @RequestParam("role") String newRole) {
+        Optional<User> userOptional = userRepository.findById(id);
 
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setName(newName);
+            user.setEmail(newEmail);
+
+            Role role = roleRepository.findByName(newRole);
+            user.getRoles().clear();
+            user.getRoles().add(role);
+            userRepository.save(user);
+            return ResponseEntity.ok("User updated successfully.");
+        } else {
+            throw new UserNotFoundException(id);
+        }
+    }
+    @GetMapping("/search-users")
+    public ResponseEntity<List<Map<String, Object>>> searchUsers(@RequestParam("category") String category,
+                                                                 @RequestParam("searchText") String searchText) {
+        List<Map<String, Object>> usersWithRoles = new ArrayList<>();
+
+        List<User> users;
+        if ("name".equals(category)) {
+            users = userRepository.findByNameContainingIgnoreCase(searchText);
+        } else if ("email".equals(category)) {
+            users = userRepository.findByEmailContainingIgnoreCase(searchText);
+        } else if ("role".equals(category)) {
+            users = userRepository.findByRoles_NameContainingIgnoreCase(searchText);
+        } else {
+            users = new ArrayList<>();
+        }
+
+        for (User user : users) {
+            Map<String, Object> userWithRole = new HashMap<>();
+            userWithRole.put("id", user.getId());
+            userWithRole.put("name", user.getName());
+            userWithRole.put("email", user.getEmail());
+            userWithRole.put("role", user.getRoles().iterator().next().getName()); // Get the user's role
+
+            usersWithRoles.add(userWithRole);
+        }
+
+        return ResponseEntity.ok(usersWithRoles);
+    }
 }
