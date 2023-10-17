@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Blank Page - Brand</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/static/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="/static/assets/css/Add-Another-Button.css">
+    <link rel="stylesheet" href="/static/css/Bootstrap-Calendar.css">
+    <link rel="stylesheet" href="/static/css/Bootstrap-Chat.css">
+    <link rel="stylesheet" href="/static/css/Box-panels-box-panel.css">
+    <link rel="stylesheet" href="/static/css/Box-panels.css">
+    <link rel="stylesheet" href="/static/css/Navbar-With-Button-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" href="/static/css/Simple-Bootstrap-Chat.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<style>
+    .conversation-list {
+        height: 510px;
+        overflow-y: scroll;
+        font-size: 20px;
+    }
+    #send-button {
+        background-color: #007bff; /* Custom background color */
+        color: #fff; /* Text color */
+        border: none; /* Remove border if desired */
+        border-radius: 0; /* Adjust border-radius as needed */
+        padding: 10px 20px; /* Adjust padding as needed */
+		height: 100%;
+		align-items: center;
+    }
+    .message-content {
+        word-wrap: break-word;
+    }
+</style>
+<body id="page-top">
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Modal Title</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row"></div>
+                    <div class="row"></div>
+                    <div class="row">
+                        <div class="col"><input type="date"></div>
+                    </div>
+                    <div class="row"></div>
+                    <div class="row">
+                        <div class="col"><input type="date"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button><button class="btn btn-primary" type="button">Save</button></div>
+            </div>
+        </div>
+    </div>
+    <div id="wrapper">
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0" style="background: var(--bs-gray-900);">
+            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-laugh-wink"></i></div>
+                <div class="sidebar-brand-text mx-3"><span>Tailor</span></div>
+            </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                    <li class="nav-item"><a class="nav-link" href="http://localhost:8080/orders" style="font-weight: bold;">Zalecenia</a></li>
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <div class="d-flex flex-column" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                        <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <div class="input-group"></div>
+                        </form>
+                        <ul class="navbar-nav flex-nowrap ms-auto">
+                            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><i class="fas fa-search"></i></a>
+                                <div class="dropdown-menu dropdown-menu-end p-3 animated--grow-in" aria-labelledby="searchDropdown">
+                                    <form class="me-auto navbar-search w-100">
+                                        <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
+                                            <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                                        <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
+                                        <div class="me-3">
+                                            <div class="bg-primary icon-circle"><i class="fas fa-file-alt text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 12, 2019</span>
+                                            <p>A new monthly report is ready to download!</p>
+                                        </div>
+                                    </a><a class="dropdown-item d-flex align-items-center" href="#">
+                                        <div class="me-3">
+                                            <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 7, 2019</span>
+                                            <p>$290.29 has been deposited into your account!</p>
+                                        </div>
+                                    </a><a class="dropdown-item d-flex align-items-center" href="#">
+                                        <div class="me-3">
+                                            <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                                        </div>
+                                        <div><span class="small text-gray-500">December 2, 2019</span>
+                                            <p>Spending Alert: We've noticed unusually high spending for your account.</p>
+                                        </div>
+                                    </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown no-arrow mx-1">
+                                <div class="shadow dropdown-list dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown"></div>
+                            </li>
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
+                                    <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profil</a>
+                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Wyloguj</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <h1></h1><div class="bootstrap_chat">
+                <div class="container py-5 px-4">
+                    <!-- For demo purpose-->
+                    <header class="text-center">
+                        <h1 class="display-4 text-white">Panel wiadomości</h1>
+                    </header>
+                    <div class="row rounded-lg overflow-hidden shadow">
+                        <!-- Users box column -->
+                        <div class="col-4 px-0">
+                            <div class="bg-white">
+                                <div class="bg-gray px-4 py-2 bg-light">
+                                    <p class="h5 mb-0 py-1">Recent</p>
+                                </div>
+                                <div class="conversation-list">
+                                    <!-- List of conversations goes here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Box column -->
+                        <div class="col-8 px-0" >
+                            <div id="chat-box" class="px-4 py-5 chat-box bg-white">
+                                <!-- Messages will be displayed here -->
+                            </div>
+
+                            <!-- Typing area -->
+                            <div class="input-group">
+                                <input id="message-input" type="text" placeholder="Wpisz wiadomość" class="form-control rounded-0 border-0 py-4 bg-light">
+                                <div class="input-group-append">
+                                    <button id="send-button" type="button" class="btn btn-link">Wyślij</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
+</div>
+            </div>
+        </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+    </div>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/Table-With-Search.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+</body>
+<script>
+    var stompClient = null;
+    var employeeId; // Declare clientId in a higher scope
+    var employeeName; // Declare clientName in a higher scope
+    var employeeEmail;
+    var conversationId;
+
+    // Fetch clientId and clientName
+    $.get("/user", function(data) {
+        $("#user").html(data.name);
+        employeeId = data.id; // Assign the value to the global clientId variable
+        employeeName = data.name;
+        employeeEmail = data.email;
+        connect(employeeId);
+    });
+    function scrollToBottom() {
+        var chatBox = $('#chat-box');
+        chatBox.scrollTop(chatBox[0].scrollHeight);
+    }
+    function connect(employeeId) {
+        var socket = new SockJS('/ws-chat');
+        stompClient = Stomp.over(socket);
+        console.log(employeeId)
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic/employees', function (message) {
+                // Handle incoming messages and display them in the chat box
+                console.log('Received message:', message);
+                showMessage(JSON.parse(message.body));
+            });
+
+            // Fetch conversation data after connecting
+            getClientConversation();
+        });
+    }
+    function sendMessageToConversation(conversationId, messageContent) {
+        var message = {
+            conversationId: conversationId,
+            sender: {
+                id: employeeId,
+                name: 'Pracownik',
+                email: employeeEmail
+            },
+            content: messageContent,
+            dateMessage: new Date()
+        };
+
+        // Wyślij wiadomość do konkretnej konwersacji na podstawie conversationId
+        stompClient.send('/app/sendToConversation/' + conversationId, {}, JSON.stringify(message));
+    }
+
+    function getClientConversation() {
+        // Make an API request to fetch the conversation data
+        $.ajax({
+            url: '/api/conversation', // Update the URL to match your API endpoint
+            method: 'GET',
+            success: function (data) {
+                // Once you have the conversation data, you can use it as needed
+                console.log('Fetched conversation data:', data);
+
+                // Clear the chat box first
+                $('#chat-box').empty();
+
+                // Loop through the messages and display them
+                data.forEach(function (message) {
+                    showMessage(message);
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching conversation data:', error);
+            }
+        });
+    }
+
+    $(function () {
+        $('#send-button').click(function () {
+            var messageContent = $('#message-input').val();
+
+            // Upewnij się, że treść wiadomości nie jest pusta
+            if (messageContent.trim() !== '') {
+                // Użyj zmiennej conversationId do wysłania wiadomości
+                sendMessageToConversation(conversationId, messageContent);
+                $('#message-input').val('');
+            }
+        });
+    });
+
+    function showMessage(message) {
+        // Create a message element based on the fetched data
+        var isCurrentUserMessage = message.sender.name === "Pracownik"; // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+
+        var messageElement = `
+        <div class="media w-50 mb-3 ${isCurrentUserMessage ? 'ml-auto' : ''}">
+            <div class="media-body ${isCurrentUserMessage ? 'text-right' : 'ml-3'}">
+                <div class="mb-2">
+                    <p class="text-small mb-0 text-muted">${message.sender.name}</p> <!-- Dodaj nazwę użytkownika -->
+                </div>
+                <div class="bg-light rounded py-2 px-3 message-content">
+                    <p class="mb-0 text-dark">${message.content}</p>
+                </div>
+                <p class="small text-muted">${message.formattedMessageDate}</p> <!-- Użyj formattedMessageDate -->
+            </div>
+        </div>
+    `;
+
+        // Ustaw kolor tła na niebieski dla wiadomości od innych użytkowników
+        if (!isCurrentUserMessage) {
+            messageElement = messageElement.replace('bg-light', 'bg-primary text-white');
+        }
+
+        // Append the message to the chat box
+        $('#chat-box').append(messageElement);
+        scrollToBottom();
+        console.log('Message element:', messageElement);
+    }
+    function loadConversationList() {
+        // Tutaj możesz wykonać zapytanie AJAX do swojego serwera, aby pobrać listę konwersacji
+        $.ajax({
+            url: '/api/get_conversations', // Zaktualizuj URL do swojego endpointu API
+            method: 'GET',
+            success: function (data) {
+                // Wyczyść listę konwersacji
+                $('.conversation-list').empty();
+
+                // Dodaj każdą konwersację do listy
+                data.forEach(function (conversation) {
+                    var conversationItem = `
+                    <div class="conversation-item" data-conversation-id="${conversation.id}">
+                        <p>${conversation.name}</p>
+                    </div>
+                `;
+
+                    $('.conversation-list').append(conversationItem);
+
+
+
+                    // Dodaj obsługę kliknięcia na elementy listy konwersacji
+                    $('.conversation-item').click(function () {
+                        // Przypisz conversationId do zmiennej globalnej
+                        conversationId = $(this).data('conversation-id');
+                        getMessagesForConversation(conversationId);
+                    });
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching conversation list:', error);
+            }
+        });
+    }
+    function getMessagesForConversation(conversationId) {
+        // Tutaj możesz wykonać zapytanie AJAX do swojego serwera, aby pobrać wiadomości dla danej konwersacji
+        $.ajax({
+            url: '/conversation/' + conversationId, // Zaktualizuj URL do swojego endpointu API
+            method: 'GET',
+            success: function (data) {
+                // Wyczyść obszar chatu, gdzie będą wyświetlane wiadomości
+                $('#chat-box').empty();
+
+                // Wyślij conversationId do funkcji sendMessageToConversation
+                // Ta funkcja zostanie wywołana po kliknięciu przycisku "Wyślij"
+                $('#send-button').off('click').click(function () {
+                    var messageContent = $('#message-input').val();
+                    if (messageContent.trim() !== '') {
+                        sendMessageToConversation(conversationId, messageContent);
+                        $('#message-input').val('');
+                    }
+                });
+
+                // Wyświetl każdą wiadomość w obszarze chatu
+                data.forEach(function (message) {
+                    showMessage(message);
+                });
+            },
+            error: function (error) {
+                console.error('Error fetching messages for conversation:', error);
+            }
+        });
+    }
+
+    loadConversationList();
+    </script>
+</html>

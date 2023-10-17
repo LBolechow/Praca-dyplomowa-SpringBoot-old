@@ -33,5 +33,14 @@ public class UrlController {
     public ModelAndView getLocked() {
         return new ModelAndView("locked");
     }
+
+    @RequestMapping(value="/clientChat")
+    public ModelAndView getClientChat() {
+        return new ModelAndView("clientChat");
+    }
+    @RequestMapping(value="/employeeChat")
+    public ModelAndView getEmployeeChat() {
+        return new ModelAndView("employeeChat");
+    }
 }
 

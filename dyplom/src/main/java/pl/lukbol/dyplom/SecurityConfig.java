@@ -67,12 +67,12 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users", "/user", "/profile/**", "/caldendar", "/currentDate","/orders").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/users", "/user", "/profile/**", "/caldendar", "/currentDate","/orders", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**" ).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add"  ).hasRole("ADMIN")
                         //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
 
-                        .requestMatchers("/index.html", "/register.html", "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
-                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/user/add", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked").permitAll()
+                        .requestMatchers( "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
+                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation").permitAll()
                         // .anyRequest().authenticated()
                         .and()
                 )
@@ -130,7 +130,7 @@ public class SecurityConfig  {
                     .findFirst()
                     .orElseGet(() -> {
                         User newUser = new User(finalOidcUser.getFullName(), email, passwordEncoder().encode(generatedPassword), false);
-                        newUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_ADMIN")));
+                        newUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
                         userRepository.save(newUser);
                         return newUser;
                     });

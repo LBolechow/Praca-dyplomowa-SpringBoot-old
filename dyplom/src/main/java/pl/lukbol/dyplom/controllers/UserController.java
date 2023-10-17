@@ -95,7 +95,7 @@ public class UserController {
     }
     @PostMapping(value ="/register", consumes = {"*/*"})
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
-        User newUsr = new User(name,email, passwordEncoder.encode(password), true);
+        User newUsr = new User(name,email, passwordEncoder.encode(password), false);
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
         if (emailExists(newUsr.getEmail())) {
             req.getSession().setAttribute("message", "Użytkownik o takim adresie email już istnieje.");

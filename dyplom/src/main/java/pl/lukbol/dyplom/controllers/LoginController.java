@@ -46,7 +46,7 @@ public class LoginController {
             context.setAuthentication(authentication);
             securityContextHolderStrategy.setContext(context);
             securityContextRepository.saveContext(context, request, response);
-            return new ModelAndView("index");
+            return new ModelAndView("profile");
         }
         catch (AuthenticationException e) {
             ModelAndView modelAndView = new ModelAndView("login");

@@ -32,6 +32,18 @@ public class User {
     @JsonIgnore
     private Collection<Role> roles;
 
+    @ManyToMany(mappedBy = "participants")
+    @JsonIgnore
+    private List<Conversation> conversations;
+
+    public List<Conversation> getConversations() {
+        return conversations;
+    }
+
+    public void setConversations(List<Conversation> conversations) {
+        this.conversations = conversations;
+    }
+
     public User() {}
 
     public User(Long id, String name, String email, String password, Boolean enabled) {
@@ -81,6 +93,10 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void setPassword(String password) {
