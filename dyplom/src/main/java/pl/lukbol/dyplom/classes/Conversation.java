@@ -12,6 +12,7 @@ public class Conversation {
     private Long id;
 
     private String name;
+    private boolean odczyt;
 
     public Long getId() {
         return id;
@@ -28,6 +29,8 @@ public class Conversation {
     public void setName(String name) {
         this.name = name;
     }
+
+
 
     @ManyToMany
     @JoinTable(
@@ -70,17 +73,27 @@ public class Conversation {
     public Conversation() {
     }
 
-    public Conversation(String name, List<User> participants, List<Message> messages) {
+    public Conversation(String name, List<User> participants, List<Message> messages, boolean odczyt) {
         this.name = name;
         this.participants = participants;
         this.messages = messages;
+        this.odczyt = odczyt;
     }
 
-    public Conversation(Long id, String name, List<User> participants, List<Message> messages) {
+    public boolean isOdczyt() {
+        return odczyt;
+    }
+
+    public void setOdczyt(boolean odczyt) {
+        this.odczyt = odczyt;
+    }
+
+    public Conversation(Long id, String name, List<User> participants, List<Message> messages, boolean odczyt) {
         this.id = id;
         this.name = name;
         this.participants = participants;
         this.messages = messages;
+        this.odczyt = odczyt;
     }
 
     // Constructors, getters, and setters

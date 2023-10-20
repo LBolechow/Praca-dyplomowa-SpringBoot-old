@@ -214,6 +214,7 @@
         };
 
         stompClient.send('/app/sendToEmployees', {}, JSON.stringify(message));
+        markConversationsAsUnread(clientId);
     }
 
     function getClientConversation() {
@@ -274,5 +275,17 @@
         scrollToBottom();
         console.log('Message element:', messageElement);
     }
-    </script>
+    function markConversationsAsUnread(clientId) {
+        $.ajax({
+            url: `/api/markAllConversationsAsUnread/${clientId}`, // Wywołaj nowy endpoint do oznaczenia konwersacji jako nieodczytane
+            method: 'POST',
+            success: function (data) {
+                console.log('Conversations marked as unread:', data);
+            },
+            error: function (error) {
+                console.error('Error marking conversations as unread:', error);
+            }
+        });
+    }
+</script>
 </html>

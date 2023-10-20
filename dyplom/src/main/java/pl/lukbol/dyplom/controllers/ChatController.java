@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lukbol.dyplom.classes.Conversation;
 import pl.lukbol.dyplom.classes.Message;
@@ -79,6 +80,7 @@ public class ChatController {
             Conversation conversation = new Conversation();
             conversation.setClient(client);
             conversation.setName(client.getName());
+            conversation.setOdczyt(false);
             // Set any other conversation properties as needed
             // Save the conversation to associate it with the client
             conversation = conversationRepository.save(conversation);
@@ -135,6 +137,49 @@ public class ChatController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/api/conversation/{conversationId}/latest-message")
+    public ResponseEntity<Message> getLatestMessageForConversation(@PathVariable Long conversationId) {
+        Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
 
+        if (conversation != null) {
+            Message latestMessage = messageRepository.findTopByConversationOrderByMessageDateDesc(conversation);
+
+            if (latestMessage != null) {
+                return ResponseEntity.ok(latestMessage); // Zwróć pojedynczą najnowszą wiadomość
+            } else {
+                return ResponseEntity.notFound().build(); // Brak wiadomości w konwersacji
+            }
+        } else {
+            return ResponseEntity.notFound().build(); // Konwersacja nie istnieje
+        }
+    }
+    @PostMapping("/api/markConversationAsRead/{conversationId}")
+    public ResponseEntity<?> markConversationAsRead(@PathVariable Long conversationId) {
+        // Wyszukaj konwersację na podstawie conversationId
+        Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
+        if (conversation != null) {
+            // Oznacz konwersację jako odczytaną
+            conversation.setOdczyt(true);
+            conversationRepository.save(conversation);
+            return ResponseEntity.ok("Konwersacja została oznaczona jako odczytana.");
+        } else {
+            return ResponseEntity.notFound().build(); // Konwersacja nie istnieje
+        }
+    }
+    @PostMapping("/api/markAllConversationsAsUnread/{clientId}")
+    public ResponseEntity<?> markAllConversationsAsUnread(@PathVariable Long clientId) {
+        List<Conversation> conversations = conversationRepository.findConversationByClient_Id(clientId);
+
+        if (conversations != null && !conversations.isEmpty()) {
+            for (Conversation conversation : conversations) {
+                conversation.setOdczyt(false); // Ustaw flagę odczytu na false dla każdej konwersacji
+            }
+            conversationRepository.saveAll(conversations);
+
+            return ResponseEntity.ok("Wszystkie konwersacje klienta zostały oznaczone jako nieodczytane.");
+        } else {
+            return ResponseEntity.notFound().build(); // Brak konwersacji dla danego klienta
+        }
+    }
 
 }

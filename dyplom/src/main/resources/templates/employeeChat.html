@@ -209,6 +209,7 @@
                 // Handle incoming messages and display them in the chat box
                 console.log('Received message:', message);
                 showMessage(JSON.parse(message.body));
+                loadConversationList();
             });
 
             // Fetch conversation data after connecting
@@ -304,23 +305,58 @@
                 // Wyczyść listę konwersacji
                 $('.conversation-list').empty();
 
-                // Dodaj każdą konwersację do listy
+                // Add a variable to track if the default conversation has been set
+                var defaultConversationSet = false;
+
+                // Loop through and add each conversation to the list
                 data.forEach(function (conversation) {
-                    var conversationItem = `
-                    <div class="conversation-item" data-conversation-id="${conversation.id}">
-                        <p>${conversation.name}</p>
-                    </div>
-                `;
+                    // Pobierz najnowszą wiadomość z konwersacji
+                    $.ajax({
+                        url: `/api/conversation/${conversation.id}/latest-message`,
+                        method: 'GET',
+                        success: function (latestMessage) {
+                            // Sprawdź wartość odczytu konwersacji
+                            var isUnread = conversation.odczyt === false;
+                            var messageContent = isUnread ? 'Nowa wiadomość!' : latestMessage.content;
 
-                    $('.conversation-list').append(conversationItem);
+                            // Użyj latestMessage w generowaniu elementu konwersacji
+                            var conversationItem = `
+                            <a href="#" class="list-group-item list-group-item-action list-group-item-light rounded-0" data-conversation-id="${conversation.id}">
+                                <div class="media-body ml-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <h6 class="mb-0 ${isUnread ? 'font-weight-bold' : ''}">${conversation.name}</h6>
+                                        <small class="small ${isUnread ? 'font-weight-bold' : ''}">${latestMessage.formattedMessageDate}</small>
+                                    </div>
+                                    <p class="font-italic text-muted mb-0 text-small">${messageContent}</p>
+                                </div>
+                            </a>
+                        `;
 
+                            $('.conversation-list').append(conversationItem);
 
+                            // If the default conversation hasn't been set, set it to the first conversation
+                            if (!defaultConversationSet) {
+                                conversationId = conversation.id;
+                                defaultConversationSet = true;
 
-                    // Dodaj obsługę kliknięcia na elementy listy konwersacji
-                    $('.conversation-item').click(function () {
-                        // Przypisz conversationId do zmiennej globalnej
-                        conversationId = $(this).data('conversation-id');
-                        getMessagesForConversation(conversationId);
+                                // Fetch and display messages for the default conversation
+                                getMessagesForConversation(conversationId);
+                            }
+
+                            // Dodaj obsługę kliknięcia na elementy listy konwersacji
+                            $('.list-group-item').off('click').click(function () {
+                                // Przypisz conversationId do zmiennej globalnej
+                                conversationId = $(this).data('conversation-id');
+                                getMessagesForConversation(conversationId);
+
+                                // Oznacz konwersację jako odczytaną
+                                markConversationAsRead(conversationId);
+                                setTimeout(refreshConversationList, 500);
+                            });
+                        },
+                        error: function (error) {
+                            console.error('Error fetching latest message for conversation:', error);
+                        }
                     });
                 });
             },
@@ -358,7 +394,23 @@
             }
         });
     }
+    function refreshConversationList() {
+        $('.conversation-list').empty();
+        loadConversationList();
+    }
+    function markConversationAsRead(conversationId) {
+        $.ajax({
+            url: `/api/markConversationAsRead/${conversationId}`,
+            method: 'POST',
+            success: function (data) {
 
+            },
+            error: function (error) {
+                console.error('Error marking conversation as read:', error);
+            }
+        });
+
+    }
     loadConversationList();
     </script>
 </html>

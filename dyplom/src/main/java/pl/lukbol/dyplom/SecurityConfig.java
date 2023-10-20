@@ -67,7 +67,7 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users", "/user", "/profile/**", "/caldendar", "/currentDate","/orders", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**" ).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/users", "/user", "/profile/**", "/caldendar", "/currentDate","/orders", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/api/markConversationAsRead/**", "/api/markAllConversationsAsUnread/**" ).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add"  ).hasRole("ADMIN")
                         //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
 
