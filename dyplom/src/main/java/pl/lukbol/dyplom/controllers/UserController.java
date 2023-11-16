@@ -26,6 +26,7 @@ import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.UserService;
+import pl.lukbol.dyplom.utilities.AuthenticationUtils;
 
 
 import java.io.IOException;
@@ -119,33 +120,12 @@ public class UserController {
 
     @GetMapping(value="/user", consumes = {"*/*"})
     public User user(Authentication authentication) {
-        User usr = userRepository.findByEmail(checkmail(authentication.getPrincipal()));
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
 
 
         return usr;
     }
-    public String checkmail(Object authentication){
-        if (authentication instanceof DefaultOidcUser) {       //klasa która powstaje przy social loginie
-            DefaultOidcUser oauth2User = (DefaultOidcUser) authentication;
-            return oauth2User.getAttribute("email");
-        } else if (authentication instanceof UserDetails) {    //zwykla klasa posiadająca dane z bazy
-            UserDetails userDetails = (UserDetails) authentication;
-            return userDetails.getUsername();
-        }
-        else if (authentication instanceof OAuth2AuthenticationToken) {    //zwykla klasa posiadająca dane z bazy
-            OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
-            String email = oauthToken.getPrincipal().getAttribute("email");
-            return email;
-        }
-        else if (authentication instanceof UsernamePasswordAuthenticationToken) {    //zwykla klasa posiadająca dane z bazy
-            UsernamePasswordAuthenticationToken oauthToken = (UsernamePasswordAuthenticationToken) authentication;
-            String email = oauthToken.getName();
-            return email;
-        }
-        else {
-            return "notfound";
-        }
-    }
+
     @PostMapping(value = "/profile/apply", consumes = {"*/*"})
     public String changeProfile(Authentication authentication,
                                 @RequestParam("username") String username,
@@ -156,7 +136,7 @@ public class UserController {
             return "Hasła nie są zgodne";
         }
 
-        User usr = userRepository.findByEmail(checkmail(authentication.getPrincipal()));
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
         usr.setPassword(passwordEncoder.encode(password));
         usr.setName(username);
 

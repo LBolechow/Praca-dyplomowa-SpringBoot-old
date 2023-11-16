@@ -25,9 +25,9 @@ public class UrlController {
     public ModelAndView getPrices() {
         return new ModelAndView("price_list");
     }
-    @RequestMapping(value="/orders")
+    @RequestMapping(value="/order")
     public ModelAndView getOrders() {
-        return new ModelAndView("orders");
+        return new ModelAndView("order");
     }
     @RequestMapping(value="/locked")
     public ModelAndView getLocked() {

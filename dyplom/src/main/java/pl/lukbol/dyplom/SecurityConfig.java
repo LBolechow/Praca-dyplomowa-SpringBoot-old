@@ -67,9 +67,9 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users", "/user", "/profile/**", "/caldendar", "/currentDate","/orders", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/api/markConversationAsRead/**", "/api/markAllConversationsAsUnread/**" ).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/user", "/profile/**",  "/currentDate", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/api/markConversationAsRead/**", "/api/markAllConversationsAsUnread/**" ).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add"  ).hasRole("ADMIN")
-                        //.requestMatchers("/h2-console/**", "/h2-console/#/", "/h2-console**").hasRole("USER")
+                        .requestMatchers("/order/add",  "/users", "/caldendar", "/order").hasAnyRole("ADMIN", "EMPLOYEE")
 
                         .requestMatchers( "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
                                 "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation").permitAll()

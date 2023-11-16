@@ -21,6 +21,7 @@ import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.MessageService;
 import pl.lukbol.dyplom.services.UserService;
+import pl.lukbol.dyplom.utilities.AuthenticationUtils;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -69,28 +70,22 @@ public class ChatController {
 
        User client = userRepository.findByEmail(clientEmail);
 
-        // Get all conversations associated with the client
         List<Conversation> conversations = conversationRepository.findConversationByClient_Id(client.getId());
 
-        // If the client doesn't have any conversations, create a new one
         if (conversations == null || conversations.isEmpty()) {
-            conversations = new ArrayList<>(); // Initialize the conversations list
+            conversations = new ArrayList<>();
 
-            // Create a new conversation
+
             Conversation conversation = new Conversation();
             conversation.setClient(client);
             conversation.setName(client.getName());
             conversation.setOdczyt(false);
-            // Set any other conversation properties as needed
-            // Save the conversation to associate it with the client
             conversation = conversationRepository.save(conversation);
-            conversations.add(conversation); // Add the conversation to the list of client's conversations
-            client.setConversations(conversations); // Update the user's conversations
-            userRepository.save(client); // Save the updated user
+            conversations.add(conversation);
+            client.setConversations(conversations);
+            userRepository.save(client);
         }
 
-        // Use your MessageService to send the message
-        // You can loop through conversations and send the message to each one
         for (Conversation conversation : conversations) {
             messageService.sendMessage(message.getSender(), conversation, message.getContent(), message.getMessageDate());
         }
@@ -99,7 +94,7 @@ public class ChatController {
     @GetMapping("/api/conversation")
     public ResponseEntity<List<Message>> getClientConversation(Authentication authentication) {
         // Get the authenticated user's details
-        User user = userRepository.findByEmail(userController.checkmail(authentication.getPrincipal()));
+        User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
 
         List<Conversation> conversations = conversationRepository.findConversationByClient_Id(user.getId());
         if (!conversations.isEmpty()) {
@@ -117,17 +112,14 @@ public class ChatController {
     }
     @GetMapping("/api/get_conversations")
     public List<Conversation> getAllConversations() {
-        // Pobierz wszystkie konwersacje z bazy danych
         List<Conversation> conversations = conversationRepository.findAll();
 
-        // Możesz przeprowadzić dodatkowe operacje na danych konwersacji, jeśli to konieczne
 
         return conversations;
     }
 
     @GetMapping("/conversation/{conversationId}")
     public ResponseEntity<List<Message>> getMessagesForConversation(@PathVariable Long conversationId) {
-        // Pobierz konwersację na podstawie ID
         Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
 
         if (conversation != null) {
@@ -145,25 +137,23 @@ public class ChatController {
             Message latestMessage = messageRepository.findTopByConversationOrderByMessageDateDesc(conversation);
 
             if (latestMessage != null) {
-                return ResponseEntity.ok(latestMessage); // Zwróć pojedynczą najnowszą wiadomość
+                return ResponseEntity.ok(latestMessage);
             } else {
-                return ResponseEntity.notFound().build(); // Brak wiadomości w konwersacji
+                return ResponseEntity.notFound().build();
             }
         } else {
-            return ResponseEntity.notFound().build(); // Konwersacja nie istnieje
+            return ResponseEntity.notFound().build();
         }
     }
     @PostMapping("/api/markConversationAsRead/{conversationId}")
     public ResponseEntity<?> markConversationAsRead(@PathVariable Long conversationId) {
-        // Wyszukaj konwersację na podstawie conversationId
         Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
         if (conversation != null) {
-            // Oznacz konwersację jako odczytaną
             conversation.setOdczyt(true);
             conversationRepository.save(conversation);
             return ResponseEntity.ok("Konwersacja została oznaczona jako odczytana.");
         } else {
-            return ResponseEntity.notFound().build(); // Konwersacja nie istnieje
+            return ResponseEntity.notFound().build();
         }
     }
     @PostMapping("/api/markAllConversationsAsUnread/{clientId}")
@@ -172,13 +162,13 @@ public class ChatController {
 
         if (conversations != null && !conversations.isEmpty()) {
             for (Conversation conversation : conversations) {
-                conversation.setOdczyt(false); // Ustaw flagę odczytu na false dla każdej konwersacji
+                conversation.setOdczyt(false);
             }
             conversationRepository.saveAll(conversations);
 
             return ResponseEntity.ok("Wszystkie konwersacje klienta zostały oznaczone jako nieodczytane.");
         } else {
-            return ResponseEntity.notFound().build(); // Brak konwersacji dla danego klienta
+            return ResponseEntity.notFound().build();
         }
     }
 
