@@ -1,7 +1,3 @@
-.bootstrap_chat {
-  background-color: #74EBD5;
-  min-height: 100vh;
-}
 
 .text-small {
   font-size: 0.9rem;
@@ -15,4 +11,3 @@
 .rounded-lg {
   border-radius: 0.5rem;
 }
-

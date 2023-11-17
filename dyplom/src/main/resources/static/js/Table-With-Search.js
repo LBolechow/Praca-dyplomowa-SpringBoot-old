@@ -18,9 +18,6 @@ $(document).ready(function() {
     $(this).attr('visible','true');
   });
 
-  var jobCount = $('.results tbody tr[visible="true"]').length;
-    $('.counter').text(jobCount + ' item');
-
   if(jobCount == '0') {$('.no-result').show();}
     else {$('.no-result').hide();}
 		  });
