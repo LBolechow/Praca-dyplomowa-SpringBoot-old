@@ -200,7 +200,8 @@ public class UserController {
             userWithRole.put("id", user.getId());
             userWithRole.put("name", user.getName());
             userWithRole.put("email", user.getEmail());
-            userWithRole.put("role", user.getRoles().iterator().next().getName()); // Get the user's role
+            userWithRole.put("role", user.getRoles().iterator().next().getName());
+
 
             usersWithRoles.add(userWithRole);
         }

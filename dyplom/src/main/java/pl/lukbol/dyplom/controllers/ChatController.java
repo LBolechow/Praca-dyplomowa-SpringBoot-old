@@ -93,7 +93,6 @@ public class ChatController {
     }
     @GetMapping("/api/conversation")
     public ResponseEntity<List<Message>> getClientConversation(Authentication authentication) {
-        // Get the authenticated user's details
         User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
 
         List<Conversation> conversations = conversationRepository.findConversationByClient_Id(user.getId());

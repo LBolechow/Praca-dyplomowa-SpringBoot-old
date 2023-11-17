@@ -266,6 +266,43 @@
 
                 nextMonthDay++;
             }
+
+            updateOrderButtons(year, month);
+        }
+
+        function updateOrderButtons(year, month) {
+            $.get("/order/getAllOrders", function (data) {
+                data.forEach(function (order) {
+                    const orderDate = new Date(order.endDate);
+                    const orderYear = orderDate.getFullYear();
+                    const orderMonth = orderDate.getMonth() + 1;
+
+                    if (orderYear === year && orderMonth === month) {
+                        const dayElements = daysList.querySelectorAll(".weekday div.date");
+
+                        dayElements.forEach(function (dayElement) {
+                            if (parseInt(dayElement.textContent) === orderDate.getDate()) {
+                                let button = dayElement.closest("li").querySelector(".order-button");
+
+                                if (!button) {
+                                    button = document.createElement("button");
+                                    button.classList.add("btn", "btn-primary", "order-button");
+                                    dayElement.closest("li").appendChild(button);
+                                }
+
+                                button.textContent = `Zamówienia: ${orderCountForDay(orderDate.getDate(), data)}`;
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        function orderCountForDay(day, orders) {
+            return orders.filter(function (order) {
+                const orderDate = new Date(order.endDate);
+                return orderDate.getDate() === day;
+            }).length;
         }
 
         prevButton.addEventListener("click", function () {

@@ -1,5 +1,7 @@
 package pl.lukbol.dyplom.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +55,6 @@ public class OrderController {
         String email = (String) request.get("email");
         String phoneNumber = (String) request.get("phoneNumber");
 
-        // Parse the endDate as a String
         String endDateString = (String) request.get("endDate");
         Date endDate = null;
         try {
@@ -76,5 +77,15 @@ public class OrderController {
 
         orderRepository.save(newOrder);
 
+    }
+    @GetMapping(value ="/order/getAllOrders")
+    public ResponseEntity<List<Order>> getAllOrders() {
+        try {
+            List<Order> orders = orderRepository.findAll();
+
+            return new ResponseEntity<>(orders, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

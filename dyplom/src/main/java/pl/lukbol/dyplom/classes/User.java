@@ -32,7 +32,7 @@ public class User {
     @JsonIgnore
     private Collection<Role> roles;
 
-    @ManyToMany(mappedBy = "participants")
+    @ManyToMany(mappedBy = "participants", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Conversation> conversations;
 

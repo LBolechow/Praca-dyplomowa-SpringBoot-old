@@ -147,7 +147,13 @@
                                     <td th:text="${user.email}"></td>
                                     <td th:each="role : ${user.roles}" th:text="${role.name}"></td>
                                     <td style="width: 6%;"><button class="edit-btn btn btn-success" th:attr="data-user-id=${user.id}" style="margin-left: 0px;"><i class="far fa-edit" style="font-size: 15px;"></i></button>
-                                        <button class="btn btn-danger confirm-delete" style="margin-left: 5px;position: static;" type="button" th:attr="data-user-id=${user.id}" data-bs-toggle="modal" data-bs-target="#modal-2" data-action="delete">
+                                        <button class="btn btn-danger confirm-delete"
+                                                style="margin-left: 5px; position: static;"
+                                                type="button"
+                                                th:attr="data-user-id=${user.id}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modal-2"
+                                                data-action="delete">
                                             <i class="fa fa-trash" style="font-size: 15px;"></i>
                                         </button></td>
                                 </tr>
@@ -391,9 +397,18 @@
             }
         });
 
-        // Event delegation for delete confirmation button
         $('#myTable').on('click', '.confirm-delete', function() {
             var userIdToDelete = $(this).data("user-id");
+
+            // Set the data-action attribute of the modal's confirm button
+            $('#confirmDeleteButton').attr('data-user-id', userIdToDelete);
+
+            // Do NOT trigger the deletion process here
+        });
+        // Event delegation for delete confirmation button
+        $('#confirmDeleteButton').on('click', function() {
+            var userIdToDelete = $(this).data("user-id");
+
             if (userIdToDelete) {
                 $.ajax({
                     url: "/users/delete/" + userIdToDelete,
