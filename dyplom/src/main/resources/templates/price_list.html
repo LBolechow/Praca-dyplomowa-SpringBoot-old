@@ -107,7 +107,7 @@
                 <div class="pb-2 pb-lg-1">
                     <h2 class="fw-bold mb-2">Powrót na stronę logowania</h2>
                 </div>
-                <div class="my-2"><a class="btn btn-primary fs-5 py-2 px-4" role="button" href="http://localhost:8080/login">Wróć</a></div>
+                <div class="my-2"><a class="btn btn-primary fs-5 py-2 px-4" role="button" href="#" onclick="goBack()">Wróć</a></div>
             </div>
         </div>
     </section>
@@ -116,6 +116,11 @@
     <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
     <script src="/static/js/theme.js"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 
 </html>
