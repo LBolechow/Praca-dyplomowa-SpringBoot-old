@@ -10,18 +10,18 @@
     <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
 </head>
 
-<body class="bg-gradient-primary" style="background: #F0F8FF" >
+<body class="bg-gradient-primary" style="background: var(--bs-gray-100)" >
 <div class="container">
-    <div class="card shadow-lg o-hidden border-0 my-5">
+    <div class="card shadow-lg o-hidden border-0 my-5" style="background-color: var(--bs-gray-100)">
         <div class="card-body p-0">
             <div class="row">
-                <div class="col-lg-5 d-none d-lg-flex" style="background: #F5FFFA;">
+                <div class="col-lg-5 d-none d-lg-flex bg-dark" style="background: #F5FFFA;">
                     <div class="flex-grow-1 bg-register-image" style="background-image: url('/static/img/pictures/image1.jpg');"></div>
                 </div>
-                <div class="col-lg-7" style="background: #F5FFFA;">
-                    <div class="p-5" style="background: #F5FFFA;">
+                <div class="col-lg-7 bg-dark">
+                    <div class="p-5 bg-dark">
                         <div class="text-center">
-                            <h2 class="text-dark mb-4">Stwórz konto!</h2>
+                            <h2 class="text-light mb-4">Stwórz konto!</h2>
                         </div>
                         <form action="/register" method="post" id="registrationForm">
                             <div class="row mb-3">
@@ -31,13 +31,13 @@
                             <div class="row mb-3">
                                 <div class="col-sm-6 mb-3 mb-sm-0"><input class="form-control form-control-user" type="password" id="password" placeholder="Hasło" name="password"></div>
                                 <div class="col-sm-6"><input class="form-control form-control-user" type="password" id="repeatPassword" placeholder="Powtórz hasło" name="password_repeat"></div>
-                            </div><button class="btn btn-primary d-block btn-user w-100" type="button" onclick="validatePassword()">Zarejestruj się!</button>
+                            </div><button class="btn btn-primary d-block btn-user w-100 text-light" style="font-size: large;" type="button" onclick="validatePassword()">Zarejestruj się!</button>
                             <div id="messageDiv"></div>
-                            <hr><a href="/oauth2/authorization/google" class="btn btn-primary d-block btn-google btn-user w-100 mb-2" role="button"><i class="fab fa-google"></i>&nbsp; Rejestracja przez Google</a>
+                            <hr><a href="/oauth2/authorization/google" class="btn btn-primary d-block btn-google btn-user w-100 mb-2 border-0" role="button" style="font-size: large;"><i class="fab fa-google"></i>&nbsp; Rejestracja przez Google</a>
                             <hr>
                         </form>
                         <div class="text-center"></div>
-                        <div class="text-center"><a class="small" href="http://localhost:8080/login" style="font-size: large">Posiadasz już konto? Zaloguj się!</a></div>
+                        <div class="text-center"><a class="small" href="http://localhost:8080/login" style="font-size: large; color: white;">Posiadasz już konto? Zaloguj się!</a></div>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
             <div class="text-white bg-dark border rounded border-0 p-4 p-md-5">
                 <h2 class="fw-bold text-white mb-3">Witamy w zakładzie krawieckim!</h2>
                 <p class="mb-4">Ponieżej możesz sprawdzić oferowane usługi wraz z cennikiem.</p>
-                <div class="my-3"><a class="btn btn-primary btn-lg me-2" role="button" href="http://localhost:8080/price_list">Sprawdź ofertę</a>
+                <div class="my-3"><a class="btn btn-primary btn-lg me-2 text-light" role="button" href="http://localhost:8080/price_list">Sprawdź ofertę</a>
                 <a class="btn btn-light btn-lg" role="button" href="#">Sprawdź swoje zlecenia!</a>
                 </div>
             </div>

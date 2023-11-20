@@ -22,36 +22,35 @@
 
 </head>
 
-<body class="bg-gradient-primary" style="background: #F0F8FF;">
+<body class="bg-gradient-primary" style="background: var(--bs-gray-100);">
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-9 col-lg-12 col-xl-10">
-            <div class="card shadow-lg o-hidden border-0 my-5">
+        <div class="col-md-9 col-lg-12 col-xl-10" >
+            <div class="card shadow-lg o-hidden border-0 my-5" style="background-color: var(--bs-gray-100)">
                 <div class="card-body p-0">
                     <div class="row">
-                        <div class="col-lg-6 d-none d-lg-flex" style="background: #F5FFFA">
+                        <div class="col-lg-6 d-none d-lg-flex bg-dark">
                             <div class="flex-grow-1 bg-login-image" style="background-image: url('/static/img/pictures/image1.jpg');"></div>
                         </div>
-                        <div class="col-lg-6" style="background: #F5FFFA;">
-                            <div class="p-5" style="background: #F5FFFA;">
+                        <div class="col-lg-6 bg-dark">
+                            <div class="p-5 bg-dark">
                                 <div class="text-center" style="font-size: large">
-                                    <h2 class="text-dark mb-4">Witamy na stronie zakładu krawieckiego!</h2>
+                                    <h2 class="text-light mb-4">Witamy na stronie zakładu krawieckiego!</h2>
                                 </div>
                                 <form action="/login" method="post">
                                     <div class="mb-3"><input class="form-control form-control-user" type="email" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Wprowadź adres email..." name="email"></div>
                                     <div class="mb-3"><input class="form-control form-control-user" type="password" id="exampleInputPassword" placeholder="Hasło" name="password"></div>
                                     <div class="mb-3">
-                                    </div><button class="btn btn-primary d-block btn-user w-100" type="submit">Zaloguj</button>
+                                    </div><button class="btn btn-primary d-block btn-user w-100 text-light" style="font-size: large;" type="submit">Zaloguj</button>
                                     <p th:if="${error}" style="color: red">
                                          <span th:text="${error}"></span>
                                     </p>
-                                    <hr><a href="/oauth2/authorization/google" class="btn btn-primary d-block btn-google btn-user w-100 mb-2" role="button"><i class="fab fa-google"></i>&nbsp; Logowanie poprzez Google</a>
+                                    <hr><a href="/oauth2/authorization/google" class="btn btn-primary d-block btn-google btn-user w-100 mb-2 border-0" style="font-size: large;" role="button"><i class="fab fa-google"></i>&nbsp; Logowanie poprzez Google</a>
                                     <hr>
                                 </form>
-                                <div class="text-center"><a class="small" href="http://localhost:8080/register" style="font-size: large">Stwórz konto</a></div>
+                                <div class="text-center"><a class="small " href="http://localhost:8080/register" style="font-size: large; color: white;">Stwórz konto</a></div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
             <section class="py-4 py-xl-5">
@@ -59,7 +58,7 @@
                     <div class="text-white bg-dark border rounded border-0 p-4 p-md-5">
                         <h2 class="fw-bold text-white mb-3">Witamy w zakładzie krawieckim!</h2>
                         <p class="mb-4">Ponieżej możesz sprawdzić oferowane usługi wraz z cennikiem.</p>
-                        <div class="my-3"><a class="btn btn-primary btn-lg me-2" role="button" href="http://localhost:8080/price_list">Sprawdź ofertę</a>
+                        <div class="my-3"><a class="btn btn-primary btn-lg me-2 text-light" role="button"  href="http://localhost:8080/price_list">Sprawdź ofertę</a>
                         <a class="btn btn-light btn-lg" role="button" href="#">Sprawdź swoje zlecenia!</a>
                         </div>
                     </div>
@@ -68,6 +67,7 @@
             <footer class="text-white bg-dark"></footer>
         </div>
     </div>
+</div>
 </div>
 <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Blank Page - Brand</title>
+    <title>Panel wiadomości klienta</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
@@ -22,12 +22,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <style>
+    .bg-custom-orange {
+        background-color: var(--bs-orange);
+    }
     #send-button {
-        background-color: #007bff; /* Custom background color */
-        color: #fff; /* Text color */
-        border: none; /* Remove border if desired */
-        border-radius: 0; /* Adjust border-radius as needed */
-        padding: 10px 20px; /* Adjust padding as needed */
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 0;
+        padding: 10px 20px;
 		height: 100%;
 		align-items: center;
     }
@@ -35,21 +38,21 @@
         word-wrap: break-word;
     }
     .bootstrap_chat {
-        background-color: var(--bs-dark);
+        background-color: transparent;
         min-height: 100vh;
     }
+
 </style>
-<body id="page-top" style="height: 1080px;">
+<body id="page-top">
 <div id="wrapper">
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content" style="text-align: center;font-family: ABeeZee, sans-serif;font-size: 18px;height: 1080px;">
             <nav class="navbar navbar-light navbar-expand-md sticky-top bg-dark shadow mb-4 topbar static-top" style="background: var(--bs-dark);">
-                <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color: var(--bs-warning);">Zakład krawiecki</a>
+                <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color:  var(--bs-orange);">Zakład krawiecki</a>
                     <div class="collapse navbar-collapse">
                         <ul class="navbar-nav">
-                            <li class="nav-item"><a class="nav-link active" href="#">Panel administratora</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Panel wiadomości</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Panel&nbsp;</a></li>
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/index">Moje zlecenia</a></li>
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
                         </ul>
                     </div><button data-bs-target="#" data-bs-toggle="collapse" class="navbar-toggler"></button>
                     <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
@@ -148,13 +151,13 @@
 <div class="container py-5 px-4">
   <!-- For demo purpose-->
   <header class="text-center">
-    <h1 class="display-4 text-white">Napisz do pracownika!</h1>
+    <h1 class="display-4 text-dark">Napisz do pracownika!</h1>
   </header>
 
  
     <!-- Chat Box-->
     <div class="col-12 px-0 mx-auto" style="max-width: 800px;">
-        <div id="chat-box" class="px-4 py-5 chat-box bg-white">
+        <div id="chat-box" class="px-4 py-5 chat-box bg-dark text-light">
             <!-- Messages will be displayed here -->
         </div>
 </div>
@@ -164,7 +167,7 @@
   <div class="input-group mx-auto" style="max-width: 800px;">
     <input id="message-input" type="text" placeholder="Wpisz wiadomość" class="form-control rounded-0 border-0 py-4 bg-light">
     <div class="input-group-append">
-        <button id="send-button" type="button" class="btn btn-link">Wyślij</button>
+        <button id="send-button" type="button" class="btn btn-link text-dark" style="background: var(--bs-orange);">Wyślij</button>
     </div>
 </div>
 
@@ -282,7 +285,7 @@
 
         // Ustaw kolor tła na niebieski dla wiadomości od innych użytkowników
         if (!isCurrentUserMessage) {
-            messageElement = messageElement.replace('bg-light', 'bg-primary text-white');
+            messageElement = messageElement.replace('bg-light', 'bg-custom-orange text-white');
         }
 
         // Append the message to the chat box

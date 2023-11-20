@@ -17,20 +17,20 @@
     <link rel="stylesheet" href="/static/css/Table-With-Search.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
-
 </head>
 
-<body id="page-top" style="height: 1080px;">
+<body id="page-top">
    <div id="wrapper">
         <div class="d-flex flex-column" id="content-wrapper">
-            <div id="content" style="text-align: center;font-family: ABeeZee, sans-serif;font-size: 18px;height: 1080px;">
+            <div id="content" style="text-align: center; font-family: ABeeZee, sans-serif; font-size: 18px; height: auto;">
                 <nav class="navbar navbar-light navbar-expand-md sticky-top bg-dark shadow mb-4 topbar static-top" style="background: var(--bs-dark);">
-                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color: var(--bs-warning);">Zakład krawiecki</a>
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color: var(--bs-orange);">Zakład krawiecki</a>
                         <div class="collapse navbar-collapse">
                             <ul class="navbar-nav">
-                                <li class="nav-item"><a class="nav-link active" href="#">Panel administratora</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Panel wiadomości</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Panel&nbsp;</a></li>
+                                <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Panel wiadomości</a></li>
+                                <li class="nav-item"><a class="nav-link" href="http://localhost:8080/daily">Lista dzienna</a></li>
+                                <li class="nav-item"><a class="nav-link" href="http://localhost:8080/order">Kalendarz</a></li>
+                                <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
                             </ul>
                         </div><button data-bs-target="#" data-bs-toggle="collapse" class="navbar-toggler"></button>
                         <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
@@ -149,7 +149,7 @@
 
                     <!-- Przycisk do potwierdzenia -->
                     <div class="form-group col-auto" style="text-align: left;">
-                        <button class="btn btn-primary" id="searchButton">Szukaj</button>
+                        <button class="btn btn-primary text-dark border-0" style="font-size: large" id="searchButton">Szukaj</button>
                     </div>
 
                     <span class="counter pull-right"></span>
@@ -177,7 +177,14 @@
                                     <td th:text="${user.id}"></td>
                                     <td th:text="${user.name}"></td>
                                     <td th:text="${user.email}"></td>
-                                    <td th:each="role : ${user.roles}" th:text="${role.name}"></td>
+                                    <td>
+    <span th:each="role : ${user.roles}">
+        <span th:if="${role.name == 'ROLE_ADMIN'}">Admin</span>
+        <span th:if="${role.name == 'ROLE_EMPLOYEE'}">Pracownik</span>
+        <span th:if="${role.name == 'ROLE_CLIENT'}">Klient</span>
+    </span>
+
+                                    </td>
                                     <td style="width: 6%;"><button class="edit-btn btn btn-success" th:attr="data-user-id=${user.id}" style="margin-left: 0px;"><i class="far fa-edit" style="font-size: 15px;"></i></button>
                                         <button class="btn btn-danger confirm-delete"
                                                 style="margin-left: 5px; position: static;"
@@ -458,6 +465,18 @@
             }
         });
     });
+    function mapRoleToLabel(role) {
+        switch (role) {
+            case 'ROLE_ADMIN':
+                return 'Admin';
+            case 'ROLE_EMPLOYEE':
+                return 'Pracownik';
+            case 'ROLE_CLIENT':
+                return 'Klient';
+            default:
+                return 'Inna rola';
+        }
+    }
 </script>
 
 

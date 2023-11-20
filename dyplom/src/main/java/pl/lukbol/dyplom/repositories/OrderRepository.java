@@ -5,11 +5,12 @@ import pl.lukbol.dyplom.classes.Order;
 
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long>
 {
     List<Order> findAll();
 
-    List<Order> findByEndDate(LocalDate endDate);
+    List<Order> findByEndDate(Date endDate);
 }

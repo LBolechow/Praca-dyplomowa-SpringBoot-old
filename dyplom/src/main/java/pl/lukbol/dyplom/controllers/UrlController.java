@@ -29,6 +29,11 @@ public class UrlController {
     public ModelAndView getOrders() {
         return new ModelAndView("order");
     }
+
+    @RequestMapping(value="/daily")
+    public ModelAndView getDailies() {
+        return new ModelAndView("daily");
+    }
     @RequestMapping(value="/locked")
     public ModelAndView getLocked() {
         return new ModelAndView("locked");
