@@ -263,10 +263,13 @@
                   <table class="table" id="ordersTable">
                         <thead>
                             <tr>
-                                <th style="width: 45%;">Opis</th>
-                                <th style="width: 25%;">Pracownik</th>
-                                <th style="width: 10%;">Status</th>
-                                <th style="width: 20%;">Akcje</th>
+                                <th >Opis</th>
+                                <th>Klient</th>
+                                <th>Pracownik</th>
+                              <th>Początek</th>
+                              <th>Koniec</th>
+                              <th>Status</th>
+                              <th>Akcje</th>
                             </tr>
                         </thead>
                     <tbody id="ordersTableBody">
@@ -455,7 +458,11 @@
           const row = `
               <tr>
                 <td>${order.description}</td>
+                <td>${order.clientName}</td>
                 <td>${order.employeeName}</td>
+               <td>${specificDate(order.startDate)}</td>
+<td>${specificDate(order.endDate)}</td>
+
                 <td>${statusText}</td>
                  <td>
                  <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-orange);" type="submit" data-bs-toggle="modal" data-bs-target="#modal-3"><i class="far fa-question-circle"></i>
@@ -508,6 +515,17 @@
   });
 </script>
 <script>
+  function specificDate(dateString) {
+    try {
+      const options = { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
+      const formattedDate = new Date(dateString).toLocaleString('en-GB', options);
+
+      return formattedDate.replace(",", ""); // Removing the comma after the date
+    } catch (error) {
+      console.error(`Error formatting date: ${error}`);
+      return 'Invalid Date';
+    }
+  }
   $(document).ready(function () {
     // Obsługa kliknięcia przycisku "Sprawdź dostępność"
     $("#checkAvailabilityBtn").click(function () {
