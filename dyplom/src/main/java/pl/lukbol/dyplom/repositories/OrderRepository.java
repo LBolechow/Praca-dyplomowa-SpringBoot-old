@@ -13,4 +13,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>
     List<Order> findAll();
 
     List<Order> findByEndDate(Date endDate);
+
+    List<Order> findByStartDateBetweenOrEndDateBetween(Date startDate, Date endDate, Date startDate1, Date endDate1);
 }

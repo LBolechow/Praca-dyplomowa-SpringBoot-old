@@ -79,8 +79,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
-
+    @GetMapping("/users/findByRole")
+    @ResponseBody
+    public List<User> getUsersByRoles() {
+        List<User> users = userRepository.findByRoles_NameContainingIgnoreCase("ROLE_ADMIN");
+        users.addAll(userRepository.findByRoles_NameContainingIgnoreCase("ROLE_EMPLOYEE"));
+        return users;
+    }
     @GetMapping("/panel_administratora")
     public ModelAndView displayAllUsers(Authentication authentication, @RequestParam(name = "page", defaultValue = "0") int page,
                                         @RequestParam(name = "size", defaultValue = "10") int size) {

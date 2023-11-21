@@ -3,6 +3,7 @@ package pl.lukbol.dyplom.repositories;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import pl.lukbol.dyplom.classes.Role;
 import pl.lukbol.dyplom.classes.User;
 
 import java.util.List;
@@ -30,4 +31,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByEmailContainingIgnoreCase(String email);
 
     List<User> findByRoles_NameContainingIgnoreCase(String role);
+
+
+
+
 }

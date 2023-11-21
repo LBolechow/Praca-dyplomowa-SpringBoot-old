@@ -160,30 +160,25 @@
             </nav>
                 <h1></h1><div class="bootstrap_chat">
                 <div class="container py-5 px-4">
-                    <!-- For demo purpose-->
                     <header class="text-center">
                         <h1 class="display-4 text-dark">Panel wiadomości</h1>
                     </header>
                     <div class="row rounded-lg overflow-hidden shadow">
-                        <!-- Users box column -->
                         <div class="col-4 px-0">
                             <div class="bg-dark">
                                 <div class="bg-gray px-4 py-2 bg-dark text-light">
                                     <p class="h5 mb-0 py-1">Ostatnie</p>
                                 </div>
                                 <div class="conversation-list bg-light text-light border-1 w-100">
-                                    <!-- List of conversations goes here -->
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Chat Box column -->
                         <div class="col-8 px-0" >
                             <div id="chat-box" class="px-4 py-5 chat-box bg-dark text-light">
-                                <!-- Messages will be displayed here -->
                             </div>
 
-                            <!-- Typing area -->
+
                             <div class="input-group">
                                 <input id="message-input" type="text" placeholder="Wpisz wiadomość" class="form-control rounded-0 border-0 py-4 bg-light">
                                 <div class="input-group-append">
@@ -206,15 +201,14 @@
 </body>
 <script>
     var stompClient = null;
-    var employeeId; // Declare clientId in a higher scope
-    var employeeName; // Declare clientName in a higher scope
+    var employeeId;
+    var employeeName;
     var employeeEmail;
     var conversationId;
 
-    // Fetch clientId and clientName
     $.get("/user", function(data) {
         $("#user").html(data.name);
-        employeeId = data.id; // Assign the value to the global clientId variable
+        employeeId = data.id;
         employeeName = data.name;
         employeeEmail = data.email;
         connect(employeeId);
@@ -230,13 +224,12 @@
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/employees', function (message) {
-                // Handle incoming messages and display them in the chat box
                 console.log('Received message:', message);
                 showMessage(JSON.parse(message.body));
                 loadConversationList();
             });
 
-            // Fetch conversation data after connecting
+
             getClientConversation();
         });
     }
@@ -252,23 +245,18 @@
             dateMessage: new Date()
         };
 
-        // Wyślij wiadomość do konkretnej konwersacji na podstawie conversationId
         stompClient.send('/app/sendToConversation/' + conversationId, {}, JSON.stringify(message));
     }
 
     function getClientConversation() {
-        // Make an API request to fetch the conversation data
         $.ajax({
-            url: '/api/conversation', // Update the URL to match your API endpoint
+            url: '/api/conversation',
             method: 'GET',
             success: function (data) {
-                // Once you have the conversation data, you can use it as needed
                 console.log('Fetched conversation data:', data);
 
-                // Clear the chat box first
                 $('#chat-box').empty();
 
-                // Loop through the messages and display them
                 data.forEach(function (message) {
                     showMessage(message);
                 });
@@ -282,10 +270,8 @@
     $(function () {
         $('#send-button').click(function () {
             var messageContent = $('#message-input').val();
-
-            // Upewnij się, że treść wiadomości nie jest pusta
             if (messageContent.trim() !== '') {
-                // Użyj zmiennej conversationId do wysłania wiadomości
+
                 sendMessageToConversation(conversationId, messageContent);
                 $('#message-input').val('');
             }
@@ -310,7 +296,6 @@
         </div>
     `;
 
-        // Ustaw kolor tła na niebieski dla wiadomości od innych użytkowników
         if (!isCurrentUserMessage) {
             messageElement = messageElement.replace('bg-light', 'bg-custom-orange text-white');
         }

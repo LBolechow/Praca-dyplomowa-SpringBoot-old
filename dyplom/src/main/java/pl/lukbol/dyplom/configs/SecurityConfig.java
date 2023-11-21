@@ -69,7 +69,7 @@ public class SecurityConfig  {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/user", "/profile/**",  "/currentDate", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/api/markConversationAsRead/**", "/api/markAllConversationsAsUnread/**" ).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add"  ).hasRole("ADMIN")
-                        .requestMatchers("/order/add",  "/users", "/caldendar", "/order", "/order/**", "/daily", "/daily/**", "/order/getDailyOrders").hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers("/order/add",  "/users", "/caldendar", "/order", "/order/**", "/daily", "/daily/**", "/order/getDailyOrders", "/users/findByRole", "/checkAvailability").hasAnyRole("ADMIN", "EMPLOYEE")
 
                         .requestMatchers( "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
                                 "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation").permitAll()

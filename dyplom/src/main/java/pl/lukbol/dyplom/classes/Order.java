@@ -41,15 +41,22 @@ public class Order {
 
     public int price;
 
+    public double duration;
+
+
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Material> materials;
 
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonManagedReference
+    private User user;
 
     public Order() {}
 
-    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, boolean status, int price, List<Material> materials) {
+    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, boolean status, int price, double duration, List<Material> materials, User user) {
         this.description = description;
         this.clientName = clientName;
         this.clientEmail = clientEmail;
@@ -59,21 +66,9 @@ public class Order {
         this.endDate = endDate;
         this.status = status;
         this.price = price;
+        this.duration = duration;
         this.materials = materials;
-    }
-
-    public Order(Long id, String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, boolean status, int price, List<Material> materials) {
-        this.id = id;
-        this.description = description;
-        this.clientName = clientName;
-        this.clientEmail = clientEmail;
-        this.phoneNumber = phoneNumber;
-        this.employeeName = employeeName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-        this.price = price;
-        this.materials = materials;
+        this.user = user;
     }
 
     public Long getId() {
@@ -156,4 +151,18 @@ public class Order {
         this.clientEmail = clientEmail;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(double duration) {
+        this.duration = duration;
+    }
 }
