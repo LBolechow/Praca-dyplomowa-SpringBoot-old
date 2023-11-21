@@ -312,10 +312,14 @@
       var endDate = document.getElementById('endDate').value;
       var endTime = document.getElementById('endTime').value;
 
-      var combinedStartDateTime = new Date(startDate + 'T' + startTime);
-      var combinedEndDateTime = new Date(endDate + 'T' + endTime);
+      var combinedStartDateTimeString = startDate + ' ' + startTime + ':00';
+      var combinedEndDateTimeString = endDate + ' ' + endTime + ':00';
+      var combinedStartDateTime = new Date(combinedStartDateTimeString);
+      var combinedEndDateTime = new Date(combinedEndDateTimeString);
 
-      // Dodane nowe pola
+      var formattedStartDateTime = combinedStartDateTime.toISOString().slice(0, 19).replace('T', ' ');
+      var formattedEndDateTime = combinedEndDateTime.toISOString().slice(0, 19).replace('T', ' ');
+
       var hours = $("#hours").val();
       var selectedUser = $("#selectedUser").val();
 
@@ -328,8 +332,8 @@
           clientName: clientName,
           email: email,
           phoneNumber: phoneNumber,
-          startDate: combinedStartDateTime,
-          endDate: combinedEndDateTime,
+          startDate: formattedStartDateTime,
+          endDate: formattedEndDateTime,
           price: price,
           items: materials,
           hours: hours,

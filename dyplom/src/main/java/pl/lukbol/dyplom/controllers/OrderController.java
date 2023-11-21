@@ -211,7 +211,7 @@ public class OrderController {
         String startDateString = (String) request.get("startDate");
         Date startDate = null;
         try {
-            startDate = DateUtils.parseDate(startDateString, "yyyy-MM-dd");
+            startDate = DateUtils.parseDate(startDateString, "yyyy-MM-dd HH:mm:ss");
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -219,7 +219,7 @@ public class OrderController {
         String endDateString = (String) request.get("endDate");
         Date endDate = null;
         try {
-            endDate = DateUtils.parseDate(endDateString, "yyyy-MM-dd");
+            endDate = DateUtils.parseDate(endDateString, "yyyy-MM-dd HH:mm:ss");
         } catch (ParseException e) {
             e.printStackTrace();
         }
