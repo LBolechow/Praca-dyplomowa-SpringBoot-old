@@ -169,7 +169,7 @@
                 <div class="input-group">
                   <span class="input-group-text" style="margin-bottom: 10px;">Czas trwania</span>
                   <input type="number" step="0.5" min="0" id="hours-edit" name="hours-edit" style="margin-bottom: 10px;" required>
-                  <button id="checkAvailabilityBtn-edit" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Terminy</button>
+                  <button id="checkAvailabilityBtn-edit" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Przeniesienie</button>
                 </div>
                 <div class="input-group">
                   <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
@@ -200,8 +200,8 @@
                       <span class="status-text">Wybierz status</span>
                     </button>
                     <div class="dropdown-menu" id="statusDropdown-edit">
-                      <a class="dropdown-item" href="#">W trakcie</a>
-                      <a class="dropdown-item" href="#">Zakończone</a>
+                      <a class="dropdown-item" href="#" data-value="true">W trakcie</a>
+                      <a class="dropdown-item" href="#" data-value="false">Zakończone</a>
                     </div>
                   </div>
                 </div>
@@ -338,23 +338,13 @@
 <script src="/static/js/theme.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="/static/js/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone.min.js"></script>
+
 </body>
 
 <script>
   var currentOrderId;
-  var globalStatus = false;
-  $(document).ready(function () {
-    $('.dropdown-item').click(function () {
-      var selectedValue = $(this).data('value');
-      var selectedText = $(this).text();
-
-      // Aktualizacja tekstu na przycisku dropdowna
-      $('#statusDropdownButton').html(selectedText);
-
-      // Tutaj dodaj kod obsługi wybranej wartości, np. aktualizacja interfejsu użytkownika, wysłanie żądania do serwera itp.
-      console.log('Wybrano:', selectedValue);
-    });
-  });
+  var globalStatus;
 </script>
 <script>
   $.get("/user", function(data) {
@@ -385,11 +375,12 @@
 
       var combinedStartDateTimeString = startDate + ' ' + startTime + ':00';
       var combinedEndDateTimeString = endDate + ' ' + endTime + ':00';
-      var combinedStartDateTime = new Date(combinedStartDateTimeString);
-      var combinedEndDateTime = new Date(combinedEndDateTimeString);
 
-      var formattedStartDateTime = combinedStartDateTime.toISOString().slice(0, 19).replace('T', ' ');
-      var formattedEndDateTime = combinedEndDateTime.toISOString().slice(0, 19).replace('T', ' ');
+      var combinedStartDateTime = moment.tz(combinedStartDateTimeString, 'YYYY-MM-DD HH:mm', 'Europe/Warsaw');
+      var combinedEndDateTime = moment.tz(combinedEndDateTimeString, 'YYYY-MM-DD HH:mm', 'Europe/Warsaw');
+
+      var formattedStartDateTime = combinedStartDateTime.format('YYYY-MM-DD HH:mm:ss');
+      var formattedEndDateTime = combinedEndDateTime.format('YYYY-MM-DD HH:mm:ss');
 
       var hours = $("#hours").val();
       var selectedUser = $("#selectedUser").val();
@@ -555,7 +546,7 @@
 
                 <td>${statusText}</td>
                  <td>
-                   <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-orange);" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit" data-order-id="${order.id}" onclick="fillEditModal(${order.id})">
+                   <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-cyan);" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit" data-order-id="${order.id}" onclick="fillEditModal(${order.id})">
                   <i class="far fa-edit"></i>
                 </button>
                  <button class="btn btn-danger" style="margin-left: 5px;" type="submit"><i class="fa fa-trash" style="font-size: 15px;"></i>
@@ -619,7 +610,7 @@
 
       $.ajax({
         type: "GET",
-        url: "/checkAvailability",
+        url: "/order/checkAvailability",
         data: {
           durationHours: durationHours
         },
@@ -630,15 +621,13 @@
             var startDateText = startDate.toISOString().slice(0, 10);
             var endDateText = endDate.toISOString().slice(0, 10);
 
-            // Przeliczanie czasu trwania na godziny i minuty
             var durationMinutes = response.durationMinutes;
             var durationHours = Math.floor(durationMinutes / 60);
             var durationMinutesRemainder = durationMinutes % 60;
 
-            // Ustawianie czasu trwania w inpucie
             $("#hours").val(durationHours + durationMinutesRemainder / 60);
 
-            // Ustawianie pozostałych pól formularza
+
             $("#startDate").val(startDateText);
             $("#startTime").val(response.startTime);
             $("#endDate").val(endDateText);
@@ -675,12 +664,18 @@
         $("#selectedUser-edit").val(orderDetails.employee);
         $('#editForm input[name="price-edit"]').val(orderDetails.price);
 
+        $(document).ready(function () {
+          if (orderDetails.status) {
+            $('#statusDropdownButton .status-text').text('W trakcie');
+            $('#statusDropdownButton').attr('data-value', 'true');
+            globalStatus = true;
+          } else {
+            $('#statusDropdownButton .status-text').text('Zakończone');
+            $('#statusDropdownButton').attr('data-value', 'false');
+            globalStatus = false;
+          }
+        });
 
-        if (orderDetails.status) {
-          $('#statusDropdownButton .status-text').text('W trakcie');
-        } else {
-          $('#statusDropdownButton .status-text').text('Zakończone');
-        }
         var materialList = $("#materialList-edit");
         $("#materialList-edit").empty();
         for (var i = 0; i < orderDetails.materials.length; i++)
@@ -695,20 +690,21 @@
       }
     });
   }
-  function setDropdownStatus(status) {
-    globalStatus = status;
 
-    if (status) {
-      $('#statusDropdownButton .status-text').text('W trakcie');
-    } else {
-      $('#statusDropdownButton .status-text').text('Zakończone');
-    }
-  }
+  $(document).ready(function () {
+    $('#statusDropdown-edit a').on('click', function () {
+      var selectedStatusValue = $(this).text().trim(); // Zmienione pobieranie tekstu zamiast data('value')
 
-  $('#statusDropdown-edit a').on('click', function () {
-    var selectedStatusValue = $(this).data('value');
-    var status = (selectedStatusValue === 'true');
-    setDropdownStatus(status);
+      if (selectedStatusValue === 'W trakcie') {
+        $('#statusDropdownButton .status-text').text('W trakcie');
+        globalStatus = true;
+      } else if (selectedStatusValue === 'Zakończone') {
+        $('#statusDropdownButton .status-text').text('Zakończone');
+        globalStatus = false;
+      }
+
+      console.log('Zmieniono status:', globalStatus);
+    });
   });
 
   $('#editForm').submit(function(event) {
@@ -722,17 +718,19 @@
     var startTime = document.getElementById('startTime-edit').value;
     var endDate = document.getElementById('endDate-edit').value;
     var endTime = document.getElementById('endTime-edit').value;
+
     var selectedUser = $('#selectedUser-edit').val();
     var price = $('input[name="price-edit"]').val();
     var status = globalStatus;
 
     var combinedStartDateTimeString = startDate + ' ' + startTime + ':00';
     var combinedEndDateTimeString = endDate + ' ' + endTime + ':00';
-    var combinedStartDateTime = new Date(combinedStartDateTimeString);
-    var combinedEndDateTime = new Date(combinedEndDateTimeString);
 
-    var formattedStartDateTime = combinedStartDateTime.toISOString().slice(0, 19).replace('T', ' ');
-    var formattedEndDateTime = combinedEndDateTime.toISOString().slice(0, 19).replace('T', ' ');
+    var combinedStartDateTime = moment.tz(combinedStartDateTimeString, 'YYYY-MM-DD HH:mm', 'Europe/Warsaw');
+    var combinedEndDateTime = moment.tz(combinedEndDateTimeString, 'YYYY-MM-DD HH:mm', 'Europe/Warsaw');
+
+    var formattedStartDateTime = combinedStartDateTime.format('YYYY-MM-DD HH:mm:ss');
+    var formattedEndDateTime = combinedEndDateTime.format('YYYY-MM-DD HH:mm:ss');
     var materials = [];
 
     $("#materialList-edit li").each(function () {
@@ -766,6 +764,45 @@
       error: function(error) {
         console.error('Błąd podczas edycji zamówienia:', error);
       }
+    });
+  });
+  $(document).ready(function () {
+    $("#checkAvailabilityBtn-edit").click(function () {
+      var durationHours = $("#hours-edit").val();
+
+
+      $.ajax({
+        type: "GET",
+        url: "/order/checkAvailabilityNextDay/" + currentOrderId,
+        data: {
+          durationHours: durationHours
+        },
+        success: function (response) {
+          if (response.status === "success") {
+            var startDate = new Date(response.startDate);
+            var endDate = new Date(response.endDate);
+            var startDateText = startDate.toISOString().slice(0, 10);
+            var endDateText = endDate.toISOString().slice(0, 10);
+
+            var durationMinutes = response.durationMinutes;
+            var durationHours = Math.floor(durationMinutes / 60);
+            var durationMinutesRemainder = durationMinutes % 60;
+
+            $("#hours").val(durationHours + durationMinutesRemainder / 60);
+
+            $("#startDate-edit").val(startDateText);
+            $("#startTime-edit").val(response.startTime);
+            $("#endDate-edit").val(endDateText);
+            $("#endTime-edit").val(response.endTime);
+            $("#selectedUser-edit").val(response.suggestedUser);
+          } else {
+            alert("Brak dostępnych pracowników w ramach dni roboczych.");
+          }
+        },
+        error: function () {
+          alert("Wystąpił błąd podczas sprawdzania dostępności.");
+        }
+      });
     });
   });
 </script>

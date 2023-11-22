@@ -53,63 +53,6 @@ public class OrderController {
             return response;
         }
 
-    @GetMapping("/checkAvailability")
-    public ResponseEntity<Map<String, Object>> checkAvailability(@RequestParam double durationHours) {
-        try {
-            // Przygotowanie odpowiedzi
-            Map<String, Object> response = new HashMap<>();
-
-            // Pobranie daty i godziny bieżącej
-            Calendar currentDateTime = Calendar.getInstance();
-            currentDateTime.set(Calendar.HOUR_OF_DAY, 8); // Ustawienie na początek dnia
-            currentDateTime.set(Calendar.MINUTE, 0);
-            currentDateTime.set(Calendar.SECOND, 0);
-
-            // Iteracyjne sprawdzanie dostępności w ramach dni roboczych
-            while (currentDateTime.get(Calendar.HOUR_OF_DAY) < 16) {
-                // Sprawdzanie dostępności dla danego dnia
-                if (isWorkingDay(currentDateTime)) {
-                    // Obliczanie daty i godziny zakończenia na podstawie czasu trwania
-                    Calendar endDateTime = (Calendar) currentDateTime.clone();
-                    int durationMinutes = (int) (durationHours * 60);
-                    endDateTime.add(Calendar.MINUTE, durationMinutes);
-
-                    // Sprawdzanie dostępności pracowników
-                    List<User> availableUsers = findAvailableUsers(currentDateTime.getTime(), endDateTime.getTime());
-
-                    // Propozycja pierwszego dostępnego pracownika
-                    if (!availableUsers.isEmpty()) {
-                        User suggestedUser = availableUsers.get(0);
-
-                        // Ustawienie danych w odpowiedzi
-                        response.put("status", "success");
-                        response.put("startDate", formatDate(currentDateTime.getTime()));
-                        response.put("startTime", formatTime(currentDateTime.getTime()));
-                        response.put("endDate", formatDate(endDateTime.getTime()));
-                        response.put("endTime", formatTime(endDateTime.getTime()));
-                        response.put("suggestedUser", suggestedUser.getName());
-
-                        response.put("durationMinutes", durationMinutes);
-
-                        return new ResponseEntity<>(response, HttpStatus.OK);
-                    }
-                }
-
-                // Przejście do następnego dnia
-                currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
-                currentDateTime.set(Calendar.HOUR_OF_DAY, 8); // Ustawienie na początek dnia
-            }
-
-            response.put("status", "error");
-            response.put("message", "Brak dostępnych pracowników w ramach dni roboczych.");
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 
     private String formatDate(Date date) {
@@ -129,23 +72,6 @@ public class OrderController {
             return dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY;
         }
 
-
-        private List<User> findAvailableUsers(Date startDate, Date endDate) {
-            // Pobranie wszystkich zamówień w danym przedziale czasowym
-            List<Order> conflictingOrders = orderRepository.findByStartDateBetweenOrEndDateBetween(startDate, endDate, startDate, endDate);
-
-            // Pobranie wszystkich pracowników
-            List<User> allUsers = userRepository.findAll();
-
-            // Odfiltrowanie dostępnych pracowników
-            List<User> availableUsers = new ArrayList<>(allUsers);
-
-            for (Order order : conflictingOrders) {
-                availableUsers.remove(order.getUser());
-            }
-
-            return availableUsers;
-        }
 
     @GetMapping(value ="/order/getAllOrders")
     public ResponseEntity<List<Order>> getAllOrders() {
@@ -346,4 +272,163 @@ public class OrderController {
             orderRepository.save(order);
         }
     }
+    @GetMapping("/order/checkAvailabilityNextDay/{orderId}")
+    public ResponseEntity<Map<String, Object>> checkAvailabilityNextDay(@PathVariable Long orderId, @RequestParam double durationHours) {
+        try {
+            Map<String, Object> response = new HashMap<>();
+
+            Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+            if (optionalOrder.isPresent()) {
+                Order order = optionalOrder.get();
+
+                Date orderEndDate = order.getEndDate();
+                Calendar currentDateTime = Calendar.getInstance();
+                currentDateTime.setTime(orderEndDate);
+
+                while (currentDateTime.get(Calendar.HOUR_OF_DAY) < 16) {
+                    if (isWorkingDay(currentDateTime)) {
+                        Calendar endDateTime = (Calendar) currentDateTime.clone();
+                        int durationMinutes = (int) (durationHours * 60);
+                        endDateTime.add(Calendar.MINUTE, durationMinutes);
+                        List<User> availableUsers = findAvailableUsersWithEndDateTime(currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
+
+                        if (!availableUsers.isEmpty()) {
+                            User suggestedUser = availableUsers.get(0);
+
+                            response.put("status", "success");
+                            response.put("startDate", formatDate(currentDateTime.getTime()));
+                            response.put("startTime", formatTime(currentDateTime.getTime()));
+                            response.put("endDate", formatDate(endDateTime.getTime()));
+                            response.put("endTime", formatTime(endDateTime.getTime()));
+                            response.put("suggestedUser", suggestedUser.getName());
+                            response.put("durationMinutes", durationMinutes);
+
+                            return new ResponseEntity<>(response, HttpStatus.OK);
+                        }
+                    }
+                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+
+                    // Reset only if it's the beginning of the next day
+                    if (currentDateTime.get(Calendar.HOUR_OF_DAY) == 8) {
+                        break;
+                    }
+                }
+            } else {
+                response.put("status", "error");
+                response.put("message", "Zamówienie o podanym identyfikatorze nie zostało znalezione.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+            response.put("status", "error");
+            response.put("message", "Brak dostępnych pracowników w ramach dni roboczych.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/order/checkAvailability")
+    public ResponseEntity<Map<String, Object>> checkAvailability(
+            @RequestParam double durationHours,
+            @RequestParam(required = false, defaultValue = "8") int startHour) {
+
+        try {
+            Map<String, Object> response = new HashMap<>();
+
+            Calendar currentDateTime = Calendar.getInstance();
+
+            // If the current time is later than the specified startHour, start searching from the current time
+            if (currentDateTime.get(Calendar.HOUR_OF_DAY) > startHour ||
+                    (currentDateTime.get(Calendar.HOUR_OF_DAY) == startHour && currentDateTime.get(Calendar.MINUTE) > 0)) {
+                currentDateTime.set(Calendar.HOUR_OF_DAY, currentDateTime.get(Calendar.HOUR_OF_DAY));
+                currentDateTime.set(Calendar.MINUTE, currentDateTime.get(Calendar.MINUTE));
+            } else {
+                currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
+                currentDateTime.set(Calendar.MINUTE, 0);
+            }
+
+            currentDateTime.set(Calendar.SECOND, 0);
+
+            while (currentDateTime.get(Calendar.HOUR_OF_DAY) < 16) {
+
+                if (isWorkingDay(currentDateTime)) {
+
+                    Calendar endDateTime = (Calendar) currentDateTime.clone();
+                    int durationMinutes = (int) (durationHours * 60);
+                    endDateTime.add(Calendar.MINUTE, durationMinutes);
+
+                    // Check if the endDateTime is after the current time
+                    if (endDateTime.after(Calendar.getInstance())) {
+
+                        List<User> availableUsers = findAvailableUsersWithEndDateTime(currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
+
+                        if (!availableUsers.isEmpty()) {
+                            User suggestedUser = availableUsers.get(0);
+
+                            response.put("status", "success");
+                            response.put("startDate", formatDate(currentDateTime.getTime()));
+                            response.put("startTime", formatTime(currentDateTime.getTime()));
+                            response.put("endDate", formatDate(endDateTime.getTime()));
+                            response.put("endTime", formatTime(endDateTime.getTime()));
+                            response.put("suggestedUser", suggestedUser.getName());
+                            response.put("durationMinutes", durationMinutes);
+
+                            return new ResponseEntity<>(response, HttpStatus.OK);
+                        }
+                    }
+                }
+
+                // Move to the next time slot on the current day
+                currentDateTime.add(Calendar.MINUTE, 15);
+
+                // If it's close to the end of the day, reset to the specified startHour and move to the next day
+                if (currentDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
+                    currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
+                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                }
+            }
+
+            response.put("status", "error");
+            response.put("message", "Brak dostępnych pracowników w ramach dni roboczych.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private List<User> findAvailableUsersWithEndDateTime(Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
+        List<User> allUsers = userRepository.findAll();
+        List<User> availableUsers = new ArrayList<>();
+
+        for (User user : allUsers) {
+            boolean isAvailable = true;
+            List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
+
+            for (Order order : userOrders) {
+                Date orderStartDate = order.getStartDate();
+                Date orderEndDate = order.getEndDate();
+
+                // Check if the task's start or end times overlap with existing orders
+                if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
+                        (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
+                        (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
+                    isAvailable = false;
+                    break;
+                }
+            }
+
+            if (isAvailable) {
+                availableUsers.add(user);
+            }
+        }
+
+        return availableUsers;
+    }
+
 }

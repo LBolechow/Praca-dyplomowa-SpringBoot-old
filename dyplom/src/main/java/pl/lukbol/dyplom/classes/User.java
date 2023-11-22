@@ -22,6 +22,7 @@ public class User {
 
     boolean enabled;
 
+
     @ManyToMany
     @JoinTable(
             name = "users_roles",

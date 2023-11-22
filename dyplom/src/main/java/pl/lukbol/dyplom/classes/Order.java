@@ -23,13 +23,7 @@ public class Order {
 
     public String phoneNumber;
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 
     public String employeeName;
 
@@ -70,7 +64,13 @@ public class Order {
         this.materials = materials;
         this.user = user;
     }
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
     public Long getId() {
         return id;
     }

@@ -21,4 +21,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>
 
     @Query("SELECT o FROM Order o WHERE o.endDate BETWEEN :startDate AND :endDate")
     List<Order> findByEndDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    List<Order> findByEmployeeNameAndEndDateAfterAndStartDateBefore(String name, Date taskEndDateTime, Date taskEndDateTime1);
 }
