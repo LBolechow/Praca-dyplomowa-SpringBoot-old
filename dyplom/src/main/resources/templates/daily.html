@@ -27,6 +27,9 @@
   #materialList {
     text-align: left;
   }
+  #materialList-edit {
+    text-align: left;
+  }
 </style>
 
 <body id="page-top" style="height: 1080px;">
@@ -138,33 +141,82 @@
         </div>
       </nav>
        <div class="container" style="width: 100%;text-align: center;margin-bottom: 2%;"><button class="btn btn-outline-primary text-truncate float-none float-sm-none add-another-btn" data-bss-hover-animate="pulse" type="button" style="text-align: center;" data-bs-target="#modal-2" data-bs-toggle="modal">Dodaj zlecenie<i class="fas fa-plus-circle edit-icon"></i></button></div>
-      <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+      <div class="modal fade" role="dialog" tabindex="-1" id="modal-edit">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Zlecenie</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Opis</span><input class="form-control" type="text"></div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Klient</span><input class="form-control" type="text"></div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Pracownik</span>
-                <div class="dropdown"><button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button"></button>
-                  <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
-                </div>
+            <form id="editForm">
+              <div class="modal-header">
+                <h4 class="modal-title">Przeglądaj i edytuj zlecenia.</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Numer telefonu</span><input class="form-control" type="text"></div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">E-mail</span><input class="form-control" type="text"></div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Data zakończenia</span><input class="form-control" type="date"></div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Status</span>
-                <div class="dropdown"><button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button"></button>
-                  <div class="dropdown-menu"><a class="dropdown-item" href="#">First Item</a><a class="dropdown-item" href="#">Second Item</a><a class="dropdown-item" href="#">Third Item</a></div>
+              <div class="modal-body">
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Opis</span>
+                  <input class="form-control" type="text" name="description-edit" style="margin-bottom: 10px;" required>
                 </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Klient</span>
+                  <input class="form-control" type="text" name="clientName-edit" style="margin-bottom: 10px;" required>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">E-mail</span>
+                  <input class="form-control" type="email" name="email-edit" style="margin-bottom: 10px;" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Numer telefonu</span>
+                  <input class="form-control" type="tel" name="phoneNumber-edit" style="margin-bottom: 10px;" pattern="[0-9]{9}" required>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Czas trwania</span>
+                  <input type="number" step="0.5" min="0" id="hours-edit" name="hours-edit" style="margin-bottom: 10px;" required>
+                  <button id="checkAvailabilityBtn-edit" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Terminy</button>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
+                  <input class="form-control" type="date" name="startDate-edit" id="startDate-edit" style="margin-bottom: 10px;" required>
+                  <input class="form-control" type="time" name="startTime-edit" id="startTime-edit" style="margin-bottom: 10px;" required>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
+                  <input class="form-control" type="date" name="endDate-edit" id="endDate-edit" style="margin-bottom: 10px;" required>
+                  <input class="form-control" type="time" name="endTime-edit" id="endTime-edit" style="margin-bottom: 10px;" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 10px;">
+                  <span class="input-group-text">Pracownik</span>
+                  <input class="form-control" type="text" id="selectedUser-edit" disabled />
+                  <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button">Wybierz użytkownika </button>
+                    <div class="dropdown-menu" id="userDropdown-edit"></div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Cena</span>
+                  <input class="form-control" type="number" name="price-edit" style="margin-bottom: 10px;" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 10px;">
+                  <span class="input-group-text">Status</span>
+                  <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button" id="statusDropdownButton">
+                      <span class="status-text">Wybierz status</span>
+                    </button>
+                    <div class="dropdown-menu" id="statusDropdown-edit">
+                      <a class="dropdown-item" href="#">W trakcie</a>
+                      <a class="dropdown-item" href="#">Zakończone</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="margin-bottom: 10px;">Materiały</span>
+                  <input id="materialInput-edit" class="form-control" type="text" name="materials-edit" style="margin-bottom: 10px;">
+                  <button id="addMaterialBtn-edit" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Dodaj</button>
+                </div>
+                <ul id="materialList-edit"></ul>
               </div>
-              <div class="input-group" style="margin-bottom: 3%;"><span class="input-group-text">Cena</span><input class="form-control" type="text"></div>
-              <div class="input-group" style="margin-bottom: 5%;"><span class="input-group-text">Materiały</span><input class="form-control" type="text"><button class="btn btn-primary" type="button">Dodaj</button></div>
-              <ul style="text-align: left;margin-bottom: 5%;"></ul>
-            </div>
-            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button><button class="btn btn-primary" type="button">Zapisz</button></div>
+              <div class="modal-footer">
+                <button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button>
+                <button class="btn btn-primary" type="submit">Zapisz zmiany</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -211,7 +263,7 @@
                   <input class="form-control" type="time" name="endTime" id="endTime" style="margin-bottom: 10px;" required>
                 </div>
                 <div class="input-group" style="margin-bottom: 10px;">
-                  <span class="input-group-text">Addon</span>
+                  <span class="input-group-text">Pracownik</span>
                   <input class="form-control" type="text" id="selectedUser" disabled />
                   <div class="dropdown">
                     <button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button">Wybierz użytkownika </button>
@@ -263,6 +315,7 @@
                   <table class="table" id="ordersTable">
                         <thead>
                             <tr>
+                              <th >Id</th>
                                 <th >Opis</th>
                                 <th>Klient</th>
                                 <th>Pracownik</th>
@@ -287,6 +340,21 @@
 <script src="/static/js/moment.js"></script>
 </body>
 
+<script>
+  var currentOrderId;
+  var globalStatus = false;
+  $(document).ready(function () {
+    $('.dropdown-item').click(function () {
+      var selectedValue = $(this).data('value');
+      var selectedText = $(this).text();
+
+      // Aktualizacja tekstu na przycisku dropdowna
+      $('#statusDropdownButton').html(selectedText);
+
+      // Tutaj dodaj kod obsługi wybranej wartości, np. aktualizacja interfejsu użytkownika, wysłanie żądania do serwera itp.
+      console.log('Wybrano:', selectedValue);
+    });
+  });
 </script>
 <script>
   $.get("/user", function(data) {
@@ -432,12 +500,33 @@
       var materialValue = materialInput.val();
 
       if (materialValue && materialValue.trim() !== "") {
-        // Dodaj element do listy z obsługą kliknięcia
         var listItem = $("<li>" + materialValue + "</li>");
 
         materialList.append(listItem);
 
         materialInput.val("");
+      }
+    });
+  });
+</script>
+<script>
+  $(document).ready(function () {
+    var materialListEdit = $("#materialList-edit");
+
+    materialListEdit.on("click", "li", function () {
+      $(this).remove();
+    });
+
+    $("#addMaterialBtn-edit").on("click", function () {
+      var materialInputEdit = $("#materialInput-edit");
+      var materialValueEdit = materialInputEdit.val();
+
+      if (materialValueEdit && materialValueEdit.trim() !== "") {
+        var listItem = $("<li>" + materialValueEdit + "</li>");
+
+        materialListEdit.append(listItem);
+
+        materialInputEdit.val("");
       }
     });
   });
@@ -457,6 +546,7 @@
           const statusText = order.status ? 'W trakcie' : 'Zakończone';
           const row = `
               <tr>
+              <td>${order.id}</td>
                 <td>${order.description}</td>
                 <td>${order.clientName}</td>
                 <td>${order.employeeName}</td>
@@ -465,10 +555,9 @@
 
                 <td>${statusText}</td>
                  <td>
-                 <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-orange);" type="submit" data-bs-toggle="modal" data-bs-target="#modal-3"><i class="far fa-question-circle"></i>
-                 </button>
-                 <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-cyan);" type="submit" data-bs-target="#modal-1" data-bs-toggle="modal"><i class="far fa-edit"></i>
-                 </button>
+                   <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-orange);" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit" data-order-id="${order.id}" onclick="fillEditModal(${order.id})">
+                  <i class="far fa-edit"></i>
+                </button>
                  <button class="btn btn-danger" style="margin-left: 5px;" type="submit"><i class="fa fa-trash" style="font-size: 15px;"></i>
                  </button>
                  </td>
@@ -485,18 +574,16 @@
 </script>
 <script>
   $(document).ready(function() {
-    // Funkcja do pobierania i wyświetlania użytkowników w dropdownie
     function fetchUsers() {
       $.ajax({
-        url: '/users/findByRole', // Twoje API endpoint
+        url: '/users/findByRole',
         method: 'GET',
         success: function(users) {
-          // Wyczyszczenie istniejącej listy
           $('#userDropdown').empty();
-
-          // Dodanie użytkowników do dropdowna
+          $('#userDropdown-edit').empty();
           users.forEach(function(user) {
             $('#userDropdown').append('<a class="dropdown-item" href="#" onclick="selectUser(\'' + user.name + '\')">' + user.name + '</a>');
+            $('#userDropdown-edit').append('<a class="dropdown-item" href="#" onclick="selectUser(\'' + user.name + '\')">' + user.name + '</a>');
           });
         },
         error: function(error) {
@@ -505,12 +592,11 @@
       });
     }
 
-    // Funkcja do ustawiania wybranego użytkownika w inpucie
     window.selectUser = function(userName) {
       $('#selectedUser').val(userName);
+      $('#selectedUser-edit').val(userName);
     };
 
-    // Wywołaj funkcję fetchUsers, aby wczytać użytkowników przy ładowaniu strony
     fetchUsers();
   });
 </script>
@@ -520,19 +606,17 @@
       const options = { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' };
       const formattedDate = new Date(dateString).toLocaleString('en-GB', options);
 
-      return formattedDate.replace(",", ""); // Removing the comma after the date
+      return formattedDate.replace(",", "");
     } catch (error) {
       console.error(`Error formatting date: ${error}`);
       return 'Invalid Date';
     }
   }
   $(document).ready(function () {
-    // Obsługa kliknięcia przycisku "Sprawdź dostępność"
     $("#checkAvailabilityBtn").click(function () {
-      // Pobierz czas trwania z formularza
       var durationHours = $("#hours").val();
 
-      // Wywołaj kontroler za pomocą AJAX
+
       $.ajax({
         type: "GET",
         url: "/checkAvailability",
@@ -571,4 +655,119 @@
     });
   });
 </script>
+<script>
+
+  function fillEditModal(orderId) {
+    currentOrderId = orderId;
+    $.ajax({
+      url: `/order/getOrderDetails/${orderId}`,
+      type: 'GET',
+      success: function (orderDetails) {
+        $('#editForm input[name="description-edit"]').val(orderDetails.description);
+        $('#editForm input[name="clientName-edit"]').val(orderDetails.clientName);
+        $('#editForm input[name="email-edit"]').val(orderDetails.email);
+        $('#editForm input[name="phoneNumber-edit"]').val(orderDetails.phoneNumber);
+        $('#editForm input[name="hours-edit"]').val(orderDetails.hours);
+        $('#editForm input[name="startDate-edit"]').val(orderDetails.startDate);
+        $('#editForm input[name="startTime-edit"]').val(orderDetails.startTime);
+        $('#editForm input[name="endDate-edit"]').val(orderDetails.endDate);
+        $('#editForm input[name="endTime-edit"]').val(orderDetails.endTime);
+        $("#selectedUser-edit").val(orderDetails.employee);
+        $('#editForm input[name="price-edit"]').val(orderDetails.price);
+
+
+        if (orderDetails.status) {
+          $('#statusDropdownButton .status-text').text('W trakcie');
+        } else {
+          $('#statusDropdownButton .status-text').text('Zakończone');
+        }
+        var materialList = $("#materialList-edit");
+        $("#materialList-edit").empty();
+        for (var i = 0; i < orderDetails.materials.length; i++)
+        {
+          var itemValue = orderDetails.materials[i].item;
+          var newItem = $("<li>" + itemValue + "</li>");
+          materialList.append(newItem);
+        }
+      },
+      error: function () {
+        console.log('Błąd podczas pobierania danych zamówienia.');
+      }
+    });
+  }
+  function setDropdownStatus(status) {
+    globalStatus = status;
+
+    if (status) {
+      $('#statusDropdownButton .status-text').text('W trakcie');
+    } else {
+      $('#statusDropdownButton .status-text').text('Zakończone');
+    }
+  }
+
+  $('#statusDropdown-edit a').on('click', function () {
+    var selectedStatusValue = $(this).data('value');
+    var status = (selectedStatusValue === 'true');
+    setDropdownStatus(status);
+  });
+
+  $('#editForm').submit(function(event) {
+    event.preventDefault();
+    var description = $('input[name="description-edit"]').val();
+    var clientName = $('input[name="clientName-edit"]').val();
+    var email = $('input[name="email-edit"]').val();
+    var phoneNumber = $('input[name="phoneNumber-edit"]').val();
+    var hours = $('#hours-edit').val();
+    var startDate = document.getElementById('startDate-edit').value;
+    var startTime = document.getElementById('startTime-edit').value;
+    var endDate = document.getElementById('endDate-edit').value;
+    var endTime = document.getElementById('endTime-edit').value;
+    var selectedUser = $('#selectedUser-edit').val();
+    var price = $('input[name="price-edit"]').val();
+    var status = globalStatus;
+
+    var combinedStartDateTimeString = startDate + ' ' + startTime + ':00';
+    var combinedEndDateTimeString = endDate + ' ' + endTime + ':00';
+    var combinedStartDateTime = new Date(combinedStartDateTimeString);
+    var combinedEndDateTime = new Date(combinedEndDateTimeString);
+
+    var formattedStartDateTime = combinedStartDateTime.toISOString().slice(0, 19).replace('T', ' ');
+    var formattedEndDateTime = combinedEndDateTime.toISOString().slice(0, 19).replace('T', ' ');
+    var materials = [];
+
+    $("#materialList-edit li").each(function () {
+      materials.push($(this).text());
+    });
+
+    var data = {
+      id: currentOrderId,
+      description: description,
+      clientName: clientName,
+      email: email,
+      phoneNumber: phoneNumber,
+      hours: hours,
+      startDate: formattedStartDateTime,
+      endDate:  formattedEndDateTime,
+      selectedUser: selectedUser,
+      price: price,
+      status: status,
+      items: materials,
+    };
+
+    $.ajax({
+      type: 'POST',
+      url: '/order/edit/' + currentOrderId,
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      success: function() {
+        console.log('Zamówienie edytowane pomyślnie.');
+        $('#modal-edit').modal('hide');
+      },
+      error: function(error) {
+        console.error('Błąd podczas edycji zamówienia:', error);
+      }
+    });
+  });
+</script>
+
 </html>

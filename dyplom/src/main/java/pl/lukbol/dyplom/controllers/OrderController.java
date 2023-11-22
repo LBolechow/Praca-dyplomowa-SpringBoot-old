@@ -1,5 +1,6 @@
 package pl.lukbol.dyplom.controllers;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lukbol.dyplom.classes.Material;
 import pl.lukbol.dyplom.classes.Order;
 import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.repositories.MaterialRepository;
 import pl.lukbol.dyplom.repositories.OrderRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
@@ -29,10 +31,13 @@ public class OrderController {
 
     private OrderRepository orderRepository;
 
+    private MaterialRepository materialRepository;
 
-    public OrderController(UserRepository userRepository, OrderRepository orderRepository) {
+
+    public OrderController(UserRepository userRepository, OrderRepository orderRepository, MaterialRepository materialRepository) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
+        this.materialRepository = materialRepository;
     }
 
         @GetMapping("/currentDate")
@@ -106,25 +111,25 @@ public class OrderController {
         }
     }
 
-    // Funkcja pomocnicza do formatowania daty
+
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         return sdf.format(date);
     }
 
-    // Funkcja pomocnicza do formatowania godziny
+
     private String formatTime(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         return sdf.format(date);
     }
 
-        // Metoda pomocnicza do sprawdzania, czy dany dzień jest dniem roboczym
+
         private boolean isWorkingDay(Calendar calendar) {
             int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             return dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY;
         }
 
-        // Metoda pomocnicza do znalezienia dostępnych pracowników w danym przedziale czasowym
+
         private List<User> findAvailableUsers(Date startDate, Date endDate) {
             // Pobranie wszystkich zamówień w danym przedziale czasowym
             List<Order> conflictingOrders = orderRepository.findByStartDateBetweenOrEndDateBetween(startDate, endDate, startDate, endDate);
@@ -184,6 +189,7 @@ public class OrderController {
 
             for (Order order : orders) {
                 Map<String, Object> orderData = new HashMap<>();
+                orderData.put("id", order.getId());
                 orderData.put("description", order.getDescription());
                 orderData.put("clientName", order.getClientName());
                 orderData.put("employeeName", order.getEmployeeName());
@@ -222,20 +228,12 @@ public class OrderController {
         String phoneNumber = (String) request.get("phoneNumber");
 
         String startDateString = (String) request.get("startDate");
-        Date startDate = null;
-        try {
-            startDate = DateUtils.parseDate(startDateString, "yyyy-MM-dd HH:mm:ss");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date startDate = parseDateString(startDateString);
+
 
         String endDateString = (String) request.get("endDate");
-        Date endDate = null;
-        try {
-            endDate = DateUtils.parseDate(endDateString, "yyyy-MM-dd HH:mm:ss");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date endDate = parseDateString(endDateString);
+
 
         String hour = (String) request.get("hours");
         double hours =  Double.parseDouble(hour);
@@ -257,5 +255,95 @@ public class OrderController {
         newOrder.setMaterials(materials);
 
         orderRepository.save(newOrder);
+    }
+    @GetMapping("/order/getOrderDetails/{id}")
+    public ResponseEntity<Map<String, Object>> getOrderDetails(@PathVariable Long id) {
+        try {
+            Optional<Order> optionalOrder = orderRepository.findById(id);
+
+            if (optionalOrder.isPresent()) {
+                Order order = optionalOrder.get();
+
+                Map<String, Object> orderDetails = new HashMap<>();
+                orderDetails.put("id", order.getId());
+                orderDetails.put("description", order.getDescription());
+                orderDetails.put("clientName", order.getClientName());
+                orderDetails.put("email", order.getClientEmail());
+                orderDetails.put("phoneNumber", order.getPhoneNumber());
+                orderDetails.put("startDate", formatDate(order.getStartDate()));
+                orderDetails.put("startTime", formatTime(order.getStartDate()));
+                orderDetails.put("endDate", formatDate(order.getEndDate()));
+                orderDetails.put("endTime", formatTime(order.getEndDate()));
+                orderDetails.put("employee", order.getUser().getName());
+                orderDetails.put("hours", order.getDuration());
+                orderDetails.put("price", order.getPrice());
+                orderDetails.put("materials", order.getMaterials());
+                orderDetails.put("status", order.isStatus());
+
+
+                return new ResponseEntity<>(orderDetails, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    private Date parseDateString(String dateString) {
+        Date date = null;
+        try {
+            date = DateUtils.parseDate(dateString, "yyyy-MM-dd HH:mm:ss");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+    @Transactional
+    @PostMapping(value = "/order/edit/{id}", consumes = {"application/json"})
+    @ResponseBody
+    public void editOrder(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            materialRepository.deleteAllByOrder(order);
+
+            String selectedUser = (String) request.get("selectedUser");
+            List<User> users = userRepository.findByNameContainingIgnoreCase(selectedUser);
+            User user = users.isEmpty() ? null : users.get(0);
+
+            order.setDescription((String) request.get("description"));
+            order.setClientName((String) request.get("clientName"));
+            order.setClientEmail((String) request.get("email"));
+            order.setPhoneNumber((String) request.get("phoneNumber"));
+
+            String startDateString = (String) request.get("startDate");
+            Date startDate = parseDateString(startDateString);
+            order.setStartDate(startDate);
+
+            String endDateString = (String) request.get("endDate");
+            Date endDate = parseDateString(endDateString);
+            order.setEndDate(endDate);
+
+            double hours = Double.parseDouble((String) request.get("hours"));
+            order.setDuration(hours);
+
+            int price = Integer.parseInt((String) request.get("price"));
+            order.setPrice(price);
+
+            Boolean status = (Boolean) request.get("status");
+            order.setStatus(status);
+
+            List<String> items = (List<String>) request.get("items");
+            List<Material> newMaterials = new ArrayList<>();
+            for (String item : items) {
+                Material material = new Material(item, order, false);
+                newMaterials.add(material);
+            }
+            order.setMaterials(newMaterials);
+
+            orderRepository.save(order);
+        }
     }
 }
