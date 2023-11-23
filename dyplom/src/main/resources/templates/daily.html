@@ -294,12 +294,12 @@
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h4 class="modal-title">Modal Title</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">Czy na pewno chcesz usunąć zlecenie?</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                <p>The content of your modal.</p>
+                <p>Zmiana jest nieodwracalna.</p>
               </div>
-              <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button><button class="btn btn-primary" type="button">Save</button></div>
+              <div class="modal-footer d-xxl-flex justify-content-xxl-center"><button class="btn btn-light d-xxl-flex" type="button" data-bs-dismiss="modal">Nie</button><button class="btn btn-primary" type="button" data-bs-dismiss="modal" onclick="handleConfirmDelete()">Tak</button></div>
             </div>
           </div>
         </div>
@@ -549,7 +549,7 @@
                    <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-cyan);" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit" data-order-id="${order.id}" onclick="fillEditModal(${order.id})">
                   <i class="far fa-edit"></i>
                 </button>
-                 <button class="btn btn-danger" style="margin-left: 5px;" type="submit"><i class="fa fa-trash" style="font-size: 15px;"></i>
+                 <button class="btn btn-danger" style="margin-left: 5px;" type="button" data-bs-toggle="modal" data-bs-target="#modal-3" data-order-id="${order.id}" onclick="setCurrentOrderId(${order.id})"><i class="fa fa-trash" style="font-size: 15px;"></i>
                  </button>
                  </td>
               </tr>
@@ -806,5 +806,22 @@
     });
   });
 </script>
+<script>
+  function setCurrentOrderId(orderId) {
+    currentOrderId = orderId;
+  }
 
+  function handleConfirmDelete() {
+    $.ajax({
+      url: '/order/delete/' + currentOrderId,
+      method: 'DELETE',
+      success: function (data) {
+        location.reload();
+      },
+      error: function (error) {
+        console.error('Błąd podczas usuwania zlecenia:', error);
+      }
+    });
+  }
+</script>
 </html>

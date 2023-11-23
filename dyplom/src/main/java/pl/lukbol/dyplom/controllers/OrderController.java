@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.lukbol.dyplom.classes.Material;
 import pl.lukbol.dyplom.classes.Order;
 import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.MaterialRepository;
 import pl.lukbol.dyplom.repositories.OrderRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
@@ -430,5 +431,16 @@ public class OrderController {
 
         return availableUsers;
     }
+    @DeleteMapping("/order/delete/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrder(@PathVariable Long id) {
 
+        Optional<Order> orderOptional = orderRepository.findById(id);
+
+        if (orderOptional.isPresent()) {
+            orderRepository.delete(orderOptional.get());
+        } else {
+            throw new UserNotFoundException(id);
+        }
+    }
 }
