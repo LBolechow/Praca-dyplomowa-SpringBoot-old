@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Profil</title>
+  <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web:400,600,700">
+  <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
+  <link rel="stylesheet" href="/static/fonts/font-awesome.min.css">
+  <link rel="stylesheet" href="/static/fonts/fontawesome5-overrides.min.css">
+  <link rel="stylesheet" href="/static/css/Button-Change-Text-on-Hover.css">
+  <link rel="stylesheet" href="/static/css/Chat.css">
+  <link rel="stylesheet" href="/static/css/Data-Table-styles.css">
+  <link rel="stylesheet" href="/static/css/Data-Table.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/css/theme.bootstrap_4.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+  <link rel="stylesheet" href="/static/css/info-box.css">
+  <link rel="stylesheet" href="/static/css/Ludens---1-Dark-mode-Index-Table-with-Search-Filters.css">
+  <link rel="stylesheet" href="/static/css/Navbar-With-Button-icons.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+</head>
+
+<body id="page-top">
+<div id="wrapper">
+  <div class="d-flex flex-column" id="content-wrapper">
+    <div id="content" style="text-align: center;font-family: ABeeZee, sans-serif;font-size: 18px;height: 1080px;">
+      <nav class="navbar navbar-light navbar-expand-md sticky-top bg-dark shadow mb-4 topbar static-top" style="background: var(--bs-dark);">
+        <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color: var(--bs-orange);">Zakład krawiecki</a>
+          <div class="collapse navbar-collapse">
+            <ul class="navbar-nav" th:if="${#authorization.expression('hasAnyRole(''ROLE_ADMIN'')')}">
+              <li class="nav-item"><a class="nav-link active" href="http://localhost:8080/panel_administratora">Panel administratora</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Panel wiadomości</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/daily">Lista dzienna</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/order">Kalendarz</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
+            </ul>
+            <ul class="navbar-nav" th:if="${#authorization.expression('hasAnyRole(''ROLE_EMPLOYEE'')')}">
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Panel wiadomości</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/daily">Lista dzienna</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/order">Kalendarz</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
+            </ul>
+            <ul class="navbar-nav" th:if="${#authorization.expression('hasAnyRole(''ROLE_CLIENT'')')}">
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Napisz wiadomość</a></li>
+              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
+            </ul>
+          </div>
+          <button data-bs-target="#" data-bs-toggle="collapse" class="navbar-toggler"></button>
+          <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <div class="input-group"></div>
+          </form>
+          <ul class="navbar-nav flex-nowrap ms-auto">
+            <li class="nav-item dropdown d-sm-none no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><i class="fas fa-search"></i></a>
+              <div class="dropdown-menu dropdown-menu-end p-3 animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="me-auto navbar-search w-100">
+                  <div class="input-group"><input class="bg-light form-control border-0 small" type="text" placeholder="Search for ...">
+                    <div class="input-group-append"><button class="btn btn-primary py-0" type="button"><i class="fas fa-search"></i></button></div>
+                  </div>
+                </form>
+              </div>
+            </li>
+            <li class="nav-item dropdown no-arrow mx-1">
+              <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                  <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="me-3">
+                    <div class="bg-primary icon-circle"><i class="fas fa-file-alt text-white"></i></div>
+                  </div>
+                  <div><span class="small text-gray-500">December 12, 2019</span>
+                    <p>A new monthly report is ready to download!</p>
+                  </div>
+                </a><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="me-3">
+                    <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i></div>
+                  </div>
+                  <div><span class="small text-gray-500">December 7, 2019</span>
+                    <p>$290.29 has been deposited into your account!</p>
+                  </div>
+                </a><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="me-3">
+                    <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                  </div>
+                  <div><span class="small text-gray-500">December 2, 2019</span>
+                    <p>Spending Alert: We've noticed unusually high spending for your account.</p>
+                  </div>
+                </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item dropdown no-arrow mx-1">
+              <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"></a>
+                <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                  <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar4.jpeg">
+                    <div class="bg-success status-indicator"></div>
+                  </div>
+                  <div class="fw-bold">
+                    <div class="text-truncate"><span>Hi there! I am wondering if you can help me with a problem I've been having.</span></div>
+                    <p class="small text-gray-500 mb-0">Emily Fowler - 58m</p>
+                  </div>
+                </a><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar2.jpeg">
+                    <div class="status-indicator"></div>
+                  </div>
+                  <div class="fw-bold">
+                    <div class="text-truncate"><span>I have the photos that you ordered last month!</span></div>
+                    <p class="small text-gray-500 mb-0">Jae Chun - 1d</p>
+                  </div>
+                </a><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar3.jpeg">
+                    <div class="bg-warning status-indicator"></div>
+                  </div>
+                  <div class="fw-bold">
+                    <div class="text-truncate"><span>Last month's report looks great, I am very happy with the progress so far, keep up the good work!</span></div>
+                    <p class="small text-gray-500 mb-0">Morgan Alvarez - 2d</p>
+                  </div>
+                </a><a class="dropdown-item d-flex align-items-center" href="#">
+                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar5.jpeg">
+                    <div class="bg-success status-indicator"></div>
+                  </div>
+                  <div class="fw-bold">
+                    <div class="text-truncate"><span>Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</span></div>
+                    <p class="small text-gray-500 mb-0">Chicken the Dog · 2w</p>
+                  </div>
+                </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                </div>
+              </div>
+              <div class="shadow dropdown-list dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown"></div>
+            </li>
+            <div class="d-none d-sm-block topbar-divider"></div>
+            <li class="nav-item dropdown no-arrow">
+              <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
+                <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in"><a class="dropdown-item" href="/profile"><i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Profil</a>
+                  <div class="dropdown-divider"></div><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Wyloguj</a>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <label class="form-label" style="font-size: 34px;">Materiały</label>
+      <div class="container" style="width: 100%;text-align: center;margin-bottom: 2%;">
+        <label class="form-label">Od:&nbsp;</label>
+        <input type="date" id="startDateInput" required>
+      </div>
+      <label class="form-label" style="margin-left: 10px;">Do:&nbsp;
+        <input type="date" id="endDateInput" required>
+        &nbsp;
+      </label>
+      <h1></h1>
+      <button class="btn btn-primary" type="button" onclick="searchOrders()">Wyszukaj</button>
+      <div style="text-align:center;">
+        <section class="py-5 bg-light">
+          <div class="container">
+            <ul id="resultList">
+              <!-- Wyniki będą tutaj dynamicznie dodawane przez JavaScript -->
+            </ul>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+  </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+</div>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/jquery.tablesorter.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/widgets/widget-filter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/js/widgets/widget-storage.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="/static/js/Ludens---1-Dark-mode-Index-Table-with-Search-Filters-1.js"></script>
+<script src="/static/js/Ludens---1-Dark-mode-Index-Table-with-Search-Filters-2.js"></script>
+<script src="/static/js/Ludens---1-Dark-mode-Index-Table-with-Search-Filters.js"></script>
+<script src="/static/js/theme.js"></script>
+</body>
+<script>
+  $.get("/user", function(data) {
+    $("#user").html(data.name);
+  });
+</script>
+<script>
+  function searchOrders() {
+    var startDate = document.getElementById('startDateInput').value;
+    var endDate = document.getElementById('endDateInput').value;
+
+    // Wysłanie zapytania do API
+    $.ajax({
+      type: "GET",
+      url: "/order/search",
+      data: {
+        fromDate: startDate,
+        toDate: endDate
+      },
+      success: function (data) {
+        // Po pomyślnym pobraniu danych, aktualizujemy listę wyników
+        updateResultList(data);
+      },
+      error: function () {
+        console.error("Błąd podczas pobierania danych z API.");
+      }
+    });
+  }
+
+  function updateResultList(orders) {
+    var resultList = document.getElementById('resultList');
+
+    // Usuwamy istniejące elementy z listy
+    resultList.innerHTML = '';
+
+    // Dodajemy nowe elementy do listy
+    orders.forEach(function (order) {
+      // Sprawdzamy, czy lista materiałów jest niepusta
+      if (order.materials.length > 0) {
+        var listItem = document.createElement('li');
+
+        // Tworzymy tekst w formacie "description - clientName"
+        var orderText = order.description ? '<strong>' + order.description + '</strong>' : 'Brak opisu zamówienia';
+        var clientNameText = order.clientName ? '<strong>' + order.clientName + '</strong>' : 'Brak nazwy klienta';
+        listItem.innerHTML = orderText + ' - ' + clientNameText;
+
+        // Dodajemy listę materiałów
+        var materialsList = document.createElement('ul');
+        order.materials.forEach(function (material) {
+          var materialItem = document.createElement('li');
+
+          // Sprawdzamy, czy istnieje pole item w materiale
+          var materialItemName = material.item ? material.item : 'Brak nazwy materiału';
+
+          // Jeżeli checked jest true, dodajemy styl CSS przekreślenia
+          if (material.checked) {
+            materialItem.style.textDecoration = 'line-through';
+          }
+
+          // Dodajemy obsługę kliknięcia na tekst w liście
+          materialItem.addEventListener('click', function () {
+            // Wysyłamy żądanie do API w celu aktualizacji wartości checked
+            updateMaterialCheckedState(material.id, !material.checked);
+          });
+
+          materialItem.innerText = materialItemName;
+
+          materialsList.appendChild(materialItem);
+        });
+
+        listItem.appendChild(materialsList);
+        resultList.appendChild(listItem);
+      }
+    });
+  }
+
+  function updateMaterialCheckedState(materialId, checked) {
+    // Wysłanie żądania do API w celu aktualizacji wartości checked
+    $.ajax({
+      type: "PATCH",
+      url: "/material/" + materialId,
+      contentType: "application/json",
+      data: JSON.stringify({ checked: checked }),
+      success: function () {
+        // Po pomyślnym zaktualizowaniu wartości, ponownie pobieramy i aktualizujemy listę wyników
+        searchOrders();
+      },
+      error: function () {
+        console.error("Błąd podczas aktualizacji wartości checked w API.");
+      }
+    });
+  }
+</script>
+
+
+</html>

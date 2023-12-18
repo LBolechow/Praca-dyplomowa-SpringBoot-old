@@ -19,10 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findOptionalByEmail(String email);
     Boolean existsByEmail(String email);
 
-    // @Query(nativeQuery=true,value="drop database")
-    // void removedb4fun();
-
-
     @EntityGraph(attributePaths = "roles")
     List<User> findAll();
     List<User> findByNameContainingIgnoreCase(String name);
@@ -31,7 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByEmailContainingIgnoreCase(String email);
 
     List<User> findByRoles_NameContainingIgnoreCase(String role);
-
 
 
 

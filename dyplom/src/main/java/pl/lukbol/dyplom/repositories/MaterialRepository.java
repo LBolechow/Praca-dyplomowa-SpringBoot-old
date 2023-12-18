@@ -12,4 +12,6 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     List<Material> findAll();
 
     void deleteAllByOrder(Order order);
+
+    Optional<Material> findById(Long materialsId);
 }

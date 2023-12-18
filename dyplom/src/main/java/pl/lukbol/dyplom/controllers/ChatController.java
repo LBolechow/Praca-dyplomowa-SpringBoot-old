@@ -49,15 +49,12 @@ public class ChatController {
     @SendTo("/topic/employees")
     @Transactional
     public Message sendMessageToClient(@DestinationVariable Long conversationId, Message message) {
-        // Uzyskaj dostęp do konwersacji na podstawie ID
         Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
         if (conversation != null) {
-            // Użyj Twojej usługi do wysłania wiadomości do klienta
             messageService.sendMessage(message.getSender(), conversation, message.getContent(), message.getMessageDate());
 
             return message;
         } else {
-            // Dodaj loga, aby sprawdzić, czy konwersacja nie istnieje
             System.out.println("Konwersacja o ID " + conversationId + " nie istnieje.");
             return null;
         }

@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,11 +24,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import pl.lukbol.dyplom.classes.Role;
 import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.configs.MailConfig;
 import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.UserService;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
+import pl.lukbol.dyplom.utilities.GenerateCode;
 
 
 import java.io.IOException;
@@ -42,24 +46,36 @@ public class UserController {
     private UserService userService;
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    private final JavaMailSender mailSender;
     private UserRepository userRepository;
 
     private RoleRepository roleRepository;
 
-    public UserController(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserController(UserRepository userRepository, RoleRepository roleRepository, JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.mailSender = mailSender;
     }
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
+    private void sendActivationEmail(String to, String activationCode) {
+        // Utwórz wiadomość e-mail
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setSubject("Aktywacja konta");
+        message.setText("Twój kod aktywacyjny to: " + activationCode);
+        message.setTo(to);
 
+        // Wyślij wiadomość e-mail
+        mailSender.send(message);
+    }
     @PostMapping("/users/add")
     public ResponseEntity<Map<String, Object>> addUser(@RequestParam("name") String name,
                                                        @RequestParam("email") String email,
                                                        @RequestParam("password") String password,
                                                        @RequestParam("role") String roleName) {
-        User newUser = new User(name, email, passwordEncoder.encode(password), false);
+        User newUser = new User(name, email, passwordEncoder.encode(password), null,false, false);
 
         Role role = roleRepository.findByName(roleName);
 
@@ -101,7 +117,7 @@ public class UserController {
     }
     @PostMapping(value ="/register", consumes = {"*/*"})
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
-        User newUsr = new User(name,email, passwordEncoder.encode(password), false);
+        User newUsr = new User(name,email, passwordEncoder.encode(password), null, false, false);
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
         if (emailExists(newUsr.getEmail())) {
             req.getSession().setAttribute("message", "Użytkownik o takim adresie email już istnieje.");
@@ -184,6 +200,43 @@ public class UserController {
             throw new UserNotFoundException(id);
         }
     }
+
+    @PostMapping(value = "/user/activateMail", consumes = {"*/*"})
+    public String activateByMail(Authentication authentication) {
+
+        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
+
+        User usr = userRepository.findByEmail(userEmail);
+
+        if (usr != null) {
+            String activationCode = GenerateCode.generateActivationCode();
+            usr.setCode(activationCode);
+            userRepository.save(usr);
+            sendActivationEmail(userEmail, activationCode);
+
+            return "Success";
+        }
+
+        return "Błąd aktywacji";
+    }
+    @PostMapping(value = "/user/checkCode", consumes = {"*/*"})
+    public String checkCode(Authentication authentication,
+                                @RequestParam("code") String code) {
+
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+
+        if (usr != null) {
+            String checkCode = usr.getCode();
+            if (code.equals(checkCode) && !code.isEmpty()) {
+                usr.setActivated(true);
+                userRepository.save(usr);
+                return "Poprawnie aktywowano";
+            }
+        }
+
+        return "Błąd aktywacji";
+    }
+
     @GetMapping("/search-users")
     public ResponseEntity<List<Map<String, Object>>> searchUsers(@RequestParam("category") String category,
                                                                  @RequestParam("searchText") String searchText) {

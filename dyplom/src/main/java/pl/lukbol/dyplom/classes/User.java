@@ -20,6 +20,9 @@ public class User {
     public String email;
     public String password;
 
+    public String code;
+
+    boolean activated;
     boolean enabled;
 
 
@@ -47,21 +50,41 @@ public class User {
 
     public User() {}
 
-    public User(Long id, String name, String email, String password, Boolean enabled) {
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+    public User(Long id, String name, String email, String password, String code, Boolean enabled, Boolean activated) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.code=code;
         this.enabled=enabled;
+        this.activated=activated;
     }
 
 
 
-    public User(String name, String email, String password, Boolean enabled) {
+    public User(String name, String email, String password, String code, Boolean enabled, Boolean activated) {
         this.email = email;
         this.name = name;
         this.password=password;
+        this.code=code;
         this.enabled=enabled;
+        this.activated=activated;
     }
     public boolean isEnabled() {
         return enabled;

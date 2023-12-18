@@ -1,13 +1,16 @@
 package pl.lukbol.dyplom.controllers;
 
 import jakarta.transaction.Transactional;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.lukbol.dyplom.classes.Material;
 import pl.lukbol.dyplom.classes.Order;
+import pl.lukbol.dyplom.classes.Role;
 import pl.lukbol.dyplom.classes.User;
 import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.MaterialRepository;
@@ -20,11 +23,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class OrderController {
@@ -73,7 +78,19 @@ public class OrderController {
             return dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY;
         }
 
+    @GetMapping("/index")
+    public String showUserOrders(Authentication authentication, Model model) {
+        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
+        User user = userRepository.findByEmail(userEmail);
 
+        if (user != null) {
+            List<Order> userOrders = orderRepository.findOrdersByUserEmail(user.getEmail());
+
+            model.addAttribute("userOrders", userOrders);
+        }
+
+        return "index";
+    }
     @GetMapping(value ="/order/getAllOrders")
     public ResponseEntity<List<Order>> getAllOrders() {
         try {
@@ -120,9 +137,9 @@ public class OrderController {
                 orderData.put("description", order.getDescription());
                 orderData.put("clientName", order.getClientName());
                 orderData.put("employeeName", order.getEmployeeName());
-                orderData.put("status", order.isStatus()); // true = w trakcie, false = zakończone
+                orderData.put("status", order.isStatus());
                 orderData.put("startDate", order.getStartDate());
-                orderData.put("endDate", order.getEndDate()); // dodaj endDate do danych
+                orderData.put("endDate", order.getEndDate());
                 ordersData.add(orderData);
             }
 
@@ -152,6 +169,9 @@ public class OrderController {
         String description = (String) request.get("description");
         String clientName = (String) request.get("clientName");
         String email = (String) request.get("email");
+
+
+
         String phoneNumber = (String) request.get("phoneNumber");
 
         String startDateString = (String) request.get("startDate");
@@ -287,11 +307,27 @@ public class OrderController {
                 Calendar currentDateTime = Calendar.getInstance();
                 currentDateTime.setTime(orderEndDate);
 
-                while (currentDateTime.get(Calendar.HOUR_OF_DAY) < 16) {
+                // Jeżeli przekracza 16:00, przesuń na następny dzień i ustaw na 8:00
+                if (currentDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
+                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                    currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
+                    currentDateTime.set(Calendar.MINUTE, 0);
+                }
+
+                while (true) {
                     if (isWorkingDay(currentDateTime)) {
                         Calendar endDateTime = (Calendar) currentDateTime.clone();
                         int durationMinutes = (int) (durationHours * 60);
                         endDateTime.add(Calendar.MINUTE, durationMinutes);
+
+                        // Jeżeli endDateTime przekracza 16:00, przesuń na następny dzień i ustaw na 8:00
+                        if (endDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
+                            currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                            currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
+                            currentDateTime.set(Calendar.MINUTE, 0);
+                            continue;
+                        }
+
                         List<User> availableUsers = findAvailableUsersWithEndDateTime(currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
 
                         if (!availableUsers.isEmpty()) {
@@ -308,23 +344,17 @@ public class OrderController {
                             return new ResponseEntity<>(response, HttpStatus.OK);
                         }
                     }
-                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
 
-                    // Reset only if it's the beginning of the next day
-                    if (currentDateTime.get(Calendar.HOUR_OF_DAY) == 8) {
-                        break;
-                    }
+                    // Przesuń na następny dzień i ustaw na 8:00
+                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                    currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
+                    currentDateTime.set(Calendar.MINUTE, 0);
                 }
             } else {
                 response.put("status", "error");
                 response.put("message", "Zamówienie o podanym identyfikatorze nie zostało znalezione.");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-
-            response.put("status", "error");
-            response.put("message", "Brak dostępnych pracowników w ramach dni roboczych.");
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -341,29 +371,28 @@ public class OrderController {
 
             Calendar currentDateTime = Calendar.getInstance();
 
-            // If the current time is later than the specified startHour, start searching from the current time
             if (currentDateTime.get(Calendar.HOUR_OF_DAY) > startHour ||
                     (currentDateTime.get(Calendar.HOUR_OF_DAY) == startHour && currentDateTime.get(Calendar.MINUTE) > 0)) {
-                currentDateTime.set(Calendar.HOUR_OF_DAY, currentDateTime.get(Calendar.HOUR_OF_DAY));
-                currentDateTime.set(Calendar.MINUTE, currentDateTime.get(Calendar.MINUTE));
-            } else {
-                currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
-                currentDateTime.set(Calendar.MINUTE, 0);
+                currentDateTime.add(Calendar.DAY_OF_MONTH, 1);  // Przesunięcie na następny dzień
             }
 
+            currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
+            currentDateTime.set(Calendar.MINUTE, 0);
             currentDateTime.set(Calendar.SECOND, 0);
 
             while (currentDateTime.get(Calendar.HOUR_OF_DAY) < 16) {
-
                 if (isWorkingDay(currentDateTime)) {
-
                     Calendar endDateTime = (Calendar) currentDateTime.clone();
                     int durationMinutes = (int) (durationHours * 60);
                     endDateTime.add(Calendar.MINUTE, durationMinutes);
 
-                    // Check if the endDateTime is after the current time
-                    if (endDateTime.after(Calendar.getInstance())) {
+                    // Ogranicz godzinę zakończenia do 16:00
+                    if (endDateTime.get(Calendar.HOUR_OF_DAY) > 16) {
+                        endDateTime.set(Calendar.HOUR_OF_DAY, 16);
+                        endDateTime.set(Calendar.MINUTE, 0);
+                    }
 
+                    if (endDateTime.after(Calendar.getInstance())) {
                         List<User> availableUsers = findAvailableUsersWithEndDateTime(currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
 
                         if (!availableUsers.isEmpty()) {
@@ -382,14 +411,8 @@ public class OrderController {
                     }
                 }
 
-                // Move to the next time slot on the current day
-                currentDateTime.add(Calendar.MINUTE, 15);
-
-                // If it's close to the end of the day, reset to the specified startHour and move to the next day
-                if (currentDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
-                    currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
-                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
-                }
+                currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
+                currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
             }
 
             response.put("status", "error");
@@ -404,28 +427,41 @@ public class OrderController {
     }
 
     private List<User> findAvailableUsersWithEndDateTime(Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
-        List<User> allUsers = userRepository.findAll();
+        List<String> roleNamesToSearch = Arrays.asList("ROLE_EMPLOYEE", "ROLE_ADMIN");
+
         List<User> availableUsers = new ArrayList<>();
+
+        List<User> allUsers = userRepository.findAll();  // Zakładam, że masz metodę findAll w userRepository
 
         for (User user : allUsers) {
             boolean isAvailable = true;
-            List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
 
-            for (Order order : userOrders) {
-                Date orderStartDate = order.getStartDate();
-                Date orderEndDate = order.getEndDate();
+            // Sprawdzanie roli użytkownika
+            Collection<Role> userRoles = user.getRoles();
+            List<String> userRoleNames = userRoles.stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toList());
 
-                // Check if the task's start or end times overlap with existing orders
-                if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
-                        (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
-                        (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
-                    isAvailable = false;
-                    break;
+            // Sprawdzenie, czy użytkownik ma jedną z poszukiwanych ról
+            if (userRoleNames.stream().anyMatch(roleNamesToSearch::contains)) {
+                // Sprawdzanie dostępności użytkownika
+                List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
+
+                for (Order order : userOrders) {
+                    Date orderStartDate = order.getStartDate();
+                    Date orderEndDate = order.getEndDate();
+
+                    if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
+                            (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
+                            (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
+                        isAvailable = false;
+                        break;
+                    }
                 }
-            }
 
-            if (isAvailable) {
-                availableUsers.add(user);
+                if (isAvailable) {
+                    availableUsers.add(user);
+                }
             }
         }
 
@@ -443,4 +479,41 @@ public class OrderController {
             throw new UserNotFoundException(id);
         }
     }
+    @GetMapping("/order/search")
+    public ResponseEntity<List<Order>> searchOrdersByStartDateBetweenWithMaterials(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+
+        LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
+
+        Date startDate = Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<Order> matchingOrders = orderRepository.findByStartDateBetweenWithMaterials(startDate, endDate);
+
+        return ResponseEntity.ok(matchingOrders);
+    }
+
+    @PatchMapping("/material/{materialId}")
+    public ResponseEntity<Void> updateMaterialCheckedState(
+            @PathVariable Long materialId,
+            @RequestBody Map<String, Boolean> requestBody) {
+
+        boolean checked = requestBody.getOrDefault("checked", false);
+
+        Optional<Material> optionalMaterial = materialRepository.findById(materialId);
+
+        if (optionalMaterial.isPresent()) {
+            Material material = optionalMaterial.get();
+            material.setChecked(checked);
+
+            materialRepository.save(material);
+
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
