@@ -38,12 +38,14 @@
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/daily">Lista dzienna</a></li>
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/order">Kalendarz</a></li>
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/materials">Materiały</a></li>
                         </ul>
                         <ul class="navbar-nav" th:if="${#authorization.expression('hasAnyRole(''ROLE_EMPLOYEE'')')}">
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Panel wiadomości</a></li>
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/daily">Lista dzienna</a></li>
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/order">Kalendarz</a></li>
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/materials">Materiały</a></li>
                         </ul>
                         <ul class="navbar-nav" th:if="${#authorization.expression('hasAnyRole(''ROLE_CLIENT'')')}">
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Napisz wiadomość</a></li>
