@@ -147,74 +147,74 @@
 </div>
                 </div>
                 <h1></h1>
-                <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <form id="orderForm"> <!-- Added form element with an id -->
-                                <div class="modal-header">
-                                    <h4 class="modal-title">Dodaj zlecenie</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form id="orderForm"> <!-- Added form element with an id -->
+                            <div class="modal-header">
+                                <h4 class="modal-title">Dodaj zlecenie</h4>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Opis</span>
+                                    <input class="form-control" type="text" name="description" style="margin-bottom: 10px;" required>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Opis</span>
-                                        <input class="form-control" type="text" name="description" style="margin-bottom: 10px;" required>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Klient</span>
-                                        <input class="form-control" type="text" name="clientName" style="margin-bottom: 10px;" required>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">E-mail</span>
-                                        <input class="form-control" type="email" name="email" style="margin-bottom: 10px;" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Numer telefonu</span>
-                                        <input class="form-control" type="tel" name="phoneNumber" style="margin-bottom: 10px;" pattern="[0-9]{9}" required>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Czas trwania</span>
-                                        <input type="number" step="0.5" min="0" id="hours" name="hours" style="margin-bottom: 10px;" required>
-                                        <button id="checkAvailabilityBtn" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Terminy</button>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
-                                        <input class="form-control" type="date" name="startDate" id="startDate" style="margin-bottom: 10px;" required>
-                                        <input class="form-control" type="time" name="startTime" id="startTime" style="margin-bottom: 10px;" required>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Klient</span>
+                                    <input class="form-control" type="text" name="clientName" style="margin-bottom: 10px;" required>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">E-mail</span>
+                                    <input class="form-control" type="email" name="email" style="margin-bottom: 10px;" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+                                </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Numer telefonu</span>
+                                    <input class="form-control" type="tel" name="phoneNumber" style="margin-bottom: 10px;" pattern="[0-9]{9}" required>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Czas trwania</span>
+                                    <input type="number" step="0.5" min="0" id="hours" name="hours" style="margin-bottom: 10px;" required>
+                                    <button id="checkAvailabilityBtn" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Terminy</button>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
+                                    <input class="form-control" type="date" name="startDate" id="startDate" style="margin-bottom: 10px;" required>
+                                    <input class="form-control" type="time" name="startTime" id="startTime" style="margin-bottom: 10px;" required>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
 
-                                        <input class="form-control" type="date" name="endDate" id="endDate" style="margin-bottom: 10px;" required>
-                                        <input class="form-control" type="time" name="endTime" id="endTime" style="margin-bottom: 10px;" required>
-                                    </div>
-                                    <div class="input-group" style="margin-bottom: 10px;">
-                                        <span class="input-group-text">Addon</span>
-                                        <input class="form-control" type="text" id="selectedUser" disabled />
-                                        <div class="dropdown">
-                                            <button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button">Wybierz użytkownika </button>
-                                            <div class="dropdown-menu" id="userDropdown"></div>
-                                        </div>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Cena</span>
-                                        <input class="form-control" type="number" name="price" style="margin-bottom: 10px;" required>
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="margin-bottom: 10px;">Materiały</span>
-                                        <input id="materialInput" class="form-control" type="text" name="materials" style="margin-bottom: 10px;">
-                                        <button id="addMaterialBtn" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Dodaj</button>
-                                    </div>
-                                    <ul id="materialList"></ul>
+                                    <input class="form-control" type="date" name="endDate" id="endDate" style="margin-bottom: 10px;" required>
+                                    <input class="form-control" type="time" name="endTime" id="endTime" style="margin-bottom: 10px;" required>
                                 </div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button>
-                                    <button class="btn btn-primary" type="submit">Zapisz</button> <!-- Changed to submit button -->
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Pracownik</span>
+                                    <input class="form-control" type="text" id="selectedUser" style="margin-bottom: 10px;" disabled />
+                                    <div class="dropdown" style="margin-bottom: 10px;">
+                                        <button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button">Wybierz użytkownika </button>
+                                        <div class="dropdown-menu" id="userDropdown"></div>
+                                    </div>
                                 </div>
-                            </form>
-                        </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Cena</span>
+                                    <input class="form-control" type="number" name="price" style="margin-bottom: 10px;" required>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 3%;">
+                                    <span class="input-group-text" style="margin-bottom: 10px;">Materiały</span>
+                                    <input id="materialInput" class="form-control" type="text" name="materials" style="margin-bottom: 10px;">
+                                    <button id="addMaterialBtn" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Dodaj</button>
+                                </div>
+                                <ul id="materialList" ></ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button>
+                                <button class="btn btn-primary" type="submit">Zapisz</button> <!-- Changed to submit button -->
+                            </div>
+                        </form>
                     </div>
                 </div>
+            </div>
                 <div class="row"><div class="bootstrap_calendar">
 <div class="container py-5">
 

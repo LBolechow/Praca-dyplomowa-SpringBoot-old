@@ -104,7 +104,9 @@ public class OrderController {
     @GetMapping(value = "/order/getDailyOrders")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getDailyOrders(
-            @RequestParam(name = "selectedDate", required = false) String selectedDateStr) {
+            Authentication authentication,
+            @RequestParam(name = "selectedDate", required = false) String selectedDateStr
+    ) {
         try {
             LocalDate selectedDate;
 
@@ -124,12 +126,41 @@ public class OrderController {
             LocalDateTime startOfDay = selectedDate.atStartOfDay();
             LocalDateTime endOfDay = selectedDate.atTime(23, 59, 59);
 
-            List<Order> orders = orderRepository.findByEndDateBetween(
-                    Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()),
-                    Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
-            );
+            List<Order> orders;
+
+            String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
+            User user = userRepository.findByEmail(userEmail);
+
+            // Check if the user has ROLE_ADMIN
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+
+            if (isAdmin) {
+                // If user has ROLE_ADMIN, retrieve all orders
+                orders = orderRepository.findByEndDateBetween(
+                        Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()),
+                        Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
+                );
+            } else {
+                // If user has ROLE_EMPLOYEE, retrieve orders only for that user
+                String username = user.getName();
+                orders = orderRepository.findByEmployeeNameAndEndDateBetween(
+                        username,
+                        Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()),
+                        Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
+                );
+
+            }
 
             List<Map<String, Object>> ordersData = new ArrayList<>();
+
+            for (Map<String, Object> order : ordersData) {
+                System.out.println("Order:");
+                for (Map.Entry<String, Object> entry : order.entrySet()) {
+                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                }
+                System.out.println("-------------------------");
+            }
 
             for (Order order : orders) {
                 Map<String, Object> orderData = new HashMap<>();
@@ -259,6 +290,7 @@ public class OrderController {
             String selectedUser = (String) request.get("selectedUser");
             List<User> users = userRepository.findByNameContainingIgnoreCase(selectedUser);
             User user = users.isEmpty() ? null : users.get(0);
+            order.setEmployeeName(user.getName());
 
             order.setDescription((String) request.get("description"));
             order.setClientName((String) request.get("clientName"));
@@ -482,7 +514,11 @@ public class OrderController {
     @GetMapping("/order/search")
     public ResponseEntity<List<Order>> searchOrdersByStartDateBetweenWithMaterials(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            Authentication authentication) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
         LocalDateTime startDateTime = LocalDateTime.of(fromDate, LocalTime.MIN);
         LocalDateTime endDateTime = LocalDateTime.of(toDate, LocalTime.MAX);
@@ -490,7 +526,18 @@ public class OrderController {
         Date startDate = Date.from(startDateTime.atZone(ZoneId.systemDefault()).toInstant());
         Date endDate = Date.from(endDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        List<Order> matchingOrders = orderRepository.findByStartDateBetweenWithMaterials(startDate, endDate);
+        List<Order> matchingOrders;
+        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
+        User user = userRepository.findByEmail(userEmail);
+
+        if (isAdmin) {
+            // If the user is an admin, retrieve all orders
+            matchingOrders = orderRepository.findByStartDateBetweenWithMaterials(startDate, endDate);
+        } else {
+            // If the user is not an admin, retrieve only orders related to the logged-in employee
+            String employeeName = user.getName();
+            matchingOrders = orderRepository.findByEmployeeNameAndStartDateBetweenWithMaterials(employeeName, startDate, endDate);
+        }
 
         return ResponseEntity.ok(matchingOrders);
     }

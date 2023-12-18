@@ -222,8 +222,7 @@
 
         // Tworzymy tekst w formacie "description - clientName"
         var orderText = order.description ? '<strong>' + order.description + '</strong>' : 'Brak opisu zamówienia';
-        var clientNameText = order.clientName ? '<strong>' + order.clientName + '</strong>' : 'Brak nazwy klienta';
-        listItem.innerHTML = orderText + ' - ' + clientNameText;
+        listItem.innerHTML = orderText;
 
         // Dodajemy listę materiałów
         var materialsList = document.createElement('ul');

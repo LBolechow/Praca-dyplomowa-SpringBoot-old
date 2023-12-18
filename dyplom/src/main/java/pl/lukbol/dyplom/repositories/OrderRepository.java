@@ -30,4 +30,17 @@ public interface OrderRepository extends JpaRepository<Order, Long>
 
     @Query("SELECT o FROM Order o WHERE o.clientEmail = :userEmail")
     List<Order> findOrdersByUserEmail(@Param("userEmail") String userEmail);
+
+    @Query("SELECT o FROM Order o WHERE o.employeeName = :employeeName AND o.endDate BETWEEN :startDate AND :endDate")
+    List<Order> findByEmployeeNameAndEndDateBetween(
+            @Param("employeeName") String employeeName,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate
+    );
+    @Query("SELECT o FROM Order o WHERE o.employeeName = :employeeName AND o.startDate BETWEEN :startDate AND :endDate")
+    List<Order> findByEmployeeNameAndStartDateBetweenWithMaterials(
+            @Param("employeeName") String employeeName,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate
+    );
 }
