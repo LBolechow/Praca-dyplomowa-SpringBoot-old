@@ -143,7 +143,7 @@
           </ul>
         </div>
       </nav>
-      <label class="form-label" style="font-size: 34px;">Materiały</label>
+      <label class="form-label" style="font-size: 40px;">Materiały</label>
       <div class="container" style="width: 100%;text-align: center;margin-bottom: 2%;">
         <label class="form-label">Od:&nbsp;</label>
         <input type="date" id="startDateInput" required>
@@ -154,6 +154,9 @@
       </label>
       <h1></h1>
       <button class="btn btn-primary" type="button" onclick="searchOrders()">Wyszukaj</button>
+      </br>
+      <input type="checkbox" id="showOnlyUnchecked" onchange="searchOrders()">
+      <label for="showOnlyUnchecked">Wyświetl tylko brakujące materiały</label>
       <div style="text-align:center;">
         <section class="py-5 bg-light">
           <div class="container">
@@ -189,6 +192,7 @@
   function searchOrders() {
     var startDate = document.getElementById('startDateInput').value;
     var endDate = document.getElementById('endDateInput').value;
+    var showOnlyUnchecked = document.getElementById('showOnlyUnchecked').checked;
 
     // Wysłanie zapytania do API
     $.ajax({
@@ -200,7 +204,7 @@
       },
       success: function (data) {
         // Po pomyślnym pobraniu danych, aktualizujemy listę wyników
-        updateResultList(data);
+        updateResultList(data, showOnlyUnchecked);
       },
       error: function () {
         console.error("Błąd podczas pobierania danych z API.");
@@ -208,44 +212,89 @@
     });
   }
 
-  function updateResultList(orders) {
+  function updateResultList(orders, showOnlyUnchecked) {
     var resultList = document.getElementById('resultList');
 
     // Usuwamy istniejące elementy z listy
     resultList.innerHTML = '';
 
+    // Sortujemy zlecenia alfabetycznie
+    orders.sort(function (a, b) {
+      var nameA = a.description.toUpperCase();
+      var nameB = b.description.toUpperCase();
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    });
+
     // Dodajemy nowe elementy do listy
     orders.forEach(function (order) {
-      // Sprawdzamy, czy lista materiałów jest niepusta
-      if (order.materials.length > 0) {
+      // Sprawdzamy, czy lista materiałów jest niepusta i czy są materiały do wyświetlenia
+      if (order.materials.length > 0 && order.materials.some(material => !showOnlyUnchecked || !material.checked)) {
         var listItem = document.createElement('li');
 
+        // Dodajemy klasę dla nazwy zlecenia
+        listItem.className = 'list-group-item list-group-item-primary mb-4'; // Dodajemy margines (mb-4)
+        listItem.style.listStyleType = 'none'; // Usuwamy kropki
+
         // Tworzymy tekst w formacie "description - clientName"
-        var orderText = order.description ? '<strong>' + order.description + '</strong>' : 'Brak opisu zamówienia';
+        var orderText = order.description ? '<strong style="font-size: 24px;">' + order.description + '</strong>' : 'Brak opisu zamówienia';
         listItem.innerHTML = orderText;
+
+        // Przechowujemy oryginalny porządek materiałów przed sortowaniem
+        var originalMaterialsOrder = order.materials.slice();
+
+        // Sortujemy materiały alfabetycznie
+        order.materials.sort(function (a, b) {
+          var nameA = a.item.toUpperCase();
+          var nameB = b.item.toUpperCase();
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+          return 0;
+        });
 
         // Dodajemy listę materiałów
         var materialsList = document.createElement('ul');
-        order.materials.forEach(function (material) {
-          var materialItem = document.createElement('li');
+        materialsList.className = 'list-group'; // Dodajemy klasę listy materiałów
 
-          // Sprawdzamy, czy istnieje pole item w materiale
-          var materialItemName = material.item ? material.item : 'Brak nazwy materiału';
+        order.materials.forEach(function (material, index) {
+          // Sprawdzamy, czy materiał powinien być wyświetlany
+          if (!showOnlyUnchecked || !material.checked) {
+            var materialItem = document.createElement('li');
 
-          // Jeżeli checked jest true, dodajemy styl CSS przekreślenia
-          if (material.checked) {
-            materialItem.style.textDecoration = 'line-through';
+            // Odzyskujemy oryginalny stan checked
+            var originalMaterial = originalMaterialsOrder.find(original => original.id === material.id);
+            var originalChecked = originalMaterial ? originalMaterial.checked : false;
+
+            // Dodajemy klasę w zależności od wartości checked
+            if (originalChecked) {
+              materialItem.className = 'list-group-item list-group-item-action list-group-item-success';
+            } else {
+              materialItem.className = 'list-group-item list-group-item-action list-group-item-danger';
+            }
+
+            if (originalChecked) {
+              material.item += ' (posiadane)';
+            }
+
+            // Dodajemy obsługę kliknięcia na tekst w liście
+            materialItem.addEventListener('click', function () {
+              // Wysyłamy żądanie do API w celu aktualizacji wartości checked
+              updateMaterialCheckedState(material.id, !originalChecked);
+            });
+
+            materialItem.innerText = material.item; // Używamy samej nazwy materiału
+
+            materialsList.appendChild(materialItem);
           }
-
-          // Dodajemy obsługę kliknięcia na tekst w liście
-          materialItem.addEventListener('click', function () {
-            // Wysyłamy żądanie do API w celu aktualizacji wartości checked
-            updateMaterialCheckedState(material.id, !material.checked);
-          });
-
-          materialItem.innerText = materialItemName;
-
-          materialsList.appendChild(materialItem);
         });
 
         listItem.appendChild(materialsList);

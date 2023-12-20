@@ -278,7 +278,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-                                <button type="button" class="btn btn-primary" id="addUserButton">Dodaj</button>
+                                <button type="button" class="btn btn-primary" id="addUserButton" data-bs-dismiss="modal">Dodaj</button>
                             </div>
                             <div id="successMessage" style="color: green;" class="d-flex justify-content-center"></div>
                             <div id="errorMessage" style="color: red;" class="d-flex justify-content-center"></div>
@@ -373,20 +373,16 @@
             var errorMessage = $("#errorMessage");
 
             if (data.success) {
-                successMessage.text("Użytkownik został dodany pomyślnie.");
+                alert("Użytkownik został dodany pomyślnie.");
+                location.reload();
                 errorMessage.text("");
             } else {
-                errorMessage.text("Wystąpił błąd podczas dodawania użytkownika: " + data.message);
+                alert("Wystąpił błąd podczas dodawania użytkownika: " + data.message);
                 successMessage.text("");
             }
 
-            successMessage.show();
-            errorMessage.show();
         }).fail(function (error) {
             console.error("Wystąpił błąd: " + error.statusText);
-            // Pokaż komunikat o błędzie
-            $("#successMessage").hide();
-            $("#errorMessage").show();
         });
     });
 
