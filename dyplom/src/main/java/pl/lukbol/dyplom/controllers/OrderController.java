@@ -131,18 +131,17 @@ public class OrderController {
             String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
             User user = userRepository.findByEmail(userEmail);
 
-            // Check if the user has ROLE_ADMIN
             boolean isAdmin = authentication.getAuthorities().stream()
                     .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
             if (isAdmin) {
-                // If user has ROLE_ADMIN, retrieve all orders
+
                 orders = orderRepository.findByEndDateBetween(
                         Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant()),
                         Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant())
                 );
             } else {
-                // If user has ROLE_EMPLOYEE, retrieve orders only for that user
+
                 String username = user.getName();
                 orders = orderRepository.findByEmployeeNameAndEndDateBetween(
                         username,
@@ -339,7 +338,6 @@ public class OrderController {
                 Calendar currentDateTime = Calendar.getInstance();
                 currentDateTime.setTime(orderEndDate);
 
-                // Jeżeli przekracza 16:00, przesuń na następny dzień i ustaw na 8:00
                 if (currentDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
                     currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
                     currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
@@ -352,7 +350,6 @@ public class OrderController {
                         int durationMinutes = (int) (durationHours * 60);
                         endDateTime.add(Calendar.MINUTE, durationMinutes);
 
-                        // Jeżeli endDateTime przekracza 16:00, przesuń na następny dzień i ustaw na 8:00
                         if (endDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
                             currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
                             currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
@@ -377,7 +374,6 @@ public class OrderController {
                         }
                     }
 
-                    // Przesuń na następny dzień i ustaw na 8:00
                     currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
                     currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
                     currentDateTime.set(Calendar.MINUTE, 0);
@@ -418,7 +414,6 @@ public class OrderController {
                     int durationMinutes = (int) (durationHours * 60);
                     endDateTime.add(Calendar.MINUTE, durationMinutes);
 
-                    // Ogranicz godzinę zakończenia do 16:00
                     if (endDateTime.get(Calendar.HOUR_OF_DAY) > 16) {
                         endDateTime.set(Calendar.HOUR_OF_DAY, 16);
                         endDateTime.set(Calendar.MINUTE, 0);
@@ -468,15 +463,13 @@ public class OrderController {
         for (User user : allUsers) {
             boolean isAvailable = true;
 
-            // Sprawdzanie roli użytkownika
             Collection<Role> userRoles = user.getRoles();
             List<String> userRoleNames = userRoles.stream()
                     .map(Role::getName)
                     .collect(Collectors.toList());
 
-            // Sprawdzenie, czy użytkownik ma jedną z poszukiwanych ról
             if (userRoleNames.stream().anyMatch(roleNamesToSearch::contains)) {
-                // Sprawdzanie dostępności użytkownika
+
                 List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
 
                 for (Order order : userOrders) {
@@ -531,10 +524,10 @@ public class OrderController {
         User user = userRepository.findByEmail(userEmail);
 
         if (isAdmin) {
-            // If the user is an admin, retrieve all orders
+
             matchingOrders = orderRepository.findByStartDateBetweenWithMaterials(startDate, endDate);
         } else {
-            // If the user is not an admin, retrieve only orders related to the logged-in employee
+
             String employeeName = user.getName();
             matchingOrders = orderRepository.findByEmployeeNameAndStartDateBetweenWithMaterials(employeeName, startDate, endDate);
         }

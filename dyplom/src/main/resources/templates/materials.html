@@ -194,7 +194,6 @@
     var endDate = document.getElementById('endDateInput').value;
     var showOnlyUnchecked = document.getElementById('showOnlyUnchecked').checked;
 
-    // Wysłanie zapytania do API
     $.ajax({
       type: "GET",
       url: "/order/search",
@@ -203,7 +202,7 @@
         toDate: endDate
       },
       success: function (data) {
-        // Po pomyślnym pobraniu danych, aktualizujemy listę wyników
+
         updateResultList(data, showOnlyUnchecked);
       },
       error: function () {
@@ -215,10 +214,8 @@
   function updateResultList(orders, showOnlyUnchecked) {
     var resultList = document.getElementById('resultList');
 
-    // Usuwamy istniejące elementy z listy
     resultList.innerHTML = '';
 
-    // Sortujemy zlecenia alfabetycznie
     orders.sort(function (a, b) {
       var nameA = a.description.toUpperCase();
       var nameB = b.description.toUpperCase();
@@ -231,24 +228,19 @@
       return 0;
     });
 
-    // Dodajemy nowe elementy do listy
     orders.forEach(function (order) {
-      // Sprawdzamy, czy lista materiałów jest niepusta i czy są materiały do wyświetlenia
+
       if (order.materials.length > 0 && order.materials.some(material => !showOnlyUnchecked || !material.checked)) {
         var listItem = document.createElement('li');
 
-        // Dodajemy klasę dla nazwy zlecenia
         listItem.className = 'list-group-item list-group-item-primary mb-4'; // Dodajemy margines (mb-4)
         listItem.style.listStyleType = 'none'; // Usuwamy kropki
 
-        // Tworzymy tekst w formacie "description - clientName"
         var orderText = order.description ? '<strong style="font-size: 24px;">' + order.description + '</strong>' : 'Brak opisu zamówienia';
         listItem.innerHTML = orderText;
 
-        // Przechowujemy oryginalny porządek materiałów przed sortowaniem
         var originalMaterialsOrder = order.materials.slice();
 
-        // Sortujemy materiały alfabetycznie
         order.materials.sort(function (a, b) {
           var nameA = a.item.toUpperCase();
           var nameB = b.item.toUpperCase();
@@ -261,20 +253,17 @@
           return 0;
         });
 
-        // Dodajemy listę materiałów
         var materialsList = document.createElement('ul');
         materialsList.className = 'list-group'; // Dodajemy klasę listy materiałów
 
         order.materials.forEach(function (material, index) {
-          // Sprawdzamy, czy materiał powinien być wyświetlany
+
           if (!showOnlyUnchecked || !material.checked) {
             var materialItem = document.createElement('li');
 
-            // Odzyskujemy oryginalny stan checked
             var originalMaterial = originalMaterialsOrder.find(original => original.id === material.id);
             var originalChecked = originalMaterial ? originalMaterial.checked : false;
 
-            // Dodajemy klasę w zależności od wartości checked
             if (originalChecked) {
               materialItem.className = 'list-group-item list-group-item-action list-group-item-success';
             } else {
@@ -285,9 +274,8 @@
               material.item += ' (posiadane)';
             }
 
-            // Dodajemy obsługę kliknięcia na tekst w liście
             materialItem.addEventListener('click', function () {
-              // Wysyłamy żądanie do API w celu aktualizacji wartości checked
+
               updateMaterialCheckedState(material.id, !originalChecked);
             });
 
@@ -304,14 +292,14 @@
   }
 
   function updateMaterialCheckedState(materialId, checked) {
-    // Wysłanie żądania do API w celu aktualizacji wartości checked
+
     $.ajax({
       type: "PATCH",
       url: "/material/" + materialId,
       contentType: "application/json",
       data: JSON.stringify({ checked: checked }),
       success: function () {
-        // Po pomyślnym zaktualizowaniu wartości, ponownie pobieramy i aktualizujemy listę wyników
+
         searchOrders();
       },
       error: function () {

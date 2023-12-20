@@ -174,11 +174,11 @@
     $.get("/user", function(data) {
         $("#user").html(data.name);
         if (data.activated) {
-            // Kod dla aktywowanego użytkownika
+
             $(".activated-content").show();
             $(".non-activated-content").hide();
         } else {
-            // Kod dla nieaktywowanego użytkownika
+
             $(".activated-content").hide();
             $(".non-activated-content").show();
         }
@@ -216,12 +216,12 @@
                 url: "/user/activateMail",
                 contentType: "application/json",
                 success: function(response) {
-                    // Obsłuż odpowiedź z serwera (np. pokaż komunikat o sukcesie)
+
                     console.log(response);
                     alert("Wiadomość z kodem aktywacyjnym została wysłana na Twój adres e-mail.");
                 },
                 error: function(error) {
-                    // Obsłuż błąd (np. pokaż komunikat o błędzie)
+
                     console.error(error);
                     alert("Wystąpił błąd podczas aktywacji.");
                 }

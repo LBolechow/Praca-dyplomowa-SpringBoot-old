@@ -450,7 +450,7 @@
             var materialValue = materialInput.val();
 
             if (materialValue && materialValue.trim() !== "") {
-                // Dodaj element do listy z obsługą kliknięcia
+
                 var listItem = $("<li>" + materialValue + "</li>");
 
                 materialList.append(listItem);
@@ -484,7 +484,6 @@
             var combinedStartDateTime = new Date(startDate + 'T' + startTime);
             var combinedEndDateTime = new Date(endDate + 'T' + endTime);
 
-            // Dodane nowe pola
             var hours = $("#hours").val();
             var selectedUser = $("#selectedUser").val();
 
@@ -518,16 +517,15 @@
 </script>
 <script>
     $(document).ready(function() {
-        // Funkcja do pobierania i wyświetlania użytkowników w dropdownie
+
         function fetchUsers() {
             $.ajax({
                 url: '/users/findByRole', // Twoje API endpoint
                 method: 'GET',
                 success: function(users) {
-                    // Wyczyszczenie istniejącej listy
+
                     $('#userDropdown').empty();
 
-                    // Dodanie użytkowników do dropdowna
                     users.forEach(function(user) {
                         $('#userDropdown').append('<a class="dropdown-item" href="#" onclick="selectUser(\'' + user.name + '\')">' + user.name + '</a>');
                     });
@@ -538,23 +536,20 @@
             });
         }
 
-        // Funkcja do ustawiania wybranego użytkownika w inpucie
         window.selectUser = function(userName) {
             $('#selectedUser').val(userName);
         };
 
-        // Wywołaj funkcję fetchUsers, aby wczytać użytkowników przy ładowaniu strony
         fetchUsers();
     });
 </script>
 <script>
     $(document).ready(function () {
-        // Obsługa kliknięcia przycisku "Sprawdź dostępność"
+
         $("#checkAvailabilityBtn").click(function () {
-            // Pobierz czas trwania z formularza
+
             var durationHours = $("#hours").val();
 
-            // Wywołaj kontroler za pomocą AJAX
             $.ajax({
                 type: "GET",
                 url: "/order/checkAvailability",
@@ -568,15 +563,12 @@
                         var startDateText = startDate.toISOString().slice(0, 10);
                         var endDateText = endDate.toISOString().slice(0, 10);
 
-                        // Przeliczanie czasu trwania na godziny i minuty
                         var durationMinutes = response.durationMinutes;
                         var durationHours = Math.floor(durationMinutes / 60);
                         var durationMinutesRemainder = durationMinutes % 60;
 
-                        // Ustawianie czasu trwania w inpucie
                         $("#hours").val(durationHours + durationMinutesRemainder / 60);
 
-                        // Ustawianie pozostałych pól formularza
                         $("#startDate").val(startDateText);
                         $("#startTime").val(response.startTime);
                         $("#endDate").val(endDateText);

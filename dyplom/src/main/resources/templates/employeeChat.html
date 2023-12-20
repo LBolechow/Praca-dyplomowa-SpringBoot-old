@@ -280,7 +280,7 @@
     });
 
     function showMessage(message) {
-        // Create a message element based on the fetched data
+
         var isCurrentUserMessage = message.sender.id === employeeId;// Sprawdź, czy wiadomość jest od bieżącego użytkownika
 
         var messageElement = `
@@ -301,7 +301,6 @@
             messageElement = messageElement.replace('bg-light', 'bg-custom-orange text-white');
         }
 
-        // Append the message to the chat box
         $('#chat-box').append(messageElement);
         scrollToBottom();
         console.log('Message element:', messageElement);

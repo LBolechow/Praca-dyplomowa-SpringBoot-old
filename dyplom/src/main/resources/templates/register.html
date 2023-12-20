@@ -60,20 +60,18 @@
 <script src="/static/js/theme.js"></script>
 </body>
 <script>
-    // Function to validate the email address format
+
     function validateEmail(email) {
-        // Regular expression for validating the email format
+
         var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        // Test the email against the pattern
         return emailPattern.test(email);
     }
 
     function validatePassword() {
-        // ... (your existing password validation function) ...
+
     }
 
-    // ... (rest of your script code) ...
 </script>
 <script>
     function validatePassword() {
@@ -81,7 +79,6 @@
         var repeatPassword = document.getElementById("repeatPassword").value;
         var email = document.getElementById("email").value;
 
-        // Validate email format
         if (!validateEmail(email)) {
             alert("Wprowadź poprawny adres email.");
             return false;
@@ -91,7 +88,7 @@
             alert("Hasła nie pasują do siebie. Proszę wprowadzić identyczne hasła.");
             return false;
         } else {
-            // Passwords match, you can proceed with the form submission.
+
             document.getElementById("registrationForm").submit();
         }
     }

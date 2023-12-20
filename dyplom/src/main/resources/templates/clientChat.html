@@ -189,7 +189,6 @@
     var clientName; // Declare clientName in a higher scope
     var clientEmail;
 
-    // Fetch clientId and clientName
     $.get("/user", function(data) {
         $("#user").html(data.name);
         clientId = data.id; // Assign the value to the global clientId variable
@@ -208,12 +207,11 @@
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic/employees', function (message) {
-                // Handle incoming messages and display them in the chat box
+
                 console.log('Received message:', message);
                 showMessage(JSON.parse(message.body));
             });
 
-            // Fetch conversation data after connecting
             getClientConversation();
         });
     }
@@ -236,18 +234,16 @@
     }
 
     function getClientConversation() {
-        // Make an API request to fetch the conversation data
+
         $.ajax({
             url: '/api/conversation', // Update the URL to match your API endpoint
             method: 'GET',
             success: function (data) {
-                // Once you have the conversation data, you can use it as needed
+
                 console.log('Fetched conversation data:', data);
 
-                // Clear the chat box first
                 $('#chat-box').empty();
 
-                // Loop through the messages and display them
                 data.forEach(function (message) {
                     showMessage(message);
                 });
@@ -266,7 +262,7 @@
     });
 
     function showMessage(message) {
-        // Create a message element based on the fetched data
+
         var isCurrentUserMessage = message.sender.id === clientId; // Sprawdź, czy wiadomość jest od bieżącego użytkownika
 
         var messageElement = `
@@ -283,12 +279,10 @@
         </div>
     `;
 
-        // Ustaw kolor tła na niebieski dla wiadomości od innych użytkowników
         if (!isCurrentUserMessage) {
             messageElement = messageElement.replace('bg-light', 'bg-custom-orange text-white');
         }
 
-        // Append the message to the chat box
         $('#chat-box').append(messageElement);
         scrollToBottom();
         console.log('Message element:', messageElement);
