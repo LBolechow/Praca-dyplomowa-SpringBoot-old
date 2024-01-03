@@ -248,6 +248,7 @@
     <script src="/static/js/Table-With-Search.js"></script>
     <script src="/static/js/theme.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -504,7 +505,7 @@
                     selectedUser: selectedUser
                 }),
                 success: function (response) {
-                    console.log(response);
+                    generatePdf(response);
                     alert("Zamówienie dodane pomyślnie!");
                 },
                 error: function (error) {
@@ -514,6 +515,15 @@
             });
         });
     });
+    function generatePdf(orderDetails) {
+        window.jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF();
+        pdf.text("Zakład krawiecki");
+        pdf.text("Opis: " + orderDetails.description, 10, 20);
+        pdf.text("Imię i nazwisko klienta: " + orderDetails.clientName, 10, 30);
+        pdf.text("Kod: " + orderDetails.idCode, 10, 40);
+        pdf.output("dataurlnewwindow");
+    }
 </script>
 <script>
     $(document).ready(function() {

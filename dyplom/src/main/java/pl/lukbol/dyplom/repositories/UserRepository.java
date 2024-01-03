@@ -29,5 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRoles_NameContainingIgnoreCase(String role);
 
 
-
+    User findByName(String name);
 }

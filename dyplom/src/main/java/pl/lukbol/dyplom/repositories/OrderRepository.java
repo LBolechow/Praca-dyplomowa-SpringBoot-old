@@ -43,4 +43,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate
     );
+
+    boolean existsByidCode(String generateActivationCode);
 }

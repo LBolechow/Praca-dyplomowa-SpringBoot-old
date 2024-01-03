@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="/static/css/Navbar-With-Button-icons.css">
   <link rel="stylesheet" href="/static/css/Table-With-Search-search-table.css">
   <link rel="stylesheet" href="/static/css/Table-With-Search.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <style>
@@ -30,6 +32,11 @@
   #materialList-edit {
     text-align: left;
   }
+     /* Dodaj styl dla kalendarza */
+   #calendar .fc-scroller {
+     overflow-y: hidden !important;
+   }
+
 </style>
 
 <body id="page-top" style="height: 1080px;">
@@ -202,7 +209,7 @@
                     </button>
                     <div class="dropdown-menu" id="statusDropdown-edit" >
                       <a class="dropdown-item" href="#" data-value="true">W trakcie</a>
-                      <a class="dropdown-item" href="#" data-value="false">Zakończone</a>
+                      <a class="dropdown-item" href="#" data-value="false">Wydane</a>
                     </div>
                   </div>
                 </div>
@@ -215,12 +222,14 @@
               </div>
               <div class="modal-footer">
                 <button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button>
+                <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#modal-3">Usuń zlecenie</button>
                 <button class="btn btn-primary" type="submit" data-bs-dismiss="modal">Zapisz zmiany</button>
               </div>
             </form>
           </div>
         </div>
       </div>
+
       <h1></h1>
       <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
         <div class="modal-dialog" role="document">
@@ -304,32 +313,11 @@
             </div>
           </div>
         </div>
-        <div class="row" id="calendar">
-                      <div class="col-md-3" style="width: 20%;text-align: center;margin-bottom: 1%;"><label class="form-label" style="width: 100%;font-size: 24px;font-family: ABeeZee, sans-serif;">Data</label><label class="form-label" style="font-family: ABeeZee, sans-serif;font-size: 18px;">Poniedziałek</label></div>
-                      <div class="col-md-3" style="width: 20%;text-align: center;margin-bottom: 1%;"><label class="form-label" style="width: 100%;font-size: 24px;font-family: ABeeZee, sans-serif;">Data</label><label class="form-label" style="font-family: ABeeZee, sans-serif;font-size: 18px;">Wtorek</label></div>
-                      <div class="col-md-3" style="width: 20%;text-align: center;margin-bottom: 1%;"><label class="form-label" style="width: 100%;font-size: 24px;font-family: ABeeZee, sans-serif;">Data</label><label class="form-label" style="font-family: ABeeZee, sans-serif;font-size: 18px;">Środa</label></div>
-                      <div class="col-md-3" style="width: 20%;text-align: center;margin-bottom: 1%;"><label class="form-label" style="width: 100%;font-size: 24px;font-family: ABeeZee, sans-serif;">Data</label><label class="form-label" style="font-family: ABeeZee, sans-serif;font-size: 18px;">Czwartek</label></div>
-                      <div class="col" style="width: 20%;text-align: center;margin-bottom: 1%;"><label class="form-label" style="width: 100%;font-size: 24px;font-family: ABeeZee, sans-serif;">Data</label><label class="form-label" style="font-family: ABeeZee, sans-serif;font-size: 18px;">Piątek</label></div>
-                    </div>
+
                 </div>
-                <div class="table-responsive" style="margin-top: 19px;">
-                  <table class="table" id="ordersTable">
-                        <thead>
-                            <tr>
-                              <th >Id</th>
-                                <th >Opis</th>
-                                <th>Klient</th>
-                                <th>Pracownik</th>
-                              <th>Początek</th>
-                              <th>Koniec</th>
-                              <th>Status</th>
-                              <th>Akcje</th>
-                            </tr>
-                        </thead>
-                    <tbody id="ordersTableBody">
-                    </tbody>
-                    </table>
-                </div>
+      <div class="table-responsive" style="margin-top: 19px;">
+        <div id="calendar"></div>
+      </div>
     </div>
   </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
 </div>
@@ -339,7 +327,11 @@
 <script src="/static/js/theme.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="/static/js/moment.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.32/moment-timezone.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/pl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 
 </body>
 
@@ -403,7 +395,9 @@
           selectedUser: selectedUser
         }),
         success: function (response) {
-          console.log(response);
+          generatePdf(response);
+          $('#calendar').fullCalendar('refetchEvents');
+
           alert("Zamówienie dodane pomyślnie!");
         },
         error: function (error) {
@@ -413,72 +407,17 @@
       });
     });
   });
+  function generatePdf(orderDetails) {
+    window.jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF();
+    pdf.text("Zakład krawiecki");
+    pdf.text("Opis: " + orderDetails.description, 10, 20);
+    pdf.text("Imię i nazwisko klienta: " + orderDetails.clientName, 10, 30);
+    pdf.text("Kod: " + orderDetails.idCode, 10, 40);
+    pdf.output("dataurlnewwindow");
+  }
 </script>
-<script>
-  $(document).ready(function () {
-    function formatDate(date) {
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear().toString().slice(-2);
-      return `${day}.${month}.${year}`;
-    }
 
-    function generateCalendar(centerDate) {
-      const daysOfWeek = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
-      const centerColor = 'var(--bs-warning)';
-
-      $('#calendar').empty();
-
-      for (let i = -2; i <= 2; i++) {
-        const currentDate = new Date(centerDate);
-        currentDate.setDate(centerDate.getDate() + i);
-        const dayOfWeek = daysOfWeek[currentDate.getDay()];
-        const textColor = (i === 0) ? centerColor : '';
-        if (i == 0)
-        {
-          displayOrders(formatDate(currentDate));
-        }
-        const column = `
-            <div class="col-md-3" style="width: 20%; text-align: center; margin-bottom: 1%;">
-              <label class="form-label" style="width: 100%; font-size: 24px; font-family: ABeeZee, sans-serif; color: ${textColor};">${formatDate(currentDate)}</label>
-              <label class="form-label" style="font-family: ABeeZee, sans-serif; font-size: 18px; color: ${textColor};">${dayOfWeek}</label>
-            </div>
-          `;
-
-        $('#calendar').append(column);
-      }
-    }
-
-    let today;
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('wybrana_data')) {
-      const selectedDateStr = urlParams.get('wybrana_data');
-      const [day, month, year] = selectedDateStr.split('.').map(Number);
-      today = new Date(year, month - 1, day);
-    } else {
-      today = new Date();
-    }
-
-    generateCalendar(today);
-
-    $('#calendar').on('click', '.col-md-3', function () {
-      const index = $(this).index();
-
-      if (index === 0) {
-        today.setDate(today.getDate() - 2);
-      } else if (index === 1) {
-        today.setDate(today.getDate() - 1);
-      } else if (index === 3) {
-        today.setDate(today.getDate() + 1);
-      } else if (index === 4) {
-        today.setDate(today.getDate() + 2);
-      }
-
-      generateCalendar(today);
-      displayOrders(formatDate(today));
-    });
-  });
-</script>
 <script>
   $(document).ready(function () {
     var materialList = $("#materialList");
@@ -525,45 +464,70 @@
 </script>
 
 <script>
-  function displayOrders(selectedDate) {
-    $.ajax({
-      url: '/order/getDailyOrders',
-      type: 'GET',
-      data: { selectedDate: selectedDate },
-      success: function (response) {
-        $('#ordersTableBody').empty();
+  $(document).ready(function () {
 
-
-        response.forEach(function (order) {
-          const statusText = order.status ? 'W trakcie' : 'Zakończone';
-          const row = `
-              <tr>
-              <td>${order.id}</td>
-                <td>${order.description}</td>
-                <td>${order.clientName}</td>
-                <td>${order.employeeName}</td>
-               <td>${specificDate(order.startDate)}</td>
-<td>${specificDate(order.endDate)}</td>
-
-                <td>${statusText}</td>
-                 <td>
-                   <button class="btn btn-success border-0" style="margin-left: 5px;background: var(--bs-cyan);" type="button" data-bs-toggle="modal" data-bs-target="#modal-edit" data-order-id="${order.id}" onclick="fillEditModal(${order.id})">
-                  <i class="far fa-edit"></i>
-                </button>
-                 <button class="btn btn-danger" style="margin-left: 5px;" type="button" data-bs-toggle="modal" data-bs-target="#modal-3" data-order-id="${order.id}" onclick="setCurrentOrderId(${order.id})"><i class="fa fa-trash" style="font-size: 15px;"></i>
-                 </button>
-                 </td>
-              </tr>
-            `;
-          $('#ordersTableBody').append(row);
-        });
+    $('#calendar').fullCalendar({
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'agendaDay' // Pozostaw tylko widok "Dzień"
       },
-      error: function () {
-        console.log('Błąd podczas pobierania danych zamówień.');
-      }
+      defaultView: 'agendaDay',
+      editable: false,
+      events: {
+        url: '/order/getDailyOrders',
+        method: 'GET',
+        extraParams: {
+          start: function () {
+            return $('#calendar').fullCalendar('getView').start.format();
+
+          },
+          end: function () {
+            return $('#calendar').fullCalendar('getView').end.format();
+          }
+        },
+        timezone: 'Europe/Warsaw',
+        failure: function () {
+          alert('Błąd pobierania danych zamówień.');
+        }
+      },
+      eventClick: function (calEvent, jsEvent, view) {
+        // Obsługa kliknięcia na zdarzenie w kalendarzu
+        openEditModal(calEvent.id);
+      },
+      eventRender: function (event, element) {
+        element.find('.fc-title').html(
+                '<strong>' + event.title + '</strong><br>' +
+                'Klient: ' + event.clientName + '<br>' +
+                'Pracownik: ' + event.employeeName
+        );
+        var backgroundColor = event.status ? '#007bff' : '#ff0000'; // Ustaw kolor tła w zależności od statusu
+        element.css('background-color', backgroundColor)
+      },
+
+      locale: 'pl', // Ustaw lokalizację na polską
+      timeFormat: 'H:mm', // Format godziny w formie 24-godzinnej
+      dayNamesShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr.', 'Czw.', 'Piąt.', 'Sob.'], // Skrócone nazwy dni tygodnia
+      monthNames: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'], // Nazwy miesięcy
+      views: {
+        agendaDay: {
+          buttonText: 'Dzień',
+          minTime: '08:00', // Ustawienie minimalnej godziny
+          maxTime: '16:00' // Ustawienie maksymalnej godziny
+        }
+      },
+
     });
-  }
+
+    function openEditModal(orderId) {
+      currentOrderId = orderId;
+      fillEditModal(orderId);
+      // Pokazuje modal edycji
+      $('#modal-edit').modal('show');
+    }
+  });
 </script>
+
 <script>
   $(document).ready(function() {
     function fetchUsers() {
@@ -671,7 +635,7 @@
             $('#statusDropdownButton').attr('data-value', 'true');
             globalStatus = true;
           } else {
-            $('#statusDropdownButton .status-text').text('Zakończone');
+            $('#statusDropdownButton .status-text').text('Wydane');
             $('#statusDropdownButton').attr('data-value', 'false');
             globalStatus = false;
           }
@@ -699,8 +663,8 @@
       if (selectedStatusValue === 'W trakcie') {
         $('#statusDropdownButton .status-text').text('W trakcie');
         globalStatus = true;
-      } else if (selectedStatusValue === 'Zakończone') {
-        $('#statusDropdownButton .status-text').text('Zakończone');
+      } else if (selectedStatusValue === 'Wydane') {
+        $('#statusDropdownButton .status-text').text('Wydane');
         globalStatus = false;
       }
 
@@ -760,6 +724,7 @@
       data: JSON.stringify(data),
       success: function() {
         console.log('Zamówienie edytowane pomyślnie.');
+        $('#calendar').fullCalendar('refetchEvents');
         $('#modal-edit').modal('hide');
       },
       error: function(error) {
@@ -808,16 +773,12 @@
   });
 </script>
 <script>
-  function setCurrentOrderId(orderId) {
-    currentOrderId = orderId;
-  }
-
   function handleConfirmDelete() {
     $.ajax({
       url: '/order/delete/' + currentOrderId,
       method: 'DELETE',
       success: function (data) {
-        location.reload();
+        $('#calendar').fullCalendar('refetchEvents');
       },
       error: function (error) {
         console.error('Błąd podczas usuwania zlecenia:', error);

@@ -37,7 +37,15 @@ public class Order {
 
     public double duration;
 
+    public String idCode;
 
+    public String getIdCode() {
+        return idCode;
+    }
+
+    public void setIdCode(String idCode) {
+        this.idCode = idCode;
+    }
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -50,7 +58,7 @@ public class Order {
 
     public Order() {}
 
-    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, boolean status, int price, double duration, List<Material> materials, User user) {
+    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, boolean status, int price, double duration, List<Material> materials, User user,String idCode) {
         this.description = description;
         this.clientName = clientName;
         this.clientEmail = clientEmail;
@@ -63,6 +71,7 @@ public class Order {
         this.duration = duration;
         this.materials = materials;
         this.user = user;
+        this.idCode= idCode;
     }
     public String getPhoneNumber() {
         return phoneNumber;
