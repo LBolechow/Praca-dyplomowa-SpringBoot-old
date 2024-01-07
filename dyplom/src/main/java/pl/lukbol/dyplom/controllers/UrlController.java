@@ -25,10 +25,6 @@ public class UrlController {
     public ModelAndView getPrices() {
         return new ModelAndView("price_list");
     }
-    @RequestMapping(value="/order")
-    public ModelAndView getOrders() {
-        return new ModelAndView("order");
-    }
 
     @RequestMapping(value="/daily")
     public ModelAndView getDailies() {
@@ -50,6 +46,10 @@ public class UrlController {
     @RequestMapping(value="/materials")
     public ModelAndView getMaterialsList() {
         return new ModelAndView("materials");
+    }
+    @RequestMapping(value="/ordersList")
+    public ModelAndView getOrderByCode() {
+        return new ModelAndView("orders");
     }
 
 }

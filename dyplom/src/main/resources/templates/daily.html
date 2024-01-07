@@ -51,7 +51,6 @@
                 <li class="nav-item"><a class="nav-link active" href="http://localhost:8080/panel_administratora">Panel administratora</a></li>
               </div>
               <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Panel wiadomości</a></li>
-              <li class="nav-item"><a class="nav-link" href="http://localhost:8080/order">Kalendarz</a></li>
               <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
               <li class="nav-item"><a class="nav-link" href="http://localhost:8080/materials">Materiały</a></li>
             </ul>
@@ -149,6 +148,7 @@
         </div>
       </nav>
        <div class="container" style="width: 100%;text-align: center;margin-bottom: 2%;"><button class="btn btn-outline-primary text-truncate float-none float-sm-none add-another-btn" data-bss-hover-animate="pulse" type="button" style="text-align: center;" data-bs-target="#modal-2" data-bs-toggle="modal">Dodaj zlecenie<i class="fas fa-plus-circle edit-icon"></i></button></div>
+      <input type="checkbox" id="showInProgress" /> Pokaż tylko "W trakcie"
       <div class="modal fade" role="dialog" tabindex="-1" id="modal-edit">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -177,7 +177,8 @@
                 <div class="input-group" style="margin-bottom: 3%;">
                   <span class="input-group-text" style="margin-bottom: 10px;">Czas trwania</span>
                   <input type="number" step="0.5" min="0" id="hours-edit" name="hours-edit" style="margin-bottom: 10px;" required>
-                  <button id="checkAvailabilityBtn-edit" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Przeniesienie</button>
+                  <button id="checkAvailabilityBtn-edit" class="btn btn-primary" type="button" style="margin-bottom: 10px;">Przełóż zlecenie</button>
+                  <button id="checkAvailabilityBtn2-edit"  class="btn btn-primary" type="button" style="margin-bottom: 10px; margin-left: 10px;">Przenieś na innego pracownika</button>
                 </div>
                 <div class="input-group" style="margin-bottom: 3%;">
                   <span class="input-group-text" style="margin-bottom: 10px;">Data</span>
@@ -207,10 +208,12 @@
                     <button class="btn btn-primary dropdown-toggle rounded-0 rounded-end" aria-expanded="false" data-bs-toggle="dropdown" type="button" id="statusDropdownButton">
                       <span class="status-text">Wybierz status</span>
                     </button>
-                    <div class="dropdown-menu" id="statusDropdown-edit" >
-                      <a class="dropdown-item" href="#" data-value="true">W trakcie</a>
-                      <a class="dropdown-item" href="#" data-value="false">Wydane</a>
+                    <div class="dropdown-menu" id="statusDropdown-edit">
+                      <a class="dropdown-item" href="#" data-value="W trakcie">W trakcie</a>
+                      <a class="dropdown-item" href="#" data-value="Gotowe">Gotowe</a>
+                      <a class="dropdown-item" href="#" data-value="Wydane">Wydane</a>
                     </div>
+
                   </div>
                 </div>
                 <div class="input-group" style="margin-bottom: 3%;">
@@ -465,25 +468,29 @@
 
 <script>
   $(document).ready(function () {
+    var showInProgressCheckbox = $('#showInProgress');
+
+    showInProgressCheckbox.on('change', function () {
+      $('#calendar').fullCalendar('rerenderEvents');
+    });
 
     $('#calendar').fullCalendar({
       header: {
         left: 'prev,next today',
         center: 'title',
-        right: 'agendaDay' // Pozostaw tylko widok "Dzień"
+        right: 'agendaDay,month' // Dodaj widok miesięczny
       },
-      defaultView: 'agendaDay',
+      defaultView: 'agendaDay', // Zmień na widok dzienny jako domyślny
       editable: false,
       events: {
         url: '/order/getDailyOrders',
         method: 'GET',
         extraParams: {
           start: function () {
-            return $('#calendar').fullCalendar('getView').start.format();
-
+            return $('#calendar').fullCalendar('getView').start.format('YYYY-MM-DDTHH:mm:ss');
           },
           end: function () {
-            return $('#calendar').fullCalendar('getView').end.format();
+            return $('#calendar').fullCalendar('getView').end.format('YYYY-MM-DDTHH:mm:ss');
           }
         },
         timezone: 'Europe/Warsaw',
@@ -496,15 +503,38 @@
         openEditModal(calEvent.id);
       },
       eventRender: function (event, element) {
+        if (showInProgressCheckbox.prop('checked') && event.status !== 'W trakcie') {
+          // Jeśli checkbox jest zaznaczony i status nie jest "W trakcie", ukryj zdarzenie
+          return false;
+        }
+
         element.find('.fc-title').html(
                 '<strong>' + event.title + '</strong><br>' +
                 'Klient: ' + event.clientName + '<br>' +
                 'Pracownik: ' + event.employeeName
         );
-        var backgroundColor = event.status ? '#007bff' : '#ff0000'; // Ustaw kolor tła w zależności od statusu
-        element.css('background-color', backgroundColor)
-      },
 
+
+        var backgroundColor;
+
+        switch (event.status) {
+          case 'W trakcie':
+            backgroundColor = '#007bff';
+            break;
+          case 'Gotowe':
+            backgroundColor = '#33cc33';
+            break;
+          case 'Wydane':
+            backgroundColor = '#ff0000';
+            break;
+          default:
+            backgroundColor = '#ffffff';
+            break;
+        }
+
+
+        element.css('background-color', backgroundColor);
+      },
       locale: 'pl', // Ustaw lokalizację na polską
       timeFormat: 'H:mm', // Format godziny w formie 24-godzinnej
       dayNamesShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr.', 'Czw.', 'Piąt.', 'Sob.'], // Skrócone nazwy dni tygodnia
@@ -514,9 +544,11 @@
           buttonText: 'Dzień',
           minTime: '08:00', // Ustawienie minimalnej godziny
           maxTime: '16:00' // Ustawienie maksymalnej godziny
+        },
+        month: {
+          buttonText: 'Miesiąc'
         }
-      },
-
+      }
     });
 
     function openEditModal(orderId) {
@@ -527,6 +559,8 @@
     }
   });
 </script>
+
+
 
 <script>
   $(document).ready(function() {
@@ -630,14 +664,25 @@
         $('#editForm input[name="price-edit"]').val(orderDetails.price);
 
         $(document).ready(function () {
-          if (orderDetails.status) {
-            $('#statusDropdownButton .status-text').text('W trakcie');
-            $('#statusDropdownButton').attr('data-value', 'true');
-            globalStatus = true;
-          } else {
-            $('#statusDropdownButton .status-text').text('Wydane');
-            $('#statusDropdownButton').attr('data-value', 'false');
-            globalStatus = false;
+          switch (orderDetails.status) {
+            case 'W trakcie':
+              $('#statusDropdownButton .status-text').text('W trakcie');
+              $('#statusDropdownButton').attr('data-value', 'W trakcie');
+              globalStatus = 'W trakcie';
+              break;
+            case 'Gotowe':
+              $('#statusDropdownButton .status-text').text('Gotowe');
+              $('#statusDropdownButton').attr('data-value', 'Gotowe');
+              globalStatus = 'Gotowe';
+              break;
+            case 'Wydane':
+              $('#statusDropdownButton .status-text').text('Wydane');
+              $('#statusDropdownButton').attr('data-value', 'Wydane');
+              globalStatus = 'Wydane';
+              break;
+            default:
+              console.log('Nieznany status');
+              break;
           }
         });
 
@@ -660,12 +705,22 @@
     $('#statusDropdown-edit a').on('click', function () {
       var selectedStatusValue = $(this).text().trim(); // Zmienione pobieranie tekstu zamiast data('value')
 
-      if (selectedStatusValue === 'W trakcie') {
-        $('#statusDropdownButton .status-text').text('W trakcie');
-        globalStatus = true;
-      } else if (selectedStatusValue === 'Wydane') {
-        $('#statusDropdownButton .status-text').text('Wydane');
-        globalStatus = false;
+      switch (selectedStatusValue) {
+        case 'W trakcie':
+          $('#statusDropdownButton .status-text').text('W trakcie');
+          globalStatus = 'W trakcie';
+          break;
+        case 'Gotowe':
+          $('#statusDropdownButton .status-text').text('Gotowe');
+          globalStatus = 'Gotowe';
+          break;
+        case 'Wydane':
+          $('#statusDropdownButton .status-text').text('Wydane');
+          globalStatus = 'Wydane';
+          break;
+        default:
+          console.log('Nieznany status');
+          break;
       }
 
       console.log('Zmieniono status:', globalStatus);
@@ -740,6 +795,45 @@
       $.ajax({
         type: "GET",
         url: "/order/checkAvailabilityNextDay/" + currentOrderId,
+        data: {
+          durationHours: durationHours
+        },
+        success: function (response) {
+          if (response.status === "success") {
+            var startDate = new Date(response.startDate);
+            var endDate = new Date(response.endDate);
+            var startDateText = startDate.toISOString().slice(0, 10);
+            var endDateText = endDate.toISOString().slice(0, 10);
+
+            var durationMinutes = response.durationMinutes;
+            var durationHours = Math.floor(durationMinutes / 60);
+            var durationMinutesRemainder = durationMinutes % 60;
+
+            $("#hours").val(durationHours + durationMinutesRemainder / 60);
+
+            $("#startDate-edit").val(startDateText);
+            $("#startTime-edit").val(response.startTime);
+            $("#endDate-edit").val(endDateText);
+            $("#endTime-edit").val(response.endTime);
+            $("#selectedUser-edit").val(response.suggestedUser);
+          } else {
+            alert("Brak dostępnych pracowników w ramach dni roboczych.");
+          }
+        },
+        error: function () {
+          alert("Wystąpił błąd podczas sprawdzania dostępności.");
+        }
+      });
+    });
+  });
+  $(document).ready(function () {
+    $("#checkAvailabilityBtn2-edit").click(function () {
+      var durationHours = $("#hours-edit").val();
+
+
+      $.ajax({
+        type: "GET",
+        url: "/order/otherEmployee/" + currentOrderId,
         data: {
           durationHours: durationHours
         },

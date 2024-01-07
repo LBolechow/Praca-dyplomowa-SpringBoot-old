@@ -93,16 +93,6 @@ public class OrderController {
 
         return "index";
     }
-    @GetMapping(value ="/order/getAllOrders")
-    public ResponseEntity<List<Order>> getAllOrders() {
-        try {
-            List<Order> orders = orderRepository.findAll();
-
-            return new ResponseEntity<>(orders, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
     @GetMapping(value = "/order/getDailyOrders")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getDailyOrders(
@@ -115,13 +105,20 @@ public class OrderController {
             LocalDateTime endDateTime;
 
             if (start != null && end != null) {
-                startDateTime = LocalDateTime.parse(start);
-                endDateTime = LocalDateTime.parse(end);
+                try {
+                    // Parse date with time component
+                    startDateTime = LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME);
+                    endDateTime = LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME);
+                } catch (DateTimeParseException e) {
+                    // Handle parsing exception for date-only strings
+                    startDateTime = LocalDate.parse(start).atStartOfDay();
+                    endDateTime = LocalDate.parse(end).atTime(23, 59, 59);
+                }
             } else {
-                startDateTime = LocalDate.now().atStartOfDay();
-                endDateTime = LocalDate.now().atTime(23, 59, 59);
+                // Use current date with time component
+                startDateTime = LocalDateTime.now().with(LocalTime.of(0, 0, 0));
+                endDateTime = LocalDateTime.now().with(LocalTime.of(23, 59, 59));
             }
-
             List<Order> orders;
             String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
             User user = userRepository.findByEmail(userEmail);
@@ -154,7 +151,7 @@ public class OrderController {
                 orderData.put("end", order.getEndDate().toInstant().plusSeconds(3600).toEpochMilli());
                 orderData.put("clientName", order.getClientName()); // Dodaj klienta do danych zlecenia
                 orderData.put("employeeName", order.getEmployeeName()); // Dodaj pracownika do danych zlecenia
-                orderData.put("status", order.isStatus());
+                orderData.put("status", order.getStatus());
                 ordersData.add(orderData);
             }
 
@@ -202,7 +199,7 @@ public class OrderController {
 
         System.out.println(generatedIdCode);
 
-        Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, true, price, hours, null, user, generatedIdCode);
+        Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, "W trakcie", price, hours, null, user, generatedIdCode);
 
         List<Material> materials = new ArrayList<>();
         for (String item : items) {
@@ -237,7 +234,7 @@ public class OrderController {
                 orderDetails.put("hours", order.getDuration());
                 orderDetails.put("price", order.getPrice());
                 orderDetails.put("materials", order.getMaterials());
-                orderDetails.put("status", order.isStatus());
+                orderDetails.put("status", order.getStatus());
 
 
                 return new ResponseEntity<>(orderDetails, HttpStatus.OK);
@@ -292,7 +289,8 @@ public class OrderController {
             int price = Integer.parseInt((String) request.get("price"));
             order.setPrice(price);
 
-            Boolean status = (Boolean) request.get("status");
+            String status = (String) request.get("status");
+
             order.setStatus(status);
 
             List<String> items = (List<String>) request.get("items");
@@ -475,7 +473,118 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/order/otherEmployee/{orderId}")
+    public ResponseEntity<Map<String, Object>> checkAvailabilityOtherEmployee(@PathVariable Long orderId, @RequestParam double durationHours) {
+        try {
+            Map<String, Object> response = new HashMap<>();
 
+            Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+            if (optionalOrder.isPresent()) {
+                Order order = optionalOrder.get();
+
+                Date orderEndDate = order.getEndDate();
+                Calendar currentDateTime = Calendar.getInstance();
+                currentDateTime.setTime(orderEndDate);
+
+                if (currentDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
+                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                    currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
+                    currentDateTime.set(Calendar.MINUTE, 0);
+                }
+
+                while (true) {
+                    if (isWorkingDay(currentDateTime)) {
+                        Calendar endDateTime = (Calendar) currentDateTime.clone();
+                        int durationMinutes = (int) (durationHours * 60);
+                        endDateTime.add(Calendar.MINUTE, durationMinutes);
+
+                        if (endDateTime.get(Calendar.HOUR_OF_DAY) >= 16) {
+                            currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                            currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
+                            currentDateTime.set(Calendar.MINUTE, 0);
+                            continue;
+                        }
+                        User user = userRepository.findByName(order.getEmployeeName());
+
+                        List<User> availableUsers = findAvailableUsersWithoutEmployee(order.getId(), currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
+
+                        if (!availableUsers.isEmpty()) {
+                            User suggestedUser = availableUsers.get(0);
+
+                            response.put("status", "success");
+                            response.put("startDate", formatDate(currentDateTime.getTime()));
+                            response.put("startTime", formatTime(currentDateTime.getTime()));
+                            response.put("endDate", formatDate(endDateTime.getTime()));
+                            response.put("endTime", formatTime(endDateTime.getTime()));
+                            response.put("suggestedUser", suggestedUser.getName());
+                            response.put("durationMinutes", durationMinutes);
+
+                            return new ResponseEntity<>(response, HttpStatus.OK);
+                        }
+                    }
+
+                    currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
+                    currentDateTime.set(Calendar.HOUR_OF_DAY, 8);
+                    currentDateTime.set(Calendar.MINUTE, 0);
+                }
+            } else {
+                response.put("status", "error");
+                response.put("message", "Zamówienie o podanym identyfikatorze nie zostało znalezione.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    private List<User> findAvailableUsersWithoutEmployee(Long orderId, Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
+        List<String> roleNamesToSearch = Arrays.asList("ROLE_EMPLOYEE", "ROLE_ADMIN");
+
+        List<User> availableUsers = new ArrayList<>();
+
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+
+            String employeeNameOnOrder = order.getEmployeeName();
+
+            List<User> allUsersExceptEmployee = userRepository.findAllByNameNot(employeeNameOnOrder);
+
+            for (User user : allUsersExceptEmployee) {
+                boolean isAvailable = true;
+
+                Collection<Role> userRoles = user.getRoles();
+                List<String> userRoleNames = userRoles.stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toList());
+
+                if (userRoleNames.stream().anyMatch(roleNamesToSearch::contains)) {
+                    List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
+
+                    for (Order userOrder : userOrders) {
+                        Date orderStartDate = userOrder.getStartDate();
+                        Date orderEndDate = userOrder.getEndDate();
+
+                        if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
+                                (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
+                                (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
+                            isAvailable = false;
+                            break;
+                        }
+                    }
+
+                    if (isAvailable) {
+                        availableUsers.add(user);
+                    }
+                }
+            }
+        }
+
+        return availableUsers;
+    }
     private List<User> findAvailableUserWithEndDateTime(Long employeeId, Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
         List<String> roleNamesToSearch = Arrays.asList("ROLE_EMPLOYEE", "ROLE_ADMIN");
 
@@ -580,5 +689,15 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/order/checkOrder/{idCode}")
+    public ResponseEntity<Order> getOrderDetails(@PathVariable String idCode) {
+        Order order = orderRepository.findByIdCode(idCode);  // Metoda findByCode musi być zaimplementowana w repozytorium
+        if (order != null) {
+            return new ResponseEntity<>(order, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }

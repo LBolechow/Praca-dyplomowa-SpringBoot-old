@@ -31,7 +31,7 @@ public class Order {
 
     public Date endDate;
 
-    public boolean status;
+    public String status;
 
     public int price;
 
@@ -58,7 +58,7 @@ public class Order {
 
     public Order() {}
 
-    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, boolean status, int price, double duration, List<Material> materials, User user,String idCode) {
+    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, String status, int price, double duration, List<Material> materials, User user,String idCode) {
         this.description = description;
         this.clientName = clientName;
         this.clientEmail = clientEmail;
@@ -128,11 +128,11 @@ public class Order {
         this.endDate = endDate;
     }
 
-    public boolean isStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

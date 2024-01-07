@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Lista zleceń</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
+    <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/static/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/fonts/fontawesome5-overrides.min.css">
+    <link rel="stylesheet" href="/static/css/animate.min.css">
+    <link rel="stylesheet" href="/static/css/Add-Another-Button.css">
+    <link rel="stylesheet" href="/static/css/Bootstrap-Calendar.css">
+    <link rel="stylesheet" href="/static/css/Box-panels-box-panel.css">
+    <link rel="stylesheet" href="/static/css/Box-panels.css">
+    <link rel="stylesheet" href="/static/css/Navbar-With-Button-icons.css">
+    <link rel="stylesheet" href="/static/css/Table-With-Search-search-table.css">
+    <link rel="stylesheet" href="/static/css/Table-With-Search.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+
+<body id="page-top" style="height: 1080px;background: var(--bs-table-border-color);">
+<div id="wrapper">
+    <div class="d-flex flex-column" id="content-wrapper">
+        <div id="content" style="text-align: center;font-family: ABeeZee, sans-serif;font-size: 18px;height: 1080px;">
+            <nav class="navbar navbar-light navbar-expand-md sticky-top bg-dark shadow mb-4 topbar static-top" style="background: var(--bs-dark);">
+                <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color:  var(--bs-orange);">Zakład krawiecki</a>
+                    <div class="collapse navbar-collapse">
+                        <ul class="navbar-nav">
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
+                        </ul>
+                    </div><button data-bs-target="#" data-bs-toggle="collapse" class="navbar-toggler"></button>
+                    <form class="d-none d-sm-inline-block me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group"></div>
+                    </form>
+                    </ul>
+                </div>
+            </nav>
+                <div class="container" style="width: 100%; text-align: center; margin-bottom: 2%;">
+                    <div class="input-group">
+                        <span class="input-group-text">Wpisz kod zlecenia</span>
+                        <input id="checkInput" class="form-control" type="text" required>
+                        <button id="checkButton" class="btn btn-primary" type="button">Sprawdź</button>
+                    </div>
+                </div>
+            <h1></h1>
+            <div style="text-align:center;"></div>
+            <div id="orderDetails">
+                <!-- Tutaj znajdują się domyślne dane lub puste, możesz je dostosować -->
+                <p> <span id="orderDescription"></span></p>
+            </div>
+
+        </div>
+    </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+</div>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/js/bs-init.js"></script>
+<script src="/static/js/Table-With-Search.js"></script>
+<script src="/static/js/theme.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="/static/js/moment.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone.min.js"></script>
+</body>
+
+<script>
+    // Tutaj dodaj resztę kodu JavaScript, tak jak wcześniej
+    document.getElementById("checkButton").addEventListener("click", function() {
+        var inputValue = document.getElementById("checkInput").value;
+
+        // Wysłanie danych do API
+        fetch('/order/checkOrder/' + inputValue)
+            .then(response => response.json())
+            .then(data => {
+                // Obsługa zwrotu z API
+                displayOrderData(data);
+            })
+            .catch(error => {
+                console.error('Błąd podczas pobierania danych z API:', error);
+            });
+    });
+
+    function displayOrderData(orderData) {
+        // Przetworzenie danych z API i wyświetlenie ich w odpowiednim miejscu na stronie
+        var orderDetailsDiv = document.getElementById("orderDetails");
+        var text = "Twoje zlecenie: ";
+        orderDetailsDiv.innerHTML = '<h1>' + text + '</h1>';
+        var planowanaDataUkonczenia = new Date(orderData.endDate);
+        var formattedEndDate = planowanaDataUkonczenia.toLocaleString();
+        // Dodanie elementów opisujących zlecenie
+        orderDetailsDiv.innerHTML += '<p><strong>Opis:</strong> ' + orderData.description + '</p>';
+        orderDetailsDiv.innerHTML += '<p><strong>Klient:</strong> ' + orderData.clientName + '</p>';
+        orderDetailsDiv.innerHTML += '<p><strong>Planowana data ukończenia:</strong> ' + formattedEndDate + '</p>';
+        orderDetailsDiv.innerHTML += '<p><strong>Status:</strong> ' + orderData.status + '</p>';
+    }
+
+</script>
+
+
+</html>

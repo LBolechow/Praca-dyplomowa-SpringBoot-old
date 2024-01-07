@@ -45,4 +45,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>
     );
 
     boolean existsByidCode(String generateActivationCode);
+
+    Order findByIdCode(String idCode);
 }
