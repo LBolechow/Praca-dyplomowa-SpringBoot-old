@@ -35,6 +35,7 @@ import pl.lukbol.dyplom.utilities.GenerateCode;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -265,5 +266,11 @@ public class UserController {
         }
 
         return ResponseEntity.ok(usersWithRoles);
+    }
+    @GetMapping("/user/employees-and-admins")
+    public List<String> getEmployeeNames() {
+        List<User> users = userRepository.findUsersByRoles_NameIn("ROLE_EMPLOYEE", "ROLE_ADMIN");
+        Set<String> uniqueEmployeeNames = users.stream().map(User::getName).collect(Collectors.toSet());
+        return new ArrayList<>(uniqueEmployeeNames);
     }
 }

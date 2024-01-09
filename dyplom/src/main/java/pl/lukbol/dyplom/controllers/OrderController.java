@@ -691,7 +691,7 @@ public class OrderController {
     }
     @GetMapping("/order/checkOrder/{idCode}")
     public ResponseEntity<Order> getOrderDetails(@PathVariable String idCode) {
-        Order order = orderRepository.findByIdCode(idCode);  // Metoda findByCode musi być zaimplementowana w repozytorium
+        Order order = orderRepository.findByIdCode(idCode);
         if (order != null) {
             return new ResponseEntity<>(order, HttpStatus.OK);
         } else {

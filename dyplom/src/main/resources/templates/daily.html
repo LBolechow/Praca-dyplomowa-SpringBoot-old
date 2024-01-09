@@ -23,6 +23,16 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <style>
+  #calendar .fc-event {
+    margin-left: 5px;
+    margin-bottom: 5px;/* Dostosuj wartość marginesu według potrzeb */
+  }
+
+  #calendar .fc-title {
+    font-size: min(4vh, 15px);
+    /* Adjust the font size as needed */
+    color: #455663; /* Set the desired font color */
+  }
   .red-text {
     color: red;
   }
@@ -96,46 +106,7 @@
                 </div>
               </div>
             </li>
-            <li class="nav-item dropdown no-arrow mx-1">
-              <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"></a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
-                  <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar4.jpeg">
-                    <div class="bg-success status-indicator"></div>
-                  </div>
-                  <div class="fw-bold">
-                    <div class="text-truncate"><span>Hi there! I am wondering if you can help me with a problem I've been having.</span></div>
-                    <p class="small text-gray-500 mb-0">Emily Fowler - 58m</p>
-                  </div>
-                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar2.jpeg">
-                    <div class="status-indicator"></div>
-                  </div>
-                  <div class="fw-bold">
-                    <div class="text-truncate"><span>I have the photos that you ordered last month!</span></div>
-                    <p class="small text-gray-500 mb-0">Jae Chun - 1d</p>
-                  </div>
-                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar3.jpeg">
-                    <div class="bg-warning status-indicator"></div>
-                  </div>
-                  <div class="fw-bold">
-                    <div class="text-truncate"><span>Last month's report looks great, I am very happy with the progress so far, keep up the good work!</span></div>
-                    <p class="small text-gray-500 mb-0">Morgan Alvarez - 2d</p>
-                  </div>
-                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image me-3"><img class="rounded-circle" src="assets/img/avatars/avatar5.jpeg">
-                    <div class="bg-success status-indicator"></div>
-                  </div>
-                  <div class="fw-bold">
-                    <div class="text-truncate"><span>Am I a good boy? The reason I ask is because someone told me that people say this to all dogs, even if they aren't good...</span></div>
-                    <p class="small text-gray-500 mb-0">Chicken the Dog · 2w</p>
-                  </div>
-                </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                </div>
-              </div>
-              <div class="shadow dropdown-list dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown"></div>
-            </li>
+
             <div class="d-none d-sm-block topbar-divider"></div>
             <li class="nav-item dropdown no-arrow">
               <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="user" class="d-none d-lg-inline me-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="/static/img/avatars/avatar1.png"></a>
@@ -401,7 +372,6 @@
           generatePdf(response);
           $('#calendar').fullCalendar('refetchEvents');
 
-          alert("Zamówienie dodane pomyślnie!");
         },
         error: function (error) {
           console.error(error);
@@ -413,9 +383,9 @@
   function generatePdf(orderDetails) {
     window.jsPDF = window.jspdf.jsPDF;
     var pdf = new jsPDF();
-    pdf.text("Zakład krawiecki");
+    pdf.text("Zaklad krawiecki", 10, 10);
     pdf.text("Opis: " + orderDetails.description, 10, 20);
-    pdf.text("Imię i nazwisko klienta: " + orderDetails.clientName, 10, 30);
+    pdf.text("Klient: " + orderDetails.clientName, 10, 30);
     pdf.text("Kod: " + orderDetails.idCode, 10, 40);
     pdf.output("dataurlnewwindow");
   }
@@ -482,6 +452,7 @@
       },
       defaultView: 'agendaDay', // Zmień na widok dzienny jako domyślny
       editable: false,
+      slotEventOverlap: false,
       events: {
         url: '/order/getDailyOrders',
         method: 'GET',
@@ -498,6 +469,16 @@
           alert('Błąd pobierania danych zamówień.');
         }
       },
+      success: function (events) {
+        // Sortuj wydarzenia alfabetycznie według employeeName
+        events.sort(function (a, b) {
+          return a.employeeName.localeCompare(b.employeeName);
+        });
+
+        // Ustaw posortowane wydarzenia
+        $('#calendar').fullCalendar('removeEvents');
+        $('#calendar').fullCalendar('addEventSource', events);
+      },
       eventClick: function (calEvent, jsEvent, view) {
         // Obsługa kliknięcia na zdarzenie w kalendarzu
         openEditModal(calEvent.id);
@@ -507,11 +488,17 @@
           // Jeśli checkbox jest zaznaczony i status nie jest "W trakcie", ukryj zdarzenie
           return false;
         }
+        element.find('.fc-time').css({
+          'color': '#455663', // Zmiana koloru tekstu
+          'font-size': '15px' // Zmiana rozmiaru czcionki
+        });
 
         element.find('.fc-title').html(
-                '<strong>' + event.title + '</strong><br>' +
+                '<strong>' + 'Pracownik: ' + event.employeeName + '</strong><br>' +
                 'Klient: ' + event.clientName + '<br>' +
-                'Pracownik: ' + event.employeeName
+                'Zlecenie: ' + event.title + '<br>' +
+                'Status: ' + event.status
+
         );
 
 
@@ -519,16 +506,16 @@
 
         switch (event.status) {
           case 'W trakcie':
-            backgroundColor = '#007bff';
+            backgroundColor = '#ADD8E6';
             break;
           case 'Gotowe':
-            backgroundColor = '#33cc33';
+            backgroundColor = '#48D1CC';
             break;
           case 'Wydane':
-            backgroundColor = '#ff0000';
+            backgroundColor = '#F08080';
             break;
           default:
-            backgroundColor = '#ffffff';
+            backgroundColor = '#E6E6FA';
             break;
         }
 
