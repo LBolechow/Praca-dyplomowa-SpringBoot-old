@@ -22,6 +22,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <style>
+    #userList li.active {
+        background-color: #4CAF50; /* Zielony kolor */
+        color: #fff; /* Biały kolor tekstu na zielonym tle */
+        list-style-type: disc; /* Dodaj kropki */
+    }
     .bg-custom-orange {
         background-color: var(--bs-orange);
     }
@@ -80,30 +85,9 @@
                             </div>
                         </li>
                         <li class="nav-item dropdown no-arrow mx-1">
-                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
-                                <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
-                                    <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-primary icon-circle"><i class="fas fa-file-alt text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 12, 2019</span>
-                                        <p>A new monthly report is ready to download!</p>
-                                    </div>
-                                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 7, 2019</span>
-                                        <p>$290.29 has been deposited into your account!</p>
-                                    </div>
-                                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 2, 2019</span>
-                                        <p>Spending Alert: We've noticed unusually high spending for your account.</p>
-                                    </div>
-                                </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="alertamount" class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
+                                <div style="height: 650px; overflow: auto;" id="notification" class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                                    <h6 class="dropdown-header">Powiadomienia</h6><a class="dropdown-item text-center small text-gray-500" onclick="deleteAlerts()" href="#">Usuń wszystkie powiadomienia</a>
                                 </div>
                             </div>
                         </li>
@@ -118,7 +102,33 @@
                     </ul>
                 </div>
             </nav>
-                <h1></h1><div class="bootstrap_chat">
+            <button class="btn btn-primary" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">Utwórz konwersację</button>
+            <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Stwórz konwersację</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label class="col-form-label" style="padding-top: 10px; margin-top: 10px;">Wybierz pracowników</label>
+                                </div>
+                            </div>
+                            <ul id="userList" style="text-align: left;">
+                                <!-- Lista użytkowników zostanie wypełniona dynamicznie za pomocą JavaScript -->
+                            </ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="button" onclick="createConversation()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1></h1><div class="bootstrap_chat">
                 <div class="container py-5 px-4">
                     <header class="text-center">
                         <h1 class="display-4 text-dark">Panel wiadomości</h1>
@@ -171,6 +181,19 @@
         employeeId = data.id;
         employeeName = data.name;
         employeeEmail = data.email;
+        for(let i=data.notifications.length-1;i>=0;i--){
+            var t = `<a class="dropdown-item d-flex align-items-center" href="#">
+                                            <div class="me-3">
+                                                <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                                            </div>
+                                            <div><span class="small text-gray-500">`+data.notifications[i].date+`</span>
+                                                <p>`+data.notifications[i].opis+`</p>
+                                            </div>
+                                        </a>`
+
+            $('#notification').append(t)
+        }
+        $('#alertamount').text(data.notifications.length);
         connect(employeeId);
     });
     function scrollToBottom() {
@@ -186,11 +209,12 @@
             stompClient.subscribe('/topic/employees', function (message) {
                 console.log('Received message:', message);
                 showMessage(JSON.parse(message.body));
-                loadConversationList();
+                updateConversationListItem(receivedMessage.conversationId, receivedMessage);
             });
 
 
             getClientConversation();
+
         });
     }
     function sendMessageToConversation(conversationId, messageContent) {
@@ -238,6 +262,21 @@
         });
     });
 
+    function updateConversationListItem(conversationId, message) {
+        var listItem = $(`.list-group-item[data-conversation-id="${conversationId}"]`);
+
+        if (listItem.length) {
+            // Znaleziono element listy, aktualizuj go
+            listItem.find('.last-message').text(message.content); // Załóżmy, że jest element pokazujący ostatnią wiadomość
+            listItem.find('.message-date').text(message.formattedMessageDate); // Aktualizacja daty
+            // Tutaj dodaj logikę aktualizacji licznika nieprzeczytanych wiadomości, jeśli jest potrzebna
+        } else {
+            // Konwersacja nie znajduje się na liście, opcjonalnie możesz dodać nowy element do listy
+            // albo po prostu odświeżyć listę, jeśli to sytuacja, której oczekujesz rzadko
+            // loadConversationList(); // Tylko jeśli to konieczne
+        }
+    }
+
     function showMessage(message) {
 
         var isCurrentUserMessage = message.sender.id === employeeId;// Sprawdź, czy wiadomość jest od bieżącego użytkownika
@@ -264,6 +303,18 @@
         scrollToBottom();
         console.log('Message element:', messageElement);
     }
+
+    $(function () {
+        $('#send-button').click(function () {
+            var messageContent = $('#message-input').val();
+            if (messageContent.trim() !== '') {
+                // Upewnij się, że masz zdefiniowaną funkcję sendMessageToConversation
+                sendMessageToConversation(conversationId, messageContent);
+                $('#message-input').val('');
+            }
+        });
+    });
+
     function loadConversationList() {
         $.ajax({
             url: '/api/get_conversations',
@@ -274,43 +325,35 @@
                 var defaultConversationSet = false;
 
                 data.forEach(function (conversation) {
-                    $.ajax({
-                        url: `/api/conversation/${conversation.id}/latest-message`,
-                        method: 'GET',
-                        success: function (latestMessage) {
-                            var isUnread = conversation.odczyt === false;
-                            var messageContent = isUnread ? 'Nowa wiadomość!' : latestMessage.content;
-                            var conversationItem = `
-                            <a href="#" class="list-group-item list-group-item-action list-group-item-light rounded-0" data-conversation-id="${conversation.id}">
-                                <div class="media-body ml-4">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <h6 class="mb-0 ${isUnread ? 'font-weight-bold' : ''}">${conversation.name}</h6>
-                                        <small class="small ${isUnread ? 'font-weight-bold' : ''}">${latestMessage.formattedMessageDate}</small>
-                                    </div>
-                                    <p class="font-italic text-muted mb-0 text-small">${messageContent}</p>
-                                </div>
-                            </a>
-                        `;
+                    var isUnread = conversation.odczyt === false;
+                    // Ustawienie zastępczych danych dla demonstracji
+                    var messageContent = isUnread ? 'Nowa wiadomość!' : 'Brak ostatniej wiadomości';
+                    var formattedMessageDate = 'Nieznana data'; // Zastępcza data
 
-                            $('.conversation-list').append(conversationItem);
+                    var conversationItem = `<a href="#" class="list-group-item list-group-item-action list-group-item-light rounded-0" data-conversation-id="${conversation.id}">
+                    <div class="media-body ml-4">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <h6 class="mb-0 ${isUnread ? 'font-weight-bold' : ''}">${conversation.name}</h6>
+                            <small class="small ${isUnread ? 'font-weight-bold' : ''}">${formattedMessageDate}</small>
+                        </div>
+                        <p class="font-italic text-muted mb-0 text-small">${messageContent}</p>
+                    </div>
+                </a>
+                `;
 
-                            if (!defaultConversationSet) {
-                                conversationId = conversation.id;
-                                defaultConversationSet = true;
+                    $('.conversation-list').append(conversationItem);
 
-                                getMessagesForConversation(conversationId);
-                            }
+                    if (!defaultConversationSet) {
+                        conversationId = conversation.id;
+                        defaultConversationSet = true;
 
-                            $('.list-group-item').off('click').click(function () {
-                                conversationId = $(this).data('conversation-id');
-                                getMessagesForConversation(conversationId);
-                                markConversationAsRead(conversationId);
+                        getMessagesForConversation(conversationId);
+                    }
 
-                            });
-                        },
-                        error: function (error) {
-                            console.error('Error fetching latest message for conversation:', error);
-                        }
+                    $('.list-group-item').off('click').click(function () {
+                        conversationId = $(this).data('conversation-id');
+                        getMessagesForConversation(conversationId);
+                        markConversationAsRead(conversationId);
                     });
                 });
             },
@@ -359,4 +402,81 @@
     }
     loadConversationList();
     </script>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "/users/employees-and-admins",
+            method: "GET",
+            success: function (data) {
+                var userList = $("#userList");
+                userList.empty();
+
+
+                data.forEach(function (user) {
+                    var listItem = $("<li>").text(user.name);
+
+                    listItem.data("userId", user.id);
+
+                    listItem.click(function (event) {
+                        $(event.target).toggleClass("active");
+                    });
+
+                    userList.append(listItem);
+                });
+            },
+            error: function (error) {
+                console.error("Błąd podczas pobierania użytkowników:", error);
+            }
+        });
+    });
+    function createConversation() {
+        var currentDate = new Date();
+        var dateString = currentDate.toLocaleDateString('pl-PL', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        }).replace(/\./g, '-').replace(',', '');
+
+        var conversationName = `Konwersacja z dnia ${dateString}`;
+        var participantIds = [];
+
+        $("#userList li.active").each(function() {
+            participantIds.push($(this).data("userId"));
+            console.log($(this).data("userId"));
+        });
+
+        $.ajax({
+            url: "/api/createConversation",
+            type: "POST",
+            contentType: "application/x-www-form-urlencoded",
+            data: {
+                name: conversationName,
+                participantIds: participantIds.join(',')
+            },
+            success: function(response) {
+                alert(response.message);
+            },
+            error: function(error) {
+                alert("Błąd podczas tworzenia konwersacji: " + error.responseJSON.message);
+            }
+        });
+    }
+</script>
+<script>
+    function deleteAlerts(){
+
+        $.ajax({
+            url: "/removeAlerts",
+            type: "DELETE",
+            success: function() {
+
+                location.reload()
+            },
+            error: function() {
+
+            }
+        });
+
+    }
+</script>
 </html>

@@ -4,15 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Blank Page - Brand</title>
+    <title>Cennik</title>
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
     <link rel="stylesheet" href="/static/css/Data-Table-styles.css">
     <link rel="stylesheet" href="/static/css/Data-Table.css">
+    <link rel="stylesheet" href="/static/fonts/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/static/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/fonts/fontawesome5-overrides.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/Section-Title.css">
     <link rel="stylesheet" href="/static/css/Table-with-Vertical-Alignment.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 
 <body id="page-top" style="height: 1080px;">
@@ -27,80 +31,54 @@
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="table-responsive" style="height: 100%;">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th style="width: 70%;">Usługa Krawiecka</th>
-                    <th style="width: 30%;">Cena</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Zmiana długości spodni</td>
-                    <td>20 PLN</td>
-                </tr>
-                <tr>
-                    <td>Przeróbka koszuli</td>
-                    <td>15 PLN</td>
-                </tr>
-                <tr>
-                    <td>Naprawa dziury w spódnicy</td>
-                    <td>25 PLN</td>
-                </tr>
-                <tr>
-                    <td>Szycie sukienki na miarę</td>
-                    <td>50 PLN</td>
-                </tr>
-                <tr>
-                    <td>Przeróbka garnituru</td>
-                    <td>30 PLN</td>
-                </tr>
-                <tr>
-                    <td>Zszywanie rozdartej kurtki</td>
-                    <td>35 PLN</td>
-                </tr>
-                <tr>
-                    <td>Przyszywanie guzików</td>
-                    <td>5 PLN (za sztukę)</td>
-                </tr>
-                <tr>
-                    <td>Mierzenie i dostosowywanie bielizny</td>
-                    <td>15 PLN</td>
-                </tr>
-                <tr>
-                    <td>Przeróbka bluzy</td>
-                    <td>20 PLN</td>
-                </tr>
-                <tr>
-                    <td>Zakładanie zamka błyskawicznego</td>
-                    <td>25 PLN</td>
-                </tr>
-                <tr>
-                    <td>Haftowanie personalizowanej nazwy</td>
-                    <td>10 PLN (za literę)</td>
-                </tr>
-                <tr>
-                    <td>Przeróbka spódniczki dla dziecka</td>
-                    <td>15 PLN</td>
-                </tr>
-                <tr>
-                    <td>Usługa naprawy skórzanej kurtki</td>
-                    <td>40 PLN</td>
-                </tr>
-                <tr>
-                    <td>Przeróbka swetra na golf</td>
-                    <td>25 PLN</td>
-                </tr>
-                <tr>
-                    <td>Skracanie rękawów w marynarce</td>
-                    <td>20 PLN</td>
-                </tr>
-                </tbody>
-            </table>
-
+    <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" class="d-flex justify-content-center" style="margin-top: 15px;">
+        <button type="button" class="btn btn-warning" data-bs-target="#addPriceModal" data-bs-toggle="modal">
+            Dodaj pozycję.
+        </button>
+    </div>
+    <div class="modal fade" id="addPriceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Dodaj pozycję cennika</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="addPriceForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="item-name">Nazwa usługi</label>
+                            <input type="text" class="form-control" id="item-name" name="item" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-price">Cena</label>
+                            <input type="text" class="form-control" id="item-price" name="price" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                        <button type="submit" class="btn btn-primary">Dodaj</button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
+    <div class="container" th:data-is-admin="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+        <div class="table-responsive" style="height: 100%;">
+            <table id="pricesTable" class="table">
+            <thead>
+            <tr>
+                <th style="width: 60%;">Usługa Krawiecka</th>
+                <th style="width: 30%;">Cena</th>
+                <th th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" style="width: 10%;">Usuń</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Tu będą dodane wiersze -->
+            </tbody>
+        </table>
+</div>
     </div>
     <section class="py-4 py-xl-5">
         <div class="container">
@@ -116,10 +94,175 @@
     <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="/static/js/theme.js"></script>
     <script>
         function goBack() {
             window.history.back();
+        }
+    </script>
+    <script>
+        $.get("/user", function(data) {
+            $("#user").html(data.name);
+            for(let i=data.notifications.length-1;i>=0;i--){
+                var t = `<a class="dropdown-item d-flex align-items-center" href="#">
+                                            <div class="me-3">
+                                                <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                                            </div>
+                                            <div><span class="small text-gray-500">`+data.notifications[i].date+`</span>
+                                                <p>`+data.notifications[i].opis+`</p>
+                                            </div>
+                                        </a>`
+
+                $('#notification').append(t)
+            }
+            $('#alertamount').text(data.notifications.length);
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+        $("#addPriceForm").submit(function(event) {
+            event.preventDefault(); // Zapobiega standardowemu wysłaniu formularza
+
+            var item = $("#item-name").val();
+            var price = $("#item-price").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/add-price",
+                data: {
+                    item: item,
+                    price: price
+                },
+                success: function(response) {
+                    $('#addPriceModal').modal('hide');
+                    alert("Pozycja dodana pomyślnie");
+                    location.reload(); // Odświeża stronę, aby pokazać aktualizacje
+                },
+                error: function(error) {
+                    console.error("Error:", error);
+                    alert("Nie udało się dodać pozycji");
+                }
+            });
+        });
+    });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Odczyt wartości jako ciągu znaków i konwersja na wartość logiczną
+            var isAdmin = $(".container").data("isAdmin");
+            $.ajax({
+                url: "/prices",
+                type: "GET",
+                success: function(prices) {
+                    var tableBody = $("#pricesTable tbody");
+                    prices.forEach(function(price) {
+                        var row = `<tr>
+                    <td>${price.item}</td>
+                    <td>${price.price}</td>`;
+
+                        if (isAdmin) {
+                            row += `<td>
+            <button type="button" class="btn btn-success edit-button" data-id="${price.id}" title="Modyfikuj"><i class="fas fa-edit"></i></button>
+            <button type="button" class="btn btn-danger delete-button" data-id="${price.id}" title="Usuń"><i class="fas fa-trash-alt"></i></button>
+        </td>`;
+                        }
+                        row += `</td></tr>`;
+                        tableBody.append(row);
+                    });
+                },
+                error: function(error) {
+                    console.log("Error: " + error);
+                }
+            });
+        });
+    </script>
+<script>
+    $("#pricesTable tbody").on("click", ".delete-button", function() {
+        var id = $(this).data("id"); // Pobierz ID
+        if(confirm("Czy na pewno chcesz usunąć ten element?")) {
+            $.ajax({
+                url: "/delete-price/" + id, // Zmień URL na odpowiedni endpoint
+                type: "DELETE",
+                success: function(result) {
+                    // Opcjonalnie: odśwież listę lub usuń wiersz z tabeli w przeglądarce
+                    console.log("Usunięto pozycję cennika: " + id);
+                    window.location.reload(); // Prosty sposób na odświeżenie, ale można też usunąć wiersz dynamicznie
+                },
+                error: function(error) {
+                    console.error("Błąd przy usuwaniu: ", error);
+                }
+            });
+        }
+    });
+</script>
+<script>
+    $('body').on('click', '.edit-button', function() {
+        var id = $(this).data('id'); // Pobieranie ID
+        var currentRow = $(this).closest('tr'); // Pobieranie bieżącego wiersza
+
+        var item = currentRow.find('td:eq(0)').text(); // Pobieranie obecnej nazwy usługi
+        var price = currentRow.find('td:eq(1)').text(); // Pobieranie obecnej ceny
+
+        // Zamiana tekstu na pola edycyjne
+        currentRow.find('td:eq(0)').html('<input type="text" class="form-control" value="' + item + '">');
+        currentRow.find('td:eq(1)').html('<input type="text" class="form-control" value="' + price + '">');
+
+        // Zmiana przycisku "Modyfikuj" na "Zapisz"
+        $(this).removeClass('btn-success edit-button')
+            .addClass('btn-primary save-button')
+            .html('<i class="fas fa-save"></i>') // Ustawienie ikony "Zapisz"
+            .attr('data-id', id);
+    });
+    $('body').on('click', '.save-button', function() {
+        var currentRow = $(this).closest('tr');
+        var id = $(this).attr('data-id'); // Pobieranie ID
+        var updatedItem = currentRow.find('td:eq(0) input').val();
+        var updatedPrice = currentRow.find('td:eq(1) input').val();
+
+        var that = this; // Zachowanie referencji do elementu 'this' przed wywołaniem AJAX
+
+        // AJAX request do serwera z ID w URL
+        $.ajax({
+            url: '/update-price/' + id, // Dodanie ID do URL
+            type: 'PUT',
+            data: {
+                item: updatedItem,
+                price: updatedPrice
+            },
+            success: function(response) {
+                // Aktualizacja wiersza tabeli
+                currentRow.find('td:eq(0)').text(updatedItem);
+                currentRow.find('td:eq(1)').text(updatedPrice);
+
+                // Przywrócenie przycisku "Modyfikuj" używając zachowanej referencji 'that'
+                $(that).removeClass('btn-primary save-button')
+                    .addClass('btn-success edit-button')
+                    .html('<i class="fas fa-edit"></i>') // Ustawienie ikony z Font Awesome
+                    .attr('data-id', id);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error: " + error);
+            }
+        });
+    });
+</script>
+    <script>
+        function deleteAlerts(){
+
+            $.ajax({
+                url: "/removeAlerts",
+                type: "DELETE",
+                success: function() {
+
+                    location.reload()
+                },
+                error: function() {
+
+                }
+            });
+
         }
     </script>
 </body>

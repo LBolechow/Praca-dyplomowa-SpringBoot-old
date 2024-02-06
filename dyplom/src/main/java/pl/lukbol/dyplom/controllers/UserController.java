@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import pl.lukbol.dyplom.classes.Notification;
 import pl.lukbol.dyplom.classes.Role;
 import pl.lukbol.dyplom.classes.User;
 import pl.lukbol.dyplom.configs.MailConfig;
@@ -86,9 +87,12 @@ public class UserController {
             response.put("message", "Użytkownik o takim adresie email już istnieje.");
             return ResponseEntity.badRequest().body(response);
         }
-
+        List<Notification> a = newUser.getNotifications();
+        a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUser));
+        newUser.setNotifications(a);
         newUser.setRoles(Arrays.asList(role));
         userRepository.save(newUser);
+
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -120,6 +124,9 @@ public class UserController {
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
         User newUsr = new User(name,email, passwordEncoder.encode(password), null, false, false);
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
+        List<Notification> a = newUsr.getNotifications();
+        a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUsr));
+        newUsr.setNotifications(a);
         if (emailExists(newUsr.getEmail())) {
             req.getSession().setAttribute("message", "Użytkownik o takim adresie email już istnieje.");
         } else {
@@ -167,6 +174,13 @@ public class UserController {
 
         userRepository.save(usr);
         return "Zmiany zostały zapisane pomyślnie";
+    }
+    @GetMapping("/users/employees-and-admins")
+    public List<User> getEmployeesAndAdmins(Authentication authentication) {
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+        List<User> users = userRepository.findUsersByRoles_NameIn("ROLE_EMPLOYEE", "ROLE_ADMIN");
+        users.removeIf(user -> user.getEmail().equalsIgnoreCase(usr.getEmail()));
+        return users;
     }
     @DeleteMapping("/users/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

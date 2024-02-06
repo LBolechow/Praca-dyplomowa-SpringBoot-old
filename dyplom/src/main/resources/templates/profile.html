@@ -46,7 +46,8 @@
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/materials">Materiały</a></li>
                         </ul>
                         <ul class="navbar-nav" th:if="${#authorization.expression('hasAnyRole(''ROLE_CLIENT'')')}">
-                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/employeeChat">Napisz wiadomość</a></li>
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/clientChat">Napisz wiadomość</a></li>
+                            <li class="nav-item"><a class="nav-link" href="http://localhost:8080/index">Moje zlecenia</a></li>
                             <li class="nav-item"><a class="nav-link" href="http://localhost:8080/price_list">Cennik</a></li>
                         </ul>
                     </div>
@@ -65,30 +66,9 @@
                             </div>
                         </li>
                         <li class="nav-item dropdown no-arrow mx-1">
-                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
-                                <div class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
-                                    <h6 class="dropdown-header">alerts center</h6><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-primary icon-circle"><i class="fas fa-file-alt text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 12, 2019</span>
-                                        <p>A new monthly report is ready to download!</p>
-                                    </div>
-                                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-success icon-circle"><i class="fas fa-donate text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 7, 2019</span>
-                                        <p>$290.29 has been deposited into your account!</p>
-                                    </div>
-                                </a><a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="me-3">
-                                        <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
-                                    </div>
-                                    <div><span class="small text-gray-500">December 2, 2019</span>
-                                        <p>Spending Alert: We've noticed unusually high spending for your account.</p>
-                                    </div>
-                                </a><a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
+                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span id="alertamount" class="badge bg-danger badge-counter">3+</span><i class="fas fa-bell fa-fw"></i></a>
+                                <div style="height: 650px; overflow: auto;" id="notification" class="dropdown-menu dropdown-menu-end dropdown-list animated--grow-in">
+                                    <h6 class="dropdown-header">Powiadomienia</h6><a class="dropdown-item text-center small text-gray-500" onclick="deleteAlerts()" href="#">Usuń wszystkie powiadomienia</a>
                                 </div>
                             </div>
                         </li>
@@ -167,6 +147,19 @@
         if (!enabled) {
             $("#password-message").html("<p style='color: red; font-size: 20px'>Po pierwszym logowaniu należy zmienić hasło!</p>");
         }
+        for(let i=data.notifications.length-1;i>=0;i--){
+            var t = `<a class="dropdown-item d-flex align-items-center" href="#">
+                                            <div class="me-3">
+                                                <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                                            </div>
+                                            <div><span class="small text-gray-500">`+data.notifications[i].date+`</span>
+                                                <p>`+data.notifications[i].opis+`</p>
+                                            </div>
+                                        </a>`
+
+            $('#notification').append(t)
+        }
+        $('#alertamount').text(data.notifications.length);
     });
 </script>
 <script>
@@ -189,5 +182,21 @@
         });
     });
 </script>
+<script>
+    function deleteAlerts(){
 
+        $.ajax({
+            url: "/removeAlerts",
+            type: "DELETE",
+            success: function() {
+
+                location.reload()
+            },
+            error: function() {
+
+            }
+        });
+
+    }
+</script>
 </html>

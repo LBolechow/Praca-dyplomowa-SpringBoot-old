@@ -34,4 +34,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByNameNot(String employeeNameOnOrder);
 
     List<User> findUsersByRoles_NameIn(String... roleNames);
+
+    List<User> findByIdIn(List<Long> ids);
 }

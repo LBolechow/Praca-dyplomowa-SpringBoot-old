@@ -28,7 +28,7 @@ public class MessageService {
     @Transactional
     public Message sendMessage(User sender, Conversation conversation, String content, Date messageDate) {
         // Create a new message associated with the conversation
-        Message message = new Message(sender, content, conversation, messageDate);
+        Message message = new Message(sender, content, conversation, messageDate, false);
         return messageRepository.save(message);
     }
 

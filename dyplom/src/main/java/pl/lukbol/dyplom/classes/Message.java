@@ -32,22 +32,34 @@ public class Message {
     @JsonBackReference
     private Conversation conversation;
 
+    private boolean seen;
+
     public Message() {
     }
 
-    public Message(User sender, String content, Conversation conversation, Date messageDate) {
+    public Message(User sender, String content, Conversation conversation, Date messageDate, Boolean seen) {
         this.sender = sender;
         this.content = content;
         this.conversation = conversation;
         this.messageDate = messageDate;
+        this.seen = seen;
     }
 
-    public Message(Long id, User sender, User receiver, String content, Conversation conversation) {
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
+    }
+
+    public Message(Long id, User sender, User receiver, String content, Conversation conversation, Boolean seen) {
         this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
         this.conversation = conversation;
+        this.seen = seen;
     }
 
     public Conversation getConversation() {

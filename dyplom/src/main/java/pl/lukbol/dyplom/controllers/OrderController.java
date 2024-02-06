@@ -10,10 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import pl.lukbol.dyplom.classes.Material;
-import pl.lukbol.dyplom.classes.Order;
-import pl.lukbol.dyplom.classes.Role;
-import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.classes.*;
 import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.MaterialRepository;
 import pl.lukbol.dyplom.repositories.OrderRepository;
@@ -82,11 +79,13 @@ public class OrderController {
 
     @GetMapping("/index")
     public String showUserOrders(Authentication authentication, Model model) {
-        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
+        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal()); // Zakładam, że nazwa metody to checkEmail
         User user = userRepository.findByEmail(userEmail);
 
         if (user != null) {
             List<Order> userOrders = orderRepository.findOrdersByUserEmail(user.getEmail());
+            // Sortowanie listy zamówień
+            userOrders.sort(Comparator.comparing(Order::getEndDate).reversed());
 
             model.addAttribute("userOrders", userOrders);
         }
@@ -146,11 +145,11 @@ public class OrderController {
             for (Order order : orders) {
                 Map<String, Object> orderData = new HashMap<>();
                 orderData.put("id", order.getId());
-                orderData.put("title", order.getDescription()); // Tytuł zlecenia
+                orderData.put("title", order.getDescription());
                 orderData.put("start", order.getStartDate().toInstant().plusSeconds(3600).toEpochMilli());
                 orderData.put("end", order.getEndDate().toInstant().plusSeconds(3600).toEpochMilli());
-                orderData.put("clientName", order.getClientName()); // Dodaj klienta do danych zlecenia
-                orderData.put("employeeName", order.getEmployeeName()); // Dodaj pracownika do danych zlecenia
+                orderData.put("clientName", order.getClientName());
+                orderData.put("employeeName", order.getEmployeeName());
                 orderData.put("status", order.getStatus());
                 ordersData.add(orderData);
             }
@@ -198,6 +197,12 @@ public class OrderController {
         String generatedIdCode = GenerateCode.generateActivationCode();
 
         System.out.println(generatedIdCode);
+
+        List<Notification> a = usr.get(0).getNotifications();
+        a.add(new Notification("Pojawiło się nowe zlecenie!", new Date(),usr.get(0)));
+        usr.get(0).setNotifications(a);
+
+        userRepository.save(usr.get(0));
 
         Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, "W trakcie", price, hours, null, user, generatedIdCode);
 

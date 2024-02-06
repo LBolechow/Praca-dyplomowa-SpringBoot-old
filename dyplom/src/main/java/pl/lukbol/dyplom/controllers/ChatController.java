@@ -2,16 +2,14 @@ package pl.lukbol.dyplom.controllers;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.lukbol.dyplom.classes.Conversation;
 import pl.lukbol.dyplom.classes.Message;
 import pl.lukbol.dyplom.classes.User;
@@ -23,8 +21,8 @@ import pl.lukbol.dyplom.services.MessageService;
 import pl.lukbol.dyplom.services.UserService;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class ChatController {
@@ -90,9 +88,9 @@ public class ChatController {
     }
     @GetMapping("/api/conversation")
     public ResponseEntity<List<Message>> getClientConversation(Authentication authentication) {
-        User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
 
-        List<Conversation> conversations = conversationRepository.findConversationByClient_Id(user.getId());
+        List<Conversation> conversations = conversationRepository.findConversationByClient_Id(usr.getId());
         if (!conversations.isEmpty()) {
             List<Message> messages = messageRepository.findByConversation(conversations.get(0));
             if (!messages.isEmpty()) {
@@ -106,11 +104,33 @@ public class ChatController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/api/employee/conversations")
+    public ResponseEntity<List<Message>> getAllEmployeeConversationMessages(Authentication authentication) {
+        // Pobierz użytkownika na podstawie danych z autoryzacji
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+
+        // Znajdź wszystkie konwersacje, w których uczestniczy użytkownik
+        List<Conversation> conversations = conversationRepository.findByParticipants_Id(usr.getId());
+
+        // Lista do agregacji wiadomości ze wszystkich konwersacji
+        List<Message> allMessages = new ArrayList<>();
+
+        // Dla każdej konwersacji pobierz wiadomości i dodaj je do listy allMessages
+        conversations.forEach(conversation -> {
+            List<Message> messages = messageRepository.findByConversation(conversation);
+            allMessages.addAll(messages);
+        });
+
+        if (!allMessages.isEmpty()) {
+            return ResponseEntity.ok(allMessages);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/api/get_conversations")
     public List<Conversation> getAllConversations() {
         List<Conversation> conversations = conversationRepository.findAll();
-
-
         return conversations;
     }
 
@@ -167,5 +187,35 @@ public class ChatController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PostMapping("/api/createConversation")
+    public ResponseEntity<Map<String, Object>> createConversation(Authentication authentication, @RequestParam("name") String name,
+                                                                  @RequestParam("participantIds") String participantIds) {
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+        try {
+            List<Long> participant = Arrays.stream(participantIds.split(","))
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            // Pobierz zaznaczonych użytkowników na podstawie ich identyfikatorów
+            List<User> participants = userRepository.findByIdIn(participant);
+            participants.add(usr);
 
+            // Stwórz nową konwersację
+            Conversation newConversation = new Conversation(name, participants, new ArrayList<>(), false);
+
+            // Zapisz konwersację w bazie danych
+            conversationRepository.save(newConversation);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Konwersacja utworzona pomyślnie.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Błąd podczas tworzenia konwersacji: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }
+
+
