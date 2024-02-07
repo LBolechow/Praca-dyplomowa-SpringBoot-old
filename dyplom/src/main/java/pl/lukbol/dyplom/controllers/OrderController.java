@@ -671,7 +671,11 @@ public class OrderController {
             matchingOrders = orderRepository.findByEmployeeNameAndStartDateBetweenWithMaterials(employeeName, startDate, endDate);
         }
 
-        return ResponseEntity.ok(matchingOrders);
+        List<Order> filteredOrders = matchingOrders.stream()
+                .filter(order -> "W trakcie".equals(order.getStatus()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(filteredOrders);
     }
 
     @PatchMapping("/material/{materialId}")
