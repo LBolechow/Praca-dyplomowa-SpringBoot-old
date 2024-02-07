@@ -2,6 +2,7 @@ package pl.lukbol.dyplom.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
@@ -22,11 +23,11 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import pl.lukbol.dyplom.classes.Notification;
-import pl.lukbol.dyplom.classes.Role;
-import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.classes.*;
 import pl.lukbol.dyplom.configs.MailConfig;
 import pl.lukbol.dyplom.exceptions.UserNotFoundException;
+import pl.lukbol.dyplom.repositories.ConversationRepository;
+import pl.lukbol.dyplom.repositories.MessageRepository;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.UserService;
@@ -54,10 +55,15 @@ public class UserController {
 
     private RoleRepository roleRepository;
 
-    public UserController(UserRepository userRepository, RoleRepository roleRepository, JavaMailSender mailSender) {
+    private ConversationRepository conversationRepository;
+
+    private MessageRepository messageRepository;
+    public UserController(UserRepository userRepository, RoleRepository roleRepository, JavaMailSender mailSender, ConversationRepository conversationRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.mailSender = mailSender;
+        this.conversationRepository = conversationRepository;
+        this.messageRepository = messageRepository;
     }
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
@@ -88,7 +94,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(response);
         }
         List<Notification> a = newUser.getNotifications();
-        a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUser));
+        a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUser, "System"));
         newUser.setNotifications(a);
         newUser.setRoles(Arrays.asList(role));
         userRepository.save(newUser);
@@ -125,7 +131,7 @@ public class UserController {
         User newUsr = new User(name,email, passwordEncoder.encode(password), null, false, false);
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
         List<Notification> a = newUsr.getNotifications();
-        a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUsr));
+        a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUsr, "System"));
         newUsr.setNotifications(a);
         if (emailExists(newUsr.getEmail())) {
             req.getSession().setAttribute("message", "Użytkownik o takim adresie email już istnieje.");
@@ -182,6 +188,7 @@ public class UserController {
         users.removeIf(user -> user.getEmail().equalsIgnoreCase(usr.getEmail()));
         return users;
     }
+    @Transactional
     @DeleteMapping("/users/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
@@ -189,9 +196,32 @@ public class UserController {
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isPresent()) {
-            userRepository.delete(userOptional.get());
-        } else {
-            throw new UserNotFoundException(id);
+            Long clientId = userOptional.get().getId();
+
+            messageRepository.deleteBySenderId(clientId);
+            List<Conversation> conversations = conversationRepository.findAll();
+
+            List<Conversation> conversationsToUpdate = conversations.stream()
+                    .filter(conversation -> conversation.getClient() != null && clientId.equals(conversation.getClient().getId()))
+                    .collect(Collectors.toList());
+            conversationsToUpdate.forEach(conversation -> {
+                conversation.setClient(null);
+                conversationRepository.saveAndFlush(conversation);
+
+                conversationRepository.delete(conversation);
+            });
+
+            List<Conversation> userConversations = conversationRepository.findByParticipants_Id(userOptional.get().getId());
+            for (Conversation c: userConversations) {
+                c.getParticipants().remove(userOptional.get());
+                conversationRepository.save(c);
+            }
+
+            if (userOptional.isPresent()) {
+                userRepository.delete(userOptional.get());
+            } else {
+                throw new UserNotFoundException(id);
+            }
         }
     }
     @PutMapping("/users/update/{id}")

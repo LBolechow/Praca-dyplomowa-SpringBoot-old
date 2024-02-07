@@ -186,8 +186,8 @@
                                             <div class="me-3">
                                                 <div class="bg-warning icon-circle"><i class="fas fa-exclamation-triangle text-white"></i></div>
                                             </div>
-                                            <div><span class="small text-gray-500">`+data.notifications[i].date+`</span>
-                                                <p>`+data.notifications[i].opis+`</p>
+                                            <div><span class="small text-gray-500">`+data.notifications[i].creator + " " +data.notifications[i].date+`</span>
+                                                <p>`+data.notifications[i].description+`</p>
                                             </div>
                                         </a>`
 
@@ -266,31 +266,27 @@
         var listItem = $(`.list-group-item[data-conversation-id="${conversationId}"]`);
 
         if (listItem.length) {
-            // Znaleziono element listy, aktualizuj go
-            listItem.find('.last-message').text(message.content); // Załóżmy, że jest element pokazujący ostatnią wiadomość
-            listItem.find('.message-date').text(message.formattedMessageDate); // Aktualizacja daty
-            // Tutaj dodaj logikę aktualizacji licznika nieprzeczytanych wiadomości, jeśli jest potrzebna
+            listItem.find('.last-message').text(message.content);
+            listItem.find('.message-date').text(message.formattedMessageDate);
         } else {
-            // Konwersacja nie znajduje się na liście, opcjonalnie możesz dodać nowy element do listy
-            // albo po prostu odświeżyć listę, jeśli to sytuacja, której oczekujesz rzadko
-            // loadConversationList(); // Tylko jeśli to konieczne
+
         }
     }
 
     function showMessage(message) {
 
-        var isCurrentUserMessage = message.sender.id === employeeId;// Sprawdź, czy wiadomość jest od bieżącego użytkownika
+        var isCurrentUserMessage = message.sender.id === employeeId;
 
         var messageElement = `
         <div class="media w-50 mb-3 ${isCurrentUserMessage ? 'ml-auto' : ''}">
             <div class="media-body ${isCurrentUserMessage ? 'text-right' : 'ml-3'}">
                 <div class="mb-2">
-                    <p class="text-small mb-0 text-muted">${message.sender.name}</p> <!-- Dodaj nazwę użytkownika -->
+                    <p class="text-small mb-0 text-muted">${message.sender.name}</p>
                 </div>
                 <div class="bg-light rounded py-2 px-3 message-content">
                     <p class="mb-0 text-dark">${message.content}</p>
                 </div>
-                <p class="small text-muted">${message.formattedMessageDate}</p> <!-- Użyj formattedMessageDate -->
+                <p class="small text-muted">${message.formattedMessageDate}</p>
             </div>
         </div>
     `;
@@ -473,7 +469,7 @@
                 location.reload()
             },
             error: function() {
-
+                location.reload()
             }
         });
 

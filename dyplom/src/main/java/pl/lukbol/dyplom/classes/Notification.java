@@ -11,8 +11,9 @@ import java.util.Date;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
-    public String opis;
-    public boolean odczyt;
+
+    public String description;
+    public String creator;
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     public Date date;
@@ -22,14 +23,13 @@ public class Notification {
     @JsonIgnore
     private User user;
 
-    public boolean isOdczyt() {
-        return odczyt;
-    }
 
-    public Notification(String opis, Date date, User usr) {
-        this.opis = opis;
+
+    public Notification(String description, Date date, User usr, String creator) {
+        this.description = description;
         this.date = date;
         this.user = usr;
+        this.creator = creator;
     }
     @JsonIgnore
     public User getUser() {
@@ -51,17 +51,14 @@ public class Notification {
     public Notification() {
 
     }
-    public Notification (String opis, boolean odczyt) {
-        this.opis = opis;
-        this.odczyt = odczyt;
+    public Notification (String description) {
+        this.description = description;
     }
 
-    public void setOpis(String opis) {this.opis = opis;}
+    public void setDescription(String description) {this.description = description;}
 
-    public void setOdczyt(boolean odczyt) {this.odczyt = odczyt;}
 
-    public String getOpis() {return opis;}
-    public boolean getOdczyt(){return odczyt;}
+    public String getDescription() {return description;}
 
     public Long getId() {
         return this.id;
@@ -69,6 +66,14 @@ public class Notification {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }
 

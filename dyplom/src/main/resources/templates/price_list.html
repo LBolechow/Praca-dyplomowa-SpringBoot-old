@@ -200,19 +200,16 @@
 <script>
     $('body').on('click', '.edit-button', function() {
         var id = $(this).data('id'); // Pobieranie ID
-        var currentRow = $(this).closest('tr'); // Pobieranie bieżącego wiersza
+        var currentRow = $(this).closest('tr');
 
-        var item = currentRow.find('td:eq(0)').text(); // Pobieranie obecnej nazwy usługi
-        var price = currentRow.find('td:eq(1)').text(); // Pobieranie obecnej ceny
-
-        // Zamiana tekstu na pola edycyjne
+        var item = currentRow.find('td:eq(0)').text();
+        var price = currentRow.find('td:eq(1)').text();
         currentRow.find('td:eq(0)').html('<input type="text" class="form-control" value="' + item + '">');
         currentRow.find('td:eq(1)').html('<input type="text" class="form-control" value="' + price + '">');
 
-        // Zmiana przycisku "Modyfikuj" na "Zapisz"
         $(this).removeClass('btn-success edit-button')
             .addClass('btn-primary save-button')
-            .html('<i class="fas fa-save"></i>') // Ustawienie ikony "Zapisz"
+            .html('<i class="fas fa-save"></i>')
             .attr('data-id', id);
     });
     $('body').on('click', '.save-button', function() {

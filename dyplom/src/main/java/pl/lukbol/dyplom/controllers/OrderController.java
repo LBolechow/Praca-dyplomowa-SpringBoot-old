@@ -199,12 +199,12 @@ public class OrderController {
         System.out.println(generatedIdCode);
 
         List<Notification> a = usr.get(0).getNotifications();
-        a.add(new Notification("Pojawiło się nowe zlecenie!", new Date(),usr.get(0)));
+        a.add(new Notification("Pojawiło się nowe zlecenie!", new Date(),usr.get(0), "System"));
         usr.get(0).setNotifications(a);
 
         userRepository.save(usr.get(0));
 
-        Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, "W trakcie", price, hours, null, user, generatedIdCode);
+        Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, "W trakcie", price, hours, null, null, generatedIdCode);
 
         List<Material> materials = new ArrayList<>();
         for (String item : items) {
@@ -222,10 +222,14 @@ public class OrderController {
         try {
             Optional<Order> optionalOrder = orderRepository.findById(id);
 
+
             if (optionalOrder.isPresent()) {
                 Order order = optionalOrder.get();
+                String employeeName = order.getEmployeeName();
+                User usr = userRepository.findByName(employeeName);
 
                 Map<String, Object> orderDetails = new HashMap<>();
+
                 orderDetails.put("id", order.getId());
                 orderDetails.put("description", order.getDescription());
                 orderDetails.put("clientName", order.getClientName());
@@ -235,7 +239,8 @@ public class OrderController {
                 orderDetails.put("startTime", formatTime(order.getStartDate()));
                 orderDetails.put("endDate", formatDate(order.getEndDate()));
                 orderDetails.put("endTime", formatTime(order.getEndDate()));
-                orderDetails.put("employee", order.getUser().getName());
+
+                orderDetails.put("employee", usr.getName());
                 orderDetails.put("hours", order.getDuration());
                 orderDetails.put("price", order.getPrice());
                 orderDetails.put("materials", order.getMaterials());

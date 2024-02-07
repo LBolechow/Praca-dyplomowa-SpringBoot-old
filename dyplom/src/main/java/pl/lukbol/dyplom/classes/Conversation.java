@@ -40,6 +40,10 @@ public class Conversation {
     )
     private List<User> participants;
 
+    public List<User> getParticipants() {
+        return participants;
+    }
+
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Message> messages;
