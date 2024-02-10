@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>pl.lukbol.dyplom.classes</OriginalElement>
+  <nodes>
+    <node x="715.0" y="659.9650179211469">pl.lukbol.dyplom.classes.Message</node>
+    <node x="-195.0" y="70.0">pl.lukbol.dyplom.classes.Notification</node>
+    <node x="1200.0" y="114.0">pl.lukbol.dyplom.classes.Material</node>
+    <node x="808.6375149342891" y="-0.04420549581834621">pl.lukbol.dyplom.classes.Conversation</node>
+    <node x="66.5947431302269" y="591.8394265232976">pl.lukbol.dyplom.classes.Price</node>
+    <node x="85.0" y="114.0">pl.lukbol.dyplom.classes.Role</node>
+    <node x="408.0" y="-29.0">pl.lukbol.dyplom.classes.User</node>
+    <node x="-456.03536439665464" y="165.0530465949821">pl.lukbol.dyplom.classes.Privilege</node>
+    <node x="1565.0" y="-203.96463560334524">pl.lukbol.dyplom.classes.Order</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="pl.lukbol.dyplom.classes.Material" target="pl.lukbol.dyplom.classes.Order" relationship="TO_ONE">
+      <point x="109.5" y="86.0" />
+      <point x="1565.0" y="372.0" />
+      <point x="-161.0" y="251.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Order" target="pl.lukbol.dyplom.classes.Material" relationship="TO_MANY">
+      <point x="-161.0" y="-251.0" />
+      <point x="1575.0" y="47.03536439665476" />
+      <point x="1575.0" y="200.0" />
+      <point x="109.5" y="-86.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Notification" target="pl.lukbol.dyplom.classes.User" relationship="TO_ONE">
+      <point x="62.5" y="-216.0" />
+      <point x="-7.5" y="-44.0" />
+      <point x="435.70000000000005" y="-44.0" />
+      <point x="-110.80000000000001" y="-315.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Message" target="pl.lukbol.dyplom.classes.Conversation" relationship="TO_ONE">
+      <point x="-76.0" y="-260.0" />
+      <point x="791.0" y="616.3054958183991" />
+      <point x="898.3875149342891" y="616.3054958183991" />
+      <point x="-89.75" y="271.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Privilege" target="pl.lukbol.dyplom.classes.Role" relationship="TO_MANY">
+      <point x="54.75" y="139.0" />
+      <point x="-291.78536439665464" y="512.0" />
+      <point x="150.75" y="512.0" />
+      <point x="-65.75" y="172.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Role" target="pl.lukbol.dyplom.classes.Privilege" relationship="TO_MANY">
+      <point x="65.75" y="172.0" />
+      <point x="282.25" y="541.5574671445639" />
+      <point x="-401.28536439665464" y="541.5574671445639" />
+      <point x="-54.75" y="139.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.User" target="pl.lukbol.dyplom.classes.Conversation" relationship="TO_MANY">
+      <point x="110.8" y="-315.0" />
+      <point x="898.3875149342891" y="-29.0" />
+      <point x="-89.75" y="-271.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Conversation" target="pl.lukbol.dyplom.classes.User" relationship="TO_MANY">
+      <point x="89.75" y="-271.0" />
+      <point x="1077.8875149342891" y="-76.0795698924731" />
+      <point x="601.9" y="-76.0795698924731" />
+      <point x="55.400000000000006" y="-315.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Order" target="pl.lukbol.dyplom.classes.User" relationship="TO_ONE">
+      <point x="0.0" y="-502.0" />
+      <point x="1726.0" y="-226.0" />
+      <point x="546.5" y="-226.0" />
+      <point x="0.0" y="-315.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Role" target="pl.lukbol.dyplom.classes.User" relationship="TO_MANY">
+      <point x="131.5" y="86.0" />
+      <point x="373.0" y="372.0" />
+      <point x="373.0" y="443.5" />
+      <point x="-138.5" y="157.5" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.User" target="pl.lukbol.dyplom.classes.Role" relationship="TO_MANY">
+      <point x="-138.5" y="-157.5" />
+      <point x="383.0" y="128.5" />
+      <point x="383.0" y="200.0" />
+      <point x="131.5" y="-86.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Conversation" target="pl.lukbol.dyplom.classes.Message" relationship="TO_MANY">
+      <point x="89.75" y="271.0" />
+      <point x="1077.8875149342891" y="793.0" />
+      <point x="943.0" y="793.0" />
+      <point x="76.0" y="-260.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.User" target="pl.lukbol.dyplom.classes.Notification" relationship="TO_MANY">
+      <point x="-55.400000000000006" y="-315.0" />
+      <point x="491.1" y="-90.10609318996416" />
+      <point x="-132.5" y="-90.10609318996416" />
+      <point x="-62.5" y="-216.0" />
+    </edge>
+    <edge source="pl.lukbol.dyplom.classes.Message" target="pl.lukbol.dyplom.classes.User" relationship="TO_ONE">
+      <point x="-76.0" y="-260.0" />
+      <point x="791.0" y="798.0" />
+      <point x="546.5" y="798.0" />
+      <point x="0.0" y="315.0" />
+    </edge>
+  </edges>
+  <settings layout="Compact" zoom="0.664707750952986" showDependencies="true" x="448.91708482676245" y="417.30800477897253" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

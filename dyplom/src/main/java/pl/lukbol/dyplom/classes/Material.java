@@ -19,13 +19,6 @@ public class Material {
     public Material() {
     }
 
-    public Material(Long id, String item, Order order, Boolean checked) {
-        this.id = id;
-        this.item = item;
-        this.order = order;
-        this.checked=checked;
-    }
-
     public Material(String item, Order order, Boolean checked) {
         this.item = item;
         this.order = order;

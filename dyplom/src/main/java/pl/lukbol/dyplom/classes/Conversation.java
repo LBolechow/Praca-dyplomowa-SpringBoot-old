@@ -3,7 +3,9 @@ package pl.lukbol.dyplom.classes;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Conversation {
@@ -30,8 +32,16 @@ public class Conversation {
         this.name = name;
     }
 
+    @ElementCollection
+    private Set<String> seenByUserIds = new HashSet<>();
 
+    public Set<String> getSeenByUserIds() {
+        return seenByUserIds;
+    }
 
+    public void setSeenByUserIds(Set<String> seenByUserIds) {
+        this.seenByUserIds = seenByUserIds;
+    }
     @ManyToMany
     @JoinTable(
             name = "conversation_users",
@@ -59,6 +69,7 @@ public class Conversation {
     public void setMessages(List<Message> messages) {
         this.messages = messages;
     }
+
     @ManyToOne
     @JoinColumn(name = "client_id")
     private User client;
@@ -70,8 +81,6 @@ public class Conversation {
     public void setClient(User client) {
         this.client = client;
     }
-
-
 
 
     public Conversation() {
@@ -92,13 +101,4 @@ public class Conversation {
         this.odczyt = odczyt;
     }
 
-    public Conversation(Long id, String name, List<User> participants, List<Message> messages, boolean odczyt) {
-        this.id = id;
-        this.name = name;
-        this.participants = participants;
-        this.messages = messages;
-        this.odczyt = odczyt;
-    }
-
-    // Constructors, getters, and setters
 }

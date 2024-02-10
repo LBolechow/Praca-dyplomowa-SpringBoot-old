@@ -34,7 +34,7 @@ public class ChatController {
     @Autowired
     private UserController userController;
 
-    private  MessageRepository messageRepository;
+    private MessageRepository messageRepository;
 
     private ConversationRepository conversationRepository;
 
@@ -43,6 +43,7 @@ public class ChatController {
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
     }
+
     @MessageMapping("/sendToConversation/{conversationId}")
     @SendTo("/topic/employees")
     @Transactional
@@ -57,13 +58,14 @@ public class ChatController {
             return null;
         }
     }
+
     @MessageMapping("/sendToEmployees")
     @SendTo("/topic/employees")
     @Transactional
     public Message sendMessageToEmployees(Message message) {
-       String clientEmail = message.getSender().getEmail();
+        String clientEmail = message.getSender().getEmail();
 
-       User client = userRepository.findByEmail(clientEmail);
+        User client = userRepository.findByEmail(clientEmail);
 
         List<Conversation> conversations = conversationRepository.findConversationByClient_Id(client.getId());
 
@@ -79,13 +81,18 @@ public class ChatController {
             conversations.add(conversation);
             client.setConversations(conversations);
             userRepository.save(client);
+
         }
 
         for (Conversation conversation : conversations) {
             messageService.sendMessage(message.getSender(), conversation, message.getContent(), message.getMessageDate());
+            conversation.getSeenByUserIds().clear();
+            conversation.setOdczyt(false);
+            conversationRepository.save(conversation);
         }
         return message;
     }
+
     @GetMapping("/api/conversation")
     public ResponseEntity<List<Message>> getClientConversation(Authentication authentication) {
         User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
@@ -98,12 +105,11 @@ public class ChatController {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        }
-        else
-        {
+        } else {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/api/employee/conversations")
     public ResponseEntity<List<Message>> getAllEmployeeConversationMessages(Authentication authentication) {
         // Pobierz użytkownika na podstawie danych z autoryzacji
@@ -128,7 +134,7 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/api/get_conversations")
+    @GetMapping("/get_conversations")
     public List<Conversation> getAllConversations() {
         List<Conversation> conversations = conversationRepository.findAll();
         return conversations;
@@ -145,6 +151,7 @@ public class ChatController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/api/conversation/{conversationId}/latest-message")
     public ResponseEntity<Message> getLatestMessageForConversation(@PathVariable Long conversationId) {
         Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
@@ -161,32 +168,7 @@ public class ChatController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PostMapping("/api/markConversationAsRead/{conversationId}")
-    public ResponseEntity<?> markConversationAsRead(@PathVariable Long conversationId) {
-        Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
-        if (conversation != null) {
-            conversation.setOdczyt(true);
-            conversationRepository.save(conversation);
-            return ResponseEntity.ok("Konwersacja została oznaczona jako odczytana.");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    @PostMapping("/api/markAllConversationsAsUnread/{clientId}")
-    public ResponseEntity<?> markAllConversationsAsUnread(@PathVariable Long clientId) {
-        List<Conversation> conversations = conversationRepository.findConversationByClient_Id(clientId);
 
-        if (conversations != null && !conversations.isEmpty()) {
-            for (Conversation conversation : conversations) {
-                conversation.setOdczyt(false);
-            }
-            conversationRepository.saveAll(conversations);
-
-            return ResponseEntity.ok("Wszystkie konwersacje klienta zostały oznaczone jako nieodczytane.");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
     @PostMapping("/api/createConversation")
     public ResponseEntity<Map<String, Object>> createConversation(Authentication authentication, @RequestParam("name") String name,
                                                                   @RequestParam("participantIds") String participantIds) {
@@ -195,14 +177,9 @@ public class ChatController {
             List<Long> participant = Arrays.stream(participantIds.split(","))
                     .map(Long::valueOf)
                     .collect(Collectors.toList());
-            // Pobierz zaznaczonych użytkowników na podstawie ich identyfikatorów
             List<User> participants = userRepository.findByIdIn(participant);
             participants.add(usr);
-
-            // Stwórz nową konwersację
             Conversation newConversation = new Conversation(name, participants, new ArrayList<>(), false);
-
-            // Zapisz konwersację w bazie danych
             conversationRepository.save(newConversation);
 
             Map<String, Object> response = new HashMap<>();
@@ -214,6 +191,92 @@ public class ChatController {
             response.put("success", false);
             response.put("message", "Błąd podczas tworzenia konwersacji: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/markConversationAsRead/{conversationId}")
+    public ResponseEntity<?> markAllMessagesAsRead(Authentication authentication, @PathVariable Long conversationId) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
+        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+        if (conversationOptional.isPresent()) {
+            Conversation conversation = conversationOptional.get();
+            Set<String> users = conversation.getSeenByUserIds();
+            users.add(usr.getId().toString());
+            conversation.setSeenByUserIds(users);
+            conversationRepository.save(conversation);
+
+            return ResponseEntity.ok("Wiadomości zostały oznaczone jako przeczytane.");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/clearSeenByUserIds/{conversationId}")
+    public ResponseEntity<?> clearSeenByUserIds(@PathVariable Long conversationId) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
+
+        if (conversationOptional.isPresent()) {
+            Conversation conversation = conversationOptional.get();
+            conversation.getSeenByUserIds().clear();
+            conversationRepository.save(conversation);
+
+            return ResponseEntity.ok("Lista przeczytanych została wyczyszczona.");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/checkIfConversationRead/{conversationId}")
+    public ResponseEntity<Boolean> checkIfConversationRead(Authentication authentication, @PathVariable Long conversationId) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
+        User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
+
+        if (conversationOptional.isPresent() && user != null) {
+            Conversation conversation = conversationOptional.get();
+            Set<String> seenByUserIds = conversation.getSeenByUserIds();
+            boolean isRead = seenByUserIds.contains(user.getId().toString());
+            return ResponseEntity.ok(isRead);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/getConversationParticipants/{conversationId}")
+    public ResponseEntity<List<User>> getConversationParticipants(@PathVariable Long conversationId) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
+        if (conversationOptional.isPresent()) {
+            Conversation conversation = conversationOptional.get();
+            // Tu zakładam, że masz sposób na pobranie uczestników konwersacji z obiektu konwersacji
+            List<User> participants = conversation.getParticipants();
+            if (participants.isEmpty())
+            {
+                participants.add(conversation.getClient());
+            }
+            return ResponseEntity.ok(participants);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/hide/{conversationId}")
+    public ResponseEntity<?> hideConversation(@PathVariable Long conversationId) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
+
+        if (conversationOptional.isPresent()) {
+            Conversation conversation = conversationOptional.get();
+            if (conversation.isOdczyt())
+            {
+                conversation.setOdczyt(false);
+            }
+            else
+            {
+                conversation.setOdczyt(true);
+            }
+           // Zakładam, że 'odczyt' to pole w klasie Conversation oznaczające, czy konwersacja została ukryta/przeczytana
+            conversationRepository.save(conversation);
+
+            return ResponseEntity.ok().body("Konwersacja została ukryta.");
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }

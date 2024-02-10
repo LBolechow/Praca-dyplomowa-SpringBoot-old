@@ -14,32 +14,32 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    public String description;
+    private String description;
 
 
-    public String clientName;
+    private String clientName;
 
-    public String clientEmail;
+    private String clientEmail;
 
-    public String phoneNumber;
+    private String phoneNumber;
 
 
 
-    public String employeeName;
+    private String employeeName;
 
-    public Date startDate;
+    private Date startDate;
 
-    public Date endDate;
+    private Date endDate;
 
-    public String status;
+    private String status;
 
-    public int price;
+    private int price;
 
-    public double duration;
+    private double duration;
 
-    public String idCode;
+    private String idCode;
 
-    public String getIdCode() {
+    private String getIdCode() {
         return idCode;
     }
 

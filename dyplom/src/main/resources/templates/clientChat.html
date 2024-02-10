@@ -124,8 +124,8 @@
 </body>
 <script>
     var stompClient = null;
-    var clientId; // Declare clientId in a higher scope
-    var clientName; // Declare clientName in a higher scope
+    var clientId;
+    var clientName;
     var clientEmail;
 
     $.get("/user", function(data) {
@@ -239,18 +239,6 @@
         scrollToBottom();
         console.log('Message element:', messageElement);
     }
-    function markConversationsAsUnread(clientId) {
-        $.ajax({
-            url: `/api/markAllConversationsAsUnread/${clientId}`, // Wywołaj nowy endpoint do oznaczenia konwersacji jako nieodczytane
-            method: 'POST',
-            success: function (data) {
-                console.log('Conversations marked as unread:', data);
-            },
-            error: function (error) {
-                console.error('Error marking conversations as unread:', error);
-            }
-        });
-    }
 </script>
 <script>
     function deleteAlerts(){
@@ -269,4 +257,5 @@
 
     }
 </script>
+
 </html>

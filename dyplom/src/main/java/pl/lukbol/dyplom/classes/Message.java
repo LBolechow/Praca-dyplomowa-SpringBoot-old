@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Message {
@@ -23,7 +25,7 @@ public class Message {
     private User receiver;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "HH:mm | dd.MM")// Ustawienie typu danych na TIMESTAMP
+    @JsonFormat(pattern = "HH:mm | dd.MM")
     private Date messageDate = new Date();;
     private String content;
 
@@ -32,34 +34,27 @@ public class Message {
     @JsonBackReference
     private Conversation conversation;
 
-    private boolean seen;
+
 
     public Message() {
     }
 
-    public Message(User sender, String content, Conversation conversation, Date messageDate, Boolean seen) {
+
+
+    public Message(User sender, String content, Conversation conversation, Date messageDate) {
         this.sender = sender;
         this.content = content;
         this.conversation = conversation;
         this.messageDate = messageDate;
-        this.seen = seen;
     }
 
-    public boolean isSeen() {
-        return seen;
-    }
 
-    public void setSeen(boolean seen) {
-        this.seen = seen;
-    }
-
-    public Message(Long id, User sender, User receiver, String content, Conversation conversation, Boolean seen) {
+    public Message(Long id, User sender, User receiver, String content, Conversation conversation) {
         this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
         this.conversation = conversation;
-        this.seen = seen;
     }
 
     public Conversation getConversation() {

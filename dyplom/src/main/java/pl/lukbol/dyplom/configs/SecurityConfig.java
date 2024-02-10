@@ -68,9 +68,9 @@ public class SecurityConfig  {
                 //.and()
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/user", "/profile/**",  "/currentDate", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/api/get_conversations", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/api/markConversationAsRead/**", "/api/markAllConversationsAsUnread/**", "/index", "/user/activateMail", "/user/checkCode", "/user/orders", "/removeAlerts", "/create-notification").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/user", "/profile/**",  "/currentDate", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/index", "/user/activateMail", "/user/checkCode", "/user/orders", "/removeAlerts", "/create-notification").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
                         .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add", "/add-price", "/delete-price/{id}", "/update-price/{id}").hasRole("ADMIN")
-                        .requestMatchers("/order/add",  "/users", "/caldendar", "/daily", "/daily/**", "/order/getDailyOrders", "/users/findByRole", "/order/checkAvailability", "/order/getOrderDetails/{id}", "/order/edit/{id}", "/order/checkAvailabilityNextDay", "/order/delete/{id}", "/materials", "/order/search", "/material/{id}", "/order/otherEmployee/{orderId}", "/user/employees-and-admins", "/users/employees-and-admins", "/api/createConversation", "/api/employee/conversations").hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers("/order/add",  "/users", "/caldendar", "/daily", "/daily/**", "/order/getDailyOrders", "/users/findByRole", "/order/checkAvailability", "/order/getOrderDetails/{id}", "/order/edit/{id}", "/order/checkAvailabilityNextDay", "/order/delete/{id}", "/materials", "/order/search", "/material/{id}", "/order/otherEmployee/{orderId}", "/user/employees-and-admins", "/users/employees-and-admins", "/api/createConversation", "/api/employee/conversations", "/clearSeenByUserIds/", "/markConversationAsRead/{conversationId}", "/checkIfConversationRead/{conversationId}", "/get_conversations", "/getConversationParticipants/{conversationId}", "/hide/{conversationId}").hasAnyRole("ADMIN", "EMPLOYEE")
 
                         .requestMatchers( "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
                                 "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation", "/ordersList", "/order", "/order/**", "/order/checkOrder/{idCode}", "/prices").permitAll()
@@ -132,7 +132,7 @@ public class SecurityConfig  {
                     .filter(u -> u.getEmail().equals(email))
                     .findFirst()
                     .orElseGet(() -> {
-                        User newUser = new User(finalOidcUser.getFullName(), email, passwordEncoder().encode(generatedPassword), null, false, false);
+                        User newUser = new User(finalOidcUser.getFullName(), email, passwordEncoder().encode(generatedPassword), false);
                         newUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
                         userRepository.save(newUser);
                         return newUser;

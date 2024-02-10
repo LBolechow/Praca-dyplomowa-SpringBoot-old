@@ -15,17 +15,14 @@ import java.util.Collection;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id")Long id;
-    public String name;
+    private String name;
     @Column(unique=true)
     @NotNull
     @NotEmpty
-    public String email;
-    public String password;
+    private String email;
+    private String password;
 
-    public String code;
-
-    boolean activated;
-    boolean enabled;
+    private boolean enabled;
 
     @OneToMany(targetEntity=Notification.class,cascade = CascadeType.ALL,
             fetch = FetchType.LAZY, mappedBy = "user")
@@ -55,41 +52,22 @@ public class User {
 
     public User() {}
 
-    public String getCode() {
-        return code;
-    }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public boolean isActivated() {
-        return activated;
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
-    }
-
-    public User(Long id, String name, String email, String password, String code, Boolean enabled, Boolean activated) {
+    public User(Long id, String name, String email, String password, Boolean enabled) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.code=code;
         this.enabled=enabled;
-        this.activated=activated;
     }
 
 
 
-    public User(String name, String email, String password, String code, Boolean enabled, Boolean activated) {
+    public User(String name, String email, String password, Boolean enabled) {
         this.email = email;
         this.name = name;
         this.password=password;
-        this.code=code;
         this.enabled=enabled;
-        this.activated=activated;
     }
     public boolean isEnabled() {
         return enabled;

@@ -83,7 +83,7 @@ public class UserController {
                                                        @RequestParam("email") String email,
                                                        @RequestParam("password") String password,
                                                        @RequestParam("role") String roleName) {
-        User newUser = new User(name, email, passwordEncoder.encode(password), null,false, false);
+        User newUser = new User(name, email, passwordEncoder.encode(password), false);
 
         Role role = roleRepository.findByName(roleName);
 
@@ -128,7 +128,7 @@ public class UserController {
     }
     @PostMapping(value ="/register", consumes = {"*/*"})
     public void registerUser(@RequestParam("name") String name, @RequestParam("email") String email, @RequestParam("password") String password,  HttpServletRequest req, HttpServletResponse resp) {
-        User newUsr = new User(name,email, passwordEncoder.encode(password), null, false, false);
+        User newUsr = new User(name,email, passwordEncoder.encode(password), false);
         newUsr.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
         List<Notification> a = newUsr.getNotifications();
         a.add(new Notification("Witamy na stronie naszego zakładu krawieckiego!", new Date(),newUsr, "System"));
@@ -244,42 +244,6 @@ public class UserController {
         } else {
             throw new UserNotFoundException(id);
         }
-    }
-
-    @PostMapping(value = "/user/activateMail", consumes = {"*/*"})
-    public String activateByMail(Authentication authentication) {
-
-        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
-
-        User usr = userRepository.findByEmail(userEmail);
-
-        if (usr != null) {
-            String activationCode = GenerateCode.generateActivationCode();
-            usr.setCode(activationCode);
-            userRepository.save(usr);
-            sendActivationEmail(userEmail, activationCode);
-
-            return "Success";
-        }
-
-        return "Błąd aktywacji";
-    }
-    @PostMapping(value = "/user/checkCode", consumes = {"*/*"})
-    public String checkCode(Authentication authentication,
-                                @RequestParam("code") String code) {
-
-        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-
-        if (usr != null) {
-            String checkCode = usr.getCode();
-            if (code.equals(checkCode) && !code.isEmpty()) {
-                usr.setActivated(true);
-                userRepository.save(usr);
-                return "Poprawnie aktywowano";
-            }
-        }
-
-        return "Błąd aktywacji";
     }
 
     @GetMapping("/search-users")
