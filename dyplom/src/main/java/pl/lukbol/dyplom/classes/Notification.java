@@ -12,11 +12,11 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
 
-    public String description;
-    public String creator;
+    private String description;
+    private String creator;
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    public Date date;
+    private Date date;
 
     @ManyToOne(targetEntity=User.class,fetch = FetchType.LAZY)
     @JsonBackReference

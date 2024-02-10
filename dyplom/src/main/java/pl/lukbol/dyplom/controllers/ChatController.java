@@ -256,6 +256,23 @@ public class ChatController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/checkSeen/{conversationId}")
+    public ResponseEntity<List<User>> getParticipantsBySeen(@PathVariable Long conversationId) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
+        if (conversationOptional.isPresent()) {
+            Conversation conversation = conversationOptional.get();
+            List<User> participants = conversation.getParticipants();
+            Set<String> seenList = conversation.getSeenByUserIds();
+            List<User> seenParticipants = participants.stream()
+                    .filter(user -> seenList.contains(user.getId().toString()))
+                    .collect(Collectors.toList());
+
+
+            return ResponseEntity.ok(seenParticipants);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @PostMapping("/hide/{conversationId}")
     public ResponseEntity<?> hideConversation(@PathVariable Long conversationId) {
@@ -263,18 +280,15 @@ public class ChatController {
 
         if (conversationOptional.isPresent()) {
             Conversation conversation = conversationOptional.get();
-            if (conversation.isOdczyt())
-            {
+            if (conversation.isOdczyt()) {
                 conversation.setOdczyt(false);
-            }
-            else
-            {
+                conversationRepository.save(conversation);
+                return ResponseEntity.ok().body("Przywrócono konwersację.");
+            } else {
                 conversation.setOdczyt(true);
+                conversationRepository.save(conversation);
+                return ResponseEntity.ok().body("Ukryto konwersację.");
             }
-           // Zakładam, że 'odczyt' to pole w klasie Conversation oznaczające, czy konwersacja została ukryta/przeczytana
-            conversationRepository.save(conversation);
-
-            return ResponseEntity.ok().body("Konwersacja została ukryta.");
         } else {
             return ResponseEntity.notFound().build();
         }

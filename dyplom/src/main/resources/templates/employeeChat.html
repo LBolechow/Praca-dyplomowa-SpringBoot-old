@@ -22,12 +22,12 @@
     <link rel="stylesheet" href="/static/css/Simple-Bootstrap-Chat.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
-<style>
 
+<style>
     #userList li.active {
-        background-color: #4CAF50; /* Zielony kolor */
-        color: #fff; /* Biały kolor tekstu na zielonym tle */
-        list-style-type: disc; /* Dodaj kropki */
+        background-color: #4CAF50;
+        color: #fff;
+        list-style-type: disc;
     }
     .bg-custom-orange {
         background-color: var(--bs-orange);
@@ -104,8 +104,30 @@
                     </ul>
                 </div>
             </nav>
+            <div class="modal fade" id="seenUsersModal" tabindex="-1" aria-labelledby="seenUsersModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="seenUsersModalLabel">Użytkownicy, którzy zobaczyli konwersację</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Uczestnicy konwersacji:</p>
+                            <ul id="participantsList" style="text-align: left;"></ul>
+                            <p>Wyświetlili:</p>
+                            <ul id="seenUsersList" style="text-align: left;"></ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <button class="btn btn-primary" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">Utwórz konwersację</button>
             </br>
+
             <input type="checkbox" id="hideConversation" /> Pokaż tylko ukryte konwersacje.
             <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
                 <div class="modal-dialog" role="document">
@@ -131,32 +153,11 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="conversationModal" tabindex="-1" role="dialog" aria-labelledby="conversationModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="conversationModalLabel">Szczegóły Konwersacji</h5>
-                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Zamknij">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Uczestnicy konwersacji:</p>
-                            <ul id="participantsList" style="text-align: left;"></ul>
-                            <p>Odczytali:</p>
-                            <ul id="seenBy" style="text-align: left;"></ul>
-                        </div>
-                        <div class="modal-footer">
-                            <button id="hideConversationButton" class="btn btn-primary">Ukryj/przywróć konwersację</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <h1></h1><div class="bootstrap_chat">
                 <div class="container py-5 px-4">
                     <header class="text-center">
                         <h1 class="display-4 text-dark">Panel wiadomości</h1>
+
                     </header>
                     <div class="row rounded-lg overflow-hidden shadow">
                         <div class="col-4 px-0">
@@ -164,6 +165,7 @@
                                 <div class="bg-gray px-4 py-2 bg-dark text-light">
                                     <p class="h5 mb-0 py-1">Ostatnie</p>
                                 </div>
+
                                 <div class="conversation-list bg-light text-light border-1 w-100">
                                 </div>
                             </div>
@@ -176,6 +178,7 @@
 
                             <div class="input-group">
                                 <input id="message-input" type="text" placeholder="Wpisz wiadomość" class="form-control rounded-0 border-0 py-4 bg-light">
+
                                 <div class="input-group-append">
                                     <button id="send-button" type="button" class="btn btn-link text-dark"  style="background: var(--bs-orange);">Wyślij</button>
                                 </div>
@@ -339,8 +342,9 @@
                 var showReadConversationsOnly = $('#hideConversation').is(':checked'); // Sprawdź, czy checkbox jest zaznaczony
 
                 data.forEach(function (conversation) {
+
                     // Zmodyfikowany warunek, aby pokazywać konwersacje z odczyt=false, gdy checkbox jest odznaczony
-                    if (showReadConversationsOnly && !conversation.odczyt || !showReadConversationsOnly && conversation.odczyt) {
+                    if ((showReadConversationsOnly && conversation.odczyt) || (!showReadConversationsOnly && !conversation.odczyt)) {
                         checkIfConversationRead(conversation.id, function(isUnread) {
                             var messageContent;
                             if (conversation.odczyt) {
@@ -356,58 +360,25 @@
         <p class="font-italic text-muted mb-0 text-small" style="margin: 0;">${messageContent}</p>
     </div>
     <div>
-        <a class="text-secondary open-modal" href="#" role="button" data-conversation-id="${conversation.id}">
-            <i class="fas fa-bars"></i>
-        </a>
+<a class="text-secondary see-participants" role="button" style="margin-right: 10px; text-decoration: none;" data-conversation-id="${conversation.id}">
+    <i class="fa fa-id-card" aria-hidden="true"></i>
+</a>
+
+        <a class="text-secondary hide-conversation" role="button" style="margin-right: 5px" data-conversation-id="${conversation.id}">
+    <i class="fas fa-trash"></i>
+</a>
     </div>
 </div>
 `);
 
                             $('.conversation-list').append(conversationItem);
-                            conversationItem.find('.open-modal').on('click', function(e) {
-                                e.preventDefault();
-                                var conversationId = $(this).data('conversation-id');
-                                $('#hideConversationButton').data('conversation-id', conversationId);
-                                $.ajax({
-                                    url: '/getConversationParticipants/' + conversationId,
-                                    method: 'GET',
-                                    success: function(participants) {
-                                        var participantsList = $('#participantsList');
-                                        participantsList.empty(); // Wyczyść listę, jeśli wcześniej coś było
-                                        participants.forEach(function(participant) {
-                                            participantsList.append('<li>' + participant.name + '</li>'); // Zakładam, że uczestnicy mają właściwość 'name'
-                                        });
-                                    },
-                                    error: function(error) {
-                                        console.error('Error fetching participants:', error);
-                                    }
-                                });
-                                $.ajax({
-                                    url: '/getSeenBy/' + conversationId,
-                                    method: 'GET',
-                                    success: function(participants) {
-                                        var participantsList = $('#participantsList');
-                                        participantsList.empty(); // Wyczyść listę, jeśli wcześniej coś było
-                                        participants.forEach(function(participant) {
-                                            participantsList.append('<li>' + participant.name + '</li>'); // Zakładam, że uczestnicy mają właściwość 'name'
-                                        });
-                                    },
-                                    error: function(error) {
-                                        console.error('Error fetching participants:', error);
-                                    }
-                                });
-
-                                $('#conversationModal').modal('show');
-                            });
 
                             // Wybór domyślnej konwersacji, jeśli potrzebny
-                            if (!defaultConversationSet) {
-                                if (conversation.id === currentSelectedConversationId || currentSelectedConversationId === null) {
+                                if (currentSelectedConversationId === null) {
                                     currentSelectedConversationId = conversation.id;
-                                    defaultConversationSet = true;
                                     getMessagesForConversation(currentSelectedConversationId);
                                 }
-                            }
+
                         });
                     }
                 });
@@ -583,26 +554,75 @@
         });
     }
 </script>
+<script>
+    $(document).ready(function(){
+        // Nasłuchiwanie kliknięcia na linki do ukrywania konwersacji
+        $(document).on('click', '.hide-conversation', function(e) {
+            e.preventDefault();
+            var conversationId = $(this).data('conversation-id');
+            hideConversation(conversationId);
+        });
+
+        function hideConversation(conversationId) {
+            $.ajax({
+                url: `/hide/${conversationId}`,
+                type: 'POST',
+                success: function(response) {
+                    alert(response);
+                    location.reload();
+                },
+                error: function(error) {
+                    console.error('Błąd ukrywania konwersacji:', error);
+                    // Możesz tutaj obsłużyć błędy, np. pokazując komunikat użytkownikowi
+                }
+            });
+        }
+    });
+</script>
 
 <script>
-    $(document).on('click', '#hideConversationButton', function() {
-        var conversationId = $(this).data('conversation-id'); // Upewnij się, że to ID jest poprawnie przypisane do przycisku
-        hideConversation(conversationId);
-    });
-    function hideConversation(conversationId) {
-        $.ajax({
-            url: `/hide/${conversationId}`, // Zastąp URL-em swojego API
-            method: 'POST', // Może być 'POST', 'PUT', zależnie od konfiguracji API
-            success: function(response) {
-                console.log('Konwersacja została ukryta:', response);
-                $('#conversationModal').modal('hide'); // Zamknij modal po pomyślnym ukryciu konwersacji
-                loadConversationList(); // Opcjonalnie, odśwież listę konwersacji, jeśli jest taka potrzeba
-            },
-            error: function(error) {
-                console.error('Błąd ukrywania konwersacji:', error);
-            }
+    $(document).ready(function(){
+        // Użyj delegacji zdarzeń dla dynamicznie dodawanych elementów
+        $(document).on('click', '.see-participants', function(e) {
+            e.preventDefault(); // Zapobiegaj domyślnej akcji nawigacji
+            var conversationId = $(this).data('conversation-id'); // Pobierz ID konwersacji
+            $.ajax({
+                url: '/getConversationParticipants/' + conversationId,
+                method: 'GET',
+                success: function(participants) {
+                    var participantsList = $('#participantsList');
+                    participantsList.empty();
+                    participants.forEach(function(participant) {
+                        participantsList.append('<li>' + participant.name + '</li>');
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching participants:', error);
+                }
+            });
+            $.ajax({
+                url: '/checkSeen/' + conversationId,
+                type: 'GET',
+                success: function(data) {
+                    var $list = $('#seenUsersList');
+                    $list.empty(); // Wyczyść poprzednią listę
+
+                    // Dodaj użytkowników do listy w modalu
+                    data.forEach(function(user) {
+                        $list.append($('<li>').text(user.name));
+                    });
+
+                    // Wyświetl modal
+                    $('#seenUsersModal').modal('show');
+                },
+                error: function(error) {
+                    console.error('Error fetching seen users:', error);
+                    $('#seenUsersList').empty().append($('<li>').text('Nie udało się pobrać danych.'));
+                    $('#seenUsersModal').modal('show');
+                }
+            });
         });
-    }
+    });
 </script>
 
 </html>
