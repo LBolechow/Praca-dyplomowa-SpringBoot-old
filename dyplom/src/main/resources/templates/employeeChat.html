@@ -24,6 +24,9 @@
 </head>
 
 <style>
+    .selected-conversation {
+        background-color: #FFDEAD; /* Jasnoszary kolor tła dla wyróżnienia */
+    }
     #userList li.active {
         background-color: #4CAF50;
         color: #fff;
@@ -128,7 +131,7 @@
             <button class="btn btn-primary" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">Utwórz konwersację</button>
             </br>
 
-            <input type="checkbox" id="hideConversation" /> Pokaż tylko ukryte konwersacje.
+
             <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -139,6 +142,8 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col">
+                                    <label for="conversationNameInput" class="col-form-label" style="padding-top: 10px; margin-top: 10px;">Nazwa konwersacji:</label>
+                                    <input type="text" id="conversationNameInput" class="form-control">
                                     <label class="col-form-label" style="padding-top: 10px; margin-top: 10px;">Wybierz pracowników</label>
                                 </div>
                             </div>
@@ -147,8 +152,8 @@
                             </ul>
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button>
-                            <button class="btn btn-primary" type="button" onclick="createConversation()">Save</button>
+                            <button class="btn btn-light" type="button" data-bs-dismiss="modal">Zamknij</button>
+                            <button class="btn btn-primary" type="button" onclick="createConversation()">Stwórz</button>
                         </div>
                     </div>
                 </div>
@@ -157,7 +162,7 @@
                 <div class="container py-5 px-4">
                     <header class="text-center">
                         <h1 class="display-4 text-dark">Panel wiadomości</h1>
-
+                        <input type="checkbox" id="hideConversation" /> Pokaż tylko ukryte konwersacje.
                     </header>
                     <div class="row rounded-lg overflow-hidden shadow">
                         <div class="col-4 px-0">
@@ -377,6 +382,10 @@
                                 if (currentSelectedConversationId === null) {
                                     currentSelectedConversationId = conversation.id;
                                     getMessagesForConversation(currentSelectedConversationId);
+                                    $('.conversation-list .selected-conversation').removeClass('selected-conversation');
+
+                                    // Dodaje klasę do aktualnie wybranej konwersacji
+                                    $(`.conversation-list div[data-conversation-id="${conversationId}"]`).addClass('selected-conversation');
                                 }
 
                         });
@@ -393,7 +402,12 @@
 
     function selectConversation(conversationId) {
         console.log("Konwersacja wybrana:", conversationId);
-        // Tutaj dodaj logikę do wyświetlenia szczegółów wybranej konwersacji
+        // Usuwa klasę z poprzednio wybranej konwersacji
+        $('.conversation-list .selected-conversation').removeClass('selected-conversation');
+
+        // Dodaje klasę do aktualnie wybranej konwersacji
+        $(`.conversation-list div[data-conversation-id="${conversationId}"]`).addClass('selected-conversation');
+
         currentSelectedConversationId = conversationId;
         getMessagesForConversation(conversationId);
         markConversationAsRead(conversationId);
@@ -483,7 +497,7 @@
             hour12: false
         }).replace(/\./g, '-').replace(',', '');
 
-        var conversationName = `Konwersacja z dnia ${dateString}`;
+        var conversationName = $("#conversationNameInput").val().trim()
         var participantIds = [];
 
         $("#userList li.active").each(function() {
