@@ -51,14 +51,10 @@ public class Order {
     @JsonManagedReference
     private List<Material> materials;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonManagedReference
-    private User user;
 
     public Order() {}
 
-    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, String status, int price, double duration, List<Material> materials, User user,String idCode) {
+    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, String status, int price, double duration, List<Material> materials,String idCode) {
         this.description = description;
         this.clientName = clientName;
         this.clientEmail = clientEmail;
@@ -70,7 +66,6 @@ public class Order {
         this.price = price;
         this.duration = duration;
         this.materials = materials;
-        this.user = user;
         this.idCode= idCode;
     }
     public String getPhoneNumber() {
@@ -160,13 +155,6 @@ public class Order {
         this.clientEmail = clientEmail;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
     public double getDuration() {
         return duration;
     }

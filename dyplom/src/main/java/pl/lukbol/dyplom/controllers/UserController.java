@@ -68,16 +68,7 @@ public class UserController {
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
-    private void sendActivationEmail(String to, String activationCode) {
-        // Utwórz wiadomość e-mail
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setSubject("Aktywacja konta");
-        message.setText("Twój kod aktywacyjny to: " + activationCode);
-        message.setTo(to);
 
-        // Wyślij wiadomość e-mail
-        mailSender.send(message);
-    }
     @PostMapping("/users/add")
     public ResponseEntity<Map<String, Object>> addUser(@RequestParam("name") String name,
                                                        @RequestParam("email") String email,
@@ -280,5 +271,31 @@ public class UserController {
         List<User> users = userRepository.findUsersByRoles_NameIn("ROLE_EMPLOYEE", "ROLE_ADMIN");
         Set<String> uniqueEmployeeNames = users.stream().map(User::getName).collect(Collectors.toSet());
         return new ArrayList<>(uniqueEmployeeNames);
+    }
+    @PostMapping("/send-new-password")
+    public ResponseEntity<?> sendNewPassword(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            String newPassword = GenerateCode.generateActivationCode();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+
+            sendResetEmail(email, newPassword);
+
+            return ResponseEntity.ok().body("Nowe hasło zostało wysłane.");
+        } else {
+            return ResponseEntity.badRequest().body("Nie znaleziono użytkownika z takim adresem e-mail.");
+        }
+    }
+    private void sendResetEmail(String to, String newPassword) {
+        // Utwórz wiadomość e-mail
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setSubject("Twoje nowe hasło");
+        message.setText("Twoje nowe hasło to: " + newPassword);
+        message.setTo(to);
+
+        // Wyślij wiadomość e-mail
+        mailSender.send(message);
     }
 }

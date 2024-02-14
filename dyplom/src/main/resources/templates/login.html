@@ -15,13 +15,29 @@
     <link rel="stylesheet" href="/static/css/Data-Table.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.2/css/theme.bootstrap_4.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <link rel="stylesheet" href="/static/css/info-box.css">
     <link rel="stylesheet" href="/static/css/Ludens---1-Dark-mode-Index-Table-with-Search-Filters.css">
     <link rel="stylesheet" href="/static/css/Navbar-With-Button-icons.css">
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
-
+<div class="modal fade" id="modalForgotPassword" tabindex="-1" role="dialog" aria-labelledby="modalForgotPasswordLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalForgotPasswordLabel">Resetowanie hasła</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Wpisz adres e-mail</p>
+                <input type="email" class="form-control" id="email" placeholder="Wpisz swój email">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                <button class="btn btn-primary" id="resetPassword">Wyślij kod na email</button>
+            </div>
+        </div>
+    </div>
+</div>
 <body class="bg-gradient-primary" style="background: var(--bs-gray-100);">
 <div class="container">
     <div class="row justify-content-center">
@@ -42,6 +58,9 @@
                                     <div class="mb-3"><input class="form-control form-control-user" type="password" id="exampleInputPassword" placeholder="Hasło" name="password"></div>
                                     <div class="mb-3">
                                     </div><button class="btn btn-primary d-block btn-user w-100 text-light" style="font-size: large;" type="submit">Zaloguj</button>
+                                    <div class="text-center">
+                                        <a class="small" href="#" style="font-size: large; color: white;" data-bs-toggle="modal" data-bs-target="#modalForgotPassword">Zapomniałem hasła</a>
+                                    </div>
                                     <p th:if="${error}" style="color: red">
                                          <span th:text="${error}"></span>
                                     </p>
@@ -80,6 +99,26 @@
 <script src="/static/js/Ludens---1-Dark-mode-Index-Table-with-Search-Filters-2.js"></script>
 <script src="/static/js/Ludens---1-Dark-mode-Index-Table-with-Search-Filters.js"></script>
 <script src="/static/js/theme.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 </body>
-
+<script>
+    $(document).ready(function(){
+        $("#resetPassword").click(function(){
+            var email = $("#email").val();
+            $.ajax({
+                type: "POST",
+                url: "/send-new-password",
+                data: JSON.stringify({ email: email }),
+                contentType: "application/json",
+                success: function(response) {
+                    alert("Sprawdź swój email.");
+                    $('#modalForgotPassword').modal('hide');
+                },
+                error: function(xhr, status, error) {
+                    alert("Wystąpił błąd: " + xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
 </html>

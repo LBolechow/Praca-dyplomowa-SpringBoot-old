@@ -73,7 +73,7 @@ public class SecurityConfig  {
                         .requestMatchers("/order/add",  "/users", "/caldendar", "/daily", "/daily/**", "/order/getDailyOrders", "/users/findByRole", "/order/checkAvailability", "/order/getOrderDetails/{id}", "/order/edit/{id}", "/order/checkAvailabilityNextDay", "/order/delete/{id}", "/materials", "/order/search", "/material/{id}", "/order/otherEmployee/{orderId}", "/user/employees-and-admins", "/users/employees-and-admins", "/api/createConversation", "/api/employee/conversations", "/clearSeenByUserIds/", "/markConversationAsRead/{conversationId}", "/checkIfConversationRead/{conversationId}", "/get_conversations", "/getConversationParticipants/{conversationId}", "/hide/{conversationId}", "/checkSeen/{conversationId}").hasAnyRole("ADMIN", "EMPLOYEE")
 
                         .requestMatchers( "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
-                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation", "/ordersList", "/order", "/order/**", "/order/checkOrder/{idCode}", "/prices").permitAll()
+                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation", "/ordersList", "/order", "/order/**", "/order/checkOrder/{idCode}", "/prices", "/send-new-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/*").permitAll()
                         // .anyRequest().authenticated()
 

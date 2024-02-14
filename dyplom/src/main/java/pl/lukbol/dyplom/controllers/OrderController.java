@@ -204,7 +204,7 @@ public class OrderController {
 
         userRepository.save(usr.get(0));
 
-        Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, "W trakcie", price, hours, null, null, generatedIdCode);
+        Order newOrder = new Order(description, clientName, email, phoneNumber, usr.get(0).getName(), startDate, endDate, "W trakcie", price, hours, null, generatedIdCode);
 
         List<Material> materials = new ArrayList<>();
         for (String item : items) {

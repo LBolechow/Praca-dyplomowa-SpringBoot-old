@@ -14,6 +14,7 @@ public class Conversation {
     private Long id;
 
     private String name;
+
     private boolean odczyt;
 
     public Long getId() {
