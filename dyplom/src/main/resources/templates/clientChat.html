@@ -130,7 +130,7 @@
 
     $.get("/user", function(data) {
         $("#user").html(data.name);
-        clientId = data.id; // Assign the value to the global clientId variable
+        clientId = data.id;
         clientName = data.name;
         clientEmail = data.email;
         for(let i=data.notifications.length-1;i>=0;i--){
@@ -178,7 +178,7 @@
                 email: clientEmail
             },
             content: $('#message-input').val(),
-            dateMessage: new Date() // Dodaj timestamp jako aktualną datę i godzinę
+            dateMessage: new Date()
         };
 
         stompClient.send('/app/sendToEmployees', {}, JSON.stringify(message));
@@ -188,7 +188,7 @@
     function getClientConversation() {
 
         $.ajax({
-            url: '/api/conversation', // Update the URL to match your API endpoint
+            url: '/api/conversation',
             method: 'GET',
             success: function (data) {
 
@@ -215,18 +215,18 @@
 
     function showMessage(message) {
 
-        var isCurrentUserMessage = message.sender.id === clientId; // Sprawdź, czy wiadomość jest od bieżącego użytkownika
+        var isCurrentUserMessage = message.sender.id === clientId;
 
         var messageElement = `
         <div class="media w-50 mb-3 ${isCurrentUserMessage ? 'ml-auto' : ''}">
             <div class="media-body ${isCurrentUserMessage ? 'text-right' : 'ml-3'}">
                 <div class="mb-2">
-                    <p class="text-small mb-0 text-muted">${message.sender.name}</p> <!-- Dodaj nazwę użytkownika -->
+                    <p class="text-small mb-0 text-muted">${message.sender.name}</p>
                 </div>
                 <div class="bg-light rounded py-2 px-3 message-content">
                     <p class="mb-0 text-dark">${message.content}</p>
                 </div>
-                <p class="small text-muted">${message.formattedMessageDate}</p> <!-- Użyj formattedMessageDate -->
+                <p class="small text-muted">${message.formattedMessageDate}</p>
             </div>
         </div>
     `;

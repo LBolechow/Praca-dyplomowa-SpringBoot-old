@@ -55,16 +55,19 @@ public class SetupDataLoader implements
         List<Privilege> clientPrivileges = Arrays.asList(
                 readPrivilege);
         createRoleIfNotFound("ROLE_CLIENT", clientPrivileges);
-        /*
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-        User adminUser = new User();
-        adminUser.setName("Admin");
-        adminUser.setPassword(passwordEncoder.encode("admin1234"));
-        adminUser.setEmail("admin@testowy.com");
-        adminUser.setRoles(Arrays.asList(adminRole));
-        userRepository.save(adminUser);
+
+        if (userRepository.findByEmail("admin@testowy.com") == null) {
+            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+            User adminUser = new User();
+            adminUser.setName("Admin");
+            adminUser.setPassword(passwordEncoder.encode("admin1234"));
+            adminUser.setEmail("admin@testowy.com");
+            adminUser.setRoles(Arrays.asList(adminRole));
+            userRepository.save(adminUser);
+        }
+
         alreadySetup = true;
-        */
+
     }
 
     @Transactional

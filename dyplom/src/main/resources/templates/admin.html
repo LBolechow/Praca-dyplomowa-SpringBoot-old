@@ -18,9 +18,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <style>
     #userList li.active {
-        background-color: #4CAF50; /* Zielony kolor */
-        color: #fff; /* Biały kolor tekstu na zielonym tle */
-        list-style-type: disc; /* Dodaj kropki */
+        background-color: #4CAF50;
+        color: #fff;
+        list-style-type: disc;
     }
 </style>
 </head>
@@ -274,10 +274,7 @@
     $("#searchButton").click(function () {
         var searchText = $(".search").val();
         var searchCategory = $("#searchCategory").val();
-
-        // Check if the search input is empty
         if (searchText.trim() === "") {
-            // If empty, reload the table with all records
             window.location.reload();
             return;
         }
@@ -290,10 +287,8 @@
                 searchText: searchText
             },
             success: function (data) {
-                // Clear the existing table body
                 $("#myTable tbody").empty();
 
-                // Add the results to the table
                 $.each(data, function (index, user) {
                     console.log(user);
                     var row = $("<tr>").append(
@@ -314,7 +309,6 @@
                         )
                     );
 
-                    // Append the row to the table
                     $("#myTable tbody").append(row);
                 });
             },
@@ -387,11 +381,9 @@
             var role = row.find('td:eq(3)').text();
 
             if (btn.hasClass('btn-success')) {
-                // Edit button logic
                 btn.removeClass('btn-success').addClass('btn-primary save-button').html('<i class="fas fa-save"></i>');
                 row.find('td:eq(1)').html('<input type="text" class="form-control" value="'+name+'" />');
                 row.find('td:eq(2)').html('<input type="text" class="form-control" value="'+email+'" />');
-                // Create a dropdown list for roles
                 var roleSelect = $('<select class="form-control"><option value="ROLE_CLIENT">Klient</option><option value="ROLE_EMPLOYEE">Pracownik</option><option value="ROLE_ADMIN">Administrator</option></select>');
                 roleSelect.val(role);
                 row.find('td:eq(3)').html(roleSelect);
@@ -422,13 +414,9 @@
 
         $('#myTable').on('click', '.confirm-delete', function() {
             var userIdToDelete = $(this).data("user-id");
-
-            // Set the data-action attribute of the modal's confirm button
             $('#confirmDeleteButton').attr('data-user-id', userIdToDelete);
 
-            // Do NOT trigger the deletion process here
         });
-        // Event delegation for delete confirmation button
         $('#confirmDeleteButton').on('click', function() {
             var userIdToDelete = $(this).data("user-id");
 

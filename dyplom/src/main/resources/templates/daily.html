@@ -25,13 +25,12 @@
 <style>
   #calendar .fc-event {
     margin-left: 5px;
-    margin-bottom: 5px;/* Dostosuj wartość marginesu według potrzeb */
+    margin-bottom: 5px;
   }
 
   #calendar .fc-title {
     font-size: min(4vh, 15px);
-    /* Adjust the font size as needed */
-    color: #455663; /* Set the desired font color */
+    color: #455663;
   }
   .red-text {
     color: red;
@@ -42,17 +41,16 @@
   #materialList-edit {
     text-align: left;
   }
-     /* Dodaj styl dla kalendarza */
    #calendar .fc-scroller {
      overflow-y: hidden !important;
    }
 
 </style>
 
-<body id="page-top" style="height: 1080px;">
+<body id="page-top" >
 <div id="wrapper">
   <div class="d-flex flex-column" id="content-wrapper">
-    <div id="content" style="text-align: center;font-family: ABeeZee, sans-serif;font-size: 18px;height: 1080px;">
+    <div id="content" style="text-align: center;font-family: ABeeZee, sans-serif;font-size: 18px;">
       <nav class="navbar navbar-light navbar-expand-md sticky-top bg-dark shadow mb-4 topbar static-top" style="background: var(--bs-dark);">
         <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button><span></span><a class="navbar-brand" href="#" style="font-size: 30px;color:  var(--bs-orange);">Zakład krawiecki</a>
           <div class="collapse navbar-collapse">
@@ -440,11 +438,12 @@
       header: {
         left: 'prev,next today',
         center: 'title',
-        right: 'agendaDay,month' // Dodaj widok miesięczny
+        right: 'agendaDay,month'
       },
-      defaultView: 'agendaDay', // Zmień na widok dzienny jako domyślny
+      defaultView: 'agendaDay',
       editable: false,
       slotEventOverlap: false,
+      hiddenDays: [0, 6],
       events: {
         url: '/order/getDailyOrders',
         method: 'GET',
@@ -462,27 +461,23 @@
         }
       },
       success: function (events) {
-        // Sortuj wydarzenia alfabetycznie według employeeName
         events.sort(function (a, b) {
           return a.employeeName.localeCompare(b.employeeName);
         });
 
-        // Ustaw posortowane wydarzenia
         $('#calendar').fullCalendar('removeEvents');
         $('#calendar').fullCalendar('addEventSource', events);
       },
       eventClick: function (calEvent, jsEvent, view) {
-        // Obsługa kliknięcia na zdarzenie w kalendarzu
         openEditModal(calEvent.id);
       },
       eventRender: function (event, element) {
         if (showInProgressCheckbox.prop('checked') && event.status !== 'W trakcie') {
-          // Jeśli checkbox jest zaznaczony i status nie jest "W trakcie", ukryj zdarzenie
           return false;
         }
         element.find('.fc-time').css({
-          'color': '#455663', // Zmiana koloru tekstu
-          'font-size': '15px' // Zmiana rozmiaru czcionki
+          'color': '#455663',
+          'font-size': '15px'
         });
 
         element.find('.fc-title').html(
@@ -514,15 +509,15 @@
 
         element.css('background-color', backgroundColor);
       },
-      locale: 'pl', // Ustaw lokalizację na polską
-      timeFormat: 'H:mm', // Format godziny w formie 24-godzinnej
-      dayNamesShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr.', 'Czw.', 'Piąt.', 'Sob.'], // Skrócone nazwy dni tygodnia
-      monthNames: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'], // Nazwy miesięcy
+      locale: 'pl',
+      timeFormat: 'H:mm',
+      dayNamesShort: ['Niedz.', 'Pon.', 'Wt.', 'Śr.', 'Czw.', 'Piąt.', 'Sob.'],
+      monthNames: ['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
       views: {
         agendaDay: {
           buttonText: 'Dzień',
-          minTime: '08:00', // Ustawienie minimalnej godziny
-          maxTime: '16:00' // Ustawienie maksymalnej godziny
+          minTime: '08:00',
+          maxTime: '16:00'
         },
         month: {
           buttonText: 'Miesiąc'
@@ -533,7 +528,6 @@
     function openEditModal(orderId) {
       currentOrderId = orderId;
       fillEditModal(orderId);
-      // Pokazuje modal edycji
       $('#modal-edit').modal('show');
     }
   });
@@ -682,7 +676,7 @@
 
   $(document).ready(function () {
     $('#statusDropdown-edit a').on('click', function () {
-      var selectedStatusValue = $(this).text().trim(); // Zmienione pobieranie tekstu zamiast data('value')
+      var selectedStatusValue = $(this).text().trim();
 
       switch (selectedStatusValue) {
         case 'W trakcie':

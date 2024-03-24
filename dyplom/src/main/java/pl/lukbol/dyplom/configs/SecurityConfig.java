@@ -124,8 +124,6 @@ public class SecurityConfig  {
         return (userRequest) -> {
             OidcUser oidcUser = delegate.loadUser(userRequest);
             String email = oidcUser.getEmail();
-
-            // Fetch the user entity along with roles eagerly using findAll()
             List<User> users = userRepository.findAll();
             OidcUser finalOidcUser = oidcUser;
             User user = users.stream()
@@ -184,15 +182,11 @@ public class SecurityConfig  {
     }
 
     private String generateRandomPassword() {
-        int passwordLength = 12; // Długość hasła
+        int passwordLength = 12;
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[passwordLength];
         random.nextBytes(bytes);
-
-        // Zamiana losowych bajtów na ciąg znaków w formie Base64
         String password = Base64.getEncoder().encodeToString(bytes);
-
-        // Możesz też dopasować wygenerowane hasło do swoich wymagań, na przykład usuwając znaki specjalne, itp.
 
         return password;
     }

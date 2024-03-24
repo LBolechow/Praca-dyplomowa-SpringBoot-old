@@ -25,7 +25,7 @@
 
 <style>
     .selected-conversation {
-        background-color: #FFDEAD; /* Jasnoszary kolor tła dla wyróżnienia */
+        background-color: #FFDEAD;
     }
     #userList li.active {
         background-color: #4CAF50;
@@ -44,11 +44,11 @@
         border-bottom: 1px solid var(--bs-gray-900);
     }
     #send-button {
-        background-color: #007bff; /* Custom background color */
-        color: #fff; /* Text color */
-        border: none; /* Remove border if desired */
-        border-radius: 0; /* Adjust border-radius as needed */
-        padding: 10px 20px; /* Adjust padding as needed */
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 0;
+        padding: 10px 20px;
 		height: 100%;
 		align-items: center;
     }
@@ -330,7 +330,6 @@
         $('#send-button').click(function () {
             var messageContent = $('#message-input').val();
             if (messageContent.trim() !== '') {
-                // Upewnij się, że masz zdefiniowaną funkcję sendMessageToConversation
                 sendMessageToConversation(conversationId, messageContent);
                 clearSeenByUserIds(conversationId);
                 $('#message-input').val('');
@@ -340,15 +339,14 @@
 
     function loadConversationList() {
         $.ajax({
-            url: '/get_conversations', // Asumując, że ten endpoint zwraca wszystkie konwersacje
+            url: '/get_conversations',
             method: 'GET',
             success: function (data) {
-                $('.conversation-list').empty(); // Czyści listę przed dodaniem nowych elementów
-                var showReadConversationsOnly = $('#hideConversation').is(':checked'); // Sprawdź, czy checkbox jest zaznaczony
+                $('.conversation-list').empty();
+                var showReadConversationsOnly = $('#hideConversation').is(':checked');
 
                 data.forEach(function (conversation) {
 
-                    // Zmodyfikowany warunek, aby pokazywać konwersacje z odczyt=false, gdy checkbox jest odznaczony
                     if ((showReadConversationsOnly && conversation.odczyt) || (!showReadConversationsOnly && !conversation.odczyt)) {
                         checkIfConversationRead(conversation.id, function(isUnread) {
                             var messageContent;
@@ -377,14 +375,10 @@
 `);
 
                             $('.conversation-list').append(conversationItem);
-
-                            // Wybór domyślnej konwersacji, jeśli potrzebny
                                 if (currentSelectedConversationId === null) {
                                     currentSelectedConversationId = conversation.id;
                                     getMessagesForConversation(currentSelectedConversationId);
                                     $('.conversation-list .selected-conversation').removeClass('selected-conversation');
-
-                                    // Dodaje klasę do aktualnie wybranej konwersacji
                                     $(`.conversation-list div[data-conversation-id="${conversationId}"]`).addClass('selected-conversation');
                                 }
 
@@ -392,7 +386,6 @@
                     }
                 });
 
-                // Tu nie potrzebujemy już nasłuchiwać kliknięcia na '.list-group-item', bo obsługa kliknięcia jest w funkcji selectConversation()
             },
             error: function (error) {
                 console.error('Error fetching conversation list:', error);
@@ -402,10 +395,8 @@
 
     function selectConversation(conversationId) {
         console.log("Konwersacja wybrana:", conversationId);
-        // Usuwa klasę z poprzednio wybranej konwersacji
         $('.conversation-list .selected-conversation').removeClass('selected-conversation');
 
-        // Dodaje klasę do aktualnie wybranej konwersacji
         $(`.conversation-list div[data-conversation-id="${conversationId}"]`).addClass('selected-conversation');
 
         currentSelectedConversationId = conversationId;
@@ -415,10 +406,9 @@
 
     $(document).ready(function() {
         $('#hideConversation').change(function() {
-            loadConversationList(); // Odśwież listę konwersacji po zmianie stanu checkboxa
+            loadConversationList();
         });
 
-        // Początkowe załadowanie listy
         loadConversationList();
     });
 
@@ -570,7 +560,6 @@
 </script>
 <script>
     $(document).ready(function(){
-        // Nasłuchiwanie kliknięcia na linki do ukrywania konwersacji
         $(document).on('click', '.hide-conversation', function(e) {
             e.preventDefault();
             var conversationId = $(this).data('conversation-id');
@@ -587,7 +576,6 @@
                 },
                 error: function(error) {
                     console.error('Błąd ukrywania konwersacji:', error);
-                    // Możesz tutaj obsłużyć błędy, np. pokazując komunikat użytkownikowi
                 }
             });
         }
@@ -596,10 +584,9 @@
 
 <script>
     $(document).ready(function(){
-        // Użyj delegacji zdarzeń dla dynamicznie dodawanych elementów
         $(document).on('click', '.see-participants', function(e) {
-            e.preventDefault(); // Zapobiegaj domyślnej akcji nawigacji
-            var conversationId = $(this).data('conversation-id'); // Pobierz ID konwersacji
+            e.preventDefault();
+            var conversationId = $(this).data('conversation-id');
             $.ajax({
                 url: '/getConversationParticipants/' + conversationId,
                 method: 'GET',
@@ -619,14 +606,12 @@
                 type: 'GET',
                 success: function(data) {
                     var $list = $('#seenUsersList');
-                    $list.empty(); // Wyczyść poprzednią listę
+                    $list.empty();
 
-                    // Dodaj użytkowników do listy w modalu
                     data.forEach(function(user) {
                         $list.append($('<li>').text(user.name));
                     });
 
-                    // Wyświetl modal
                     $('#seenUsersModal').modal('show');
                 },
                 error: function(error) {

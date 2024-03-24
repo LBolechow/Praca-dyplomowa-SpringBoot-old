@@ -16,7 +16,6 @@ import java.util.List;
 
 @Service
 public class MessageService {
-    // Inject the MessageRepository and ConversationRepository
     private final MessageRepository messageRepository;
     private final ConversationRepository conversationRepository;
 
@@ -27,7 +26,6 @@ public class MessageService {
     }
     @Transactional
     public Message sendMessage(User sender, Conversation conversation, String content, Date messageDate) {
-        // Create a new message associated with the conversation
         Message message = new Message(sender, content, conversation, messageDate);
         return messageRepository.save(message);
     }

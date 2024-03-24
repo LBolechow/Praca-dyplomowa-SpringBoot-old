@@ -122,7 +122,7 @@
     <script>
         $(document).ready(function() {
         $("#addPriceForm").submit(function(event) {
-            event.preventDefault(); // Zapobiega standardowemu wysłaniu formularza
+            event.preventDefault();
 
             var item = $("#item-name").val();
             var price = $("#item-price").val();
@@ -137,7 +137,7 @@
                 success: function(response) {
                     $('#addPriceModal').modal('hide');
                     alert("Pozycja dodana pomyślnie");
-                    location.reload(); // Odświeża stronę, aby pokazać aktualizacje
+                    location.reload();
                 },
                 error: function(error) {
                     console.error("Error:", error);
@@ -150,7 +150,6 @@
 
     <script>
         $(document).ready(function() {
-            // Odczyt wartości jako ciągu znaków i konwersja na wartość logiczną
             var isAdmin = $(".container").data("isAdmin");
             $.ajax({
                 url: "/prices",
@@ -180,15 +179,14 @@
     </script>
 <script>
     $("#pricesTable tbody").on("click", ".delete-button", function() {
-        var id = $(this).data("id"); // Pobierz ID
+        var id = $(this).data("id");
         if(confirm("Czy na pewno chcesz usunąć ten element?")) {
             $.ajax({
-                url: "/delete-price/" + id, // Zmień URL na odpowiedni endpoint
+                url: "/delete-price/" + id,
                 type: "DELETE",
                 success: function(result) {
-                    // Opcjonalnie: odśwież listę lub usuń wiersz z tabeli w przeglądarce
                     console.log("Usunięto pozycję cennika: " + id);
-                    window.location.reload(); // Prosty sposób na odświeżenie, ale można też usunąć wiersz dynamicznie
+                    window.location.reload();
                 },
                 error: function(error) {
                     console.error("Błąd przy usuwaniu: ", error);
@@ -199,7 +197,7 @@
 </script>
 <script>
     $('body').on('click', '.edit-button', function() {
-        var id = $(this).data('id'); // Pobieranie ID
+        var id = $(this).data('id');
         var currentRow = $(this).closest('tr');
 
         var item = currentRow.find('td:eq(0)').text();
@@ -214,29 +212,26 @@
     });
     $('body').on('click', '.save-button', function() {
         var currentRow = $(this).closest('tr');
-        var id = $(this).attr('data-id'); // Pobieranie ID
+        var id = $(this).attr('data-id');
         var updatedItem = currentRow.find('td:eq(0) input').val();
         var updatedPrice = currentRow.find('td:eq(1) input').val();
 
-        var that = this; // Zachowanie referencji do elementu 'this' przed wywołaniem AJAX
+        var that = this;
 
-        // AJAX request do serwera z ID w URL
         $.ajax({
-            url: '/update-price/' + id, // Dodanie ID do URL
+            url: '/update-price/' + id,
             type: 'PUT',
             data: {
                 item: updatedItem,
                 price: updatedPrice
             },
             success: function(response) {
-                // Aktualizacja wiersza tabeli
                 currentRow.find('td:eq(0)').text(updatedItem);
                 currentRow.find('td:eq(1)').text(updatedPrice);
 
-                // Przywrócenie przycisku "Modyfikuj" używając zachowanej referencji 'that'
                 $(that).removeClass('btn-primary save-button')
                     .addClass('btn-success edit-button')
-                    .html('<i class="fas fa-edit"></i>') // Ustawienie ikony z Font Awesome
+                    .html('<i class="fas fa-edit"></i>')
                     .attr('data-id', id);
             },
             error: function(xhr, status, error) {

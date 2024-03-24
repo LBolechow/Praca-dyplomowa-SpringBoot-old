@@ -79,12 +79,11 @@ public class OrderController {
 
     @GetMapping("/index")
     public String showUserOrders(Authentication authentication, Model model) {
-        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal()); // Zakładam, że nazwa metody to checkEmail
+        String userEmail = AuthenticationUtils.checkmail(authentication.getPrincipal());
         User user = userRepository.findByEmail(userEmail);
 
         if (user != null) {
             List<Order> userOrders = orderRepository.findOrdersByUserEmail(user.getEmail());
-            // Sortowanie listy zamówień
             userOrders.sort(Comparator.comparing(Order::getEndDate).reversed());
 
             model.addAttribute("userOrders", userOrders);
@@ -105,16 +104,13 @@ public class OrderController {
 
             if (start != null && end != null) {
                 try {
-                    // Parse date with time component
                     startDateTime = LocalDateTime.parse(start, DateTimeFormatter.ISO_DATE_TIME);
                     endDateTime = LocalDateTime.parse(end, DateTimeFormatter.ISO_DATE_TIME);
                 } catch (DateTimeParseException e) {
-                    // Handle parsing exception for date-only strings
                     startDateTime = LocalDate.parse(start).atStartOfDay();
                     endDateTime = LocalDate.parse(end).atTime(23, 59, 59);
                 }
             } else {
-                // Use current date with time component
                 startDateTime = LocalDateTime.now().with(LocalTime.of(0, 0, 0));
                 endDateTime = LocalDateTime.now().with(LocalTime.of(23, 59, 59));
             }
@@ -327,7 +323,7 @@ public class OrderController {
 
             if (currentDateTime.get(Calendar.HOUR_OF_DAY) > startHour ||
                     (currentDateTime.get(Calendar.HOUR_OF_DAY) == startHour && currentDateTime.get(Calendar.MINUTE) > 0)) {
-                currentDateTime.add(Calendar.DAY_OF_MONTH, 1);  // Przesunięcie na następny dzień
+                currentDateTime.add(Calendar.DAY_OF_MONTH, 1);
             }
 
             currentDateTime.set(Calendar.HOUR_OF_DAY, startHour);
@@ -383,7 +379,7 @@ public class OrderController {
 
         List<User> availableUsers = new ArrayList<>();
 
-        List<User> allUsers = userRepository.findAll();  // Zakładam, że masz metodę findAll w userRepository
+        List<User> allUsers = userRepository.findAll();
 
         for (User user : allUsers) {
             boolean isAvailable = true;

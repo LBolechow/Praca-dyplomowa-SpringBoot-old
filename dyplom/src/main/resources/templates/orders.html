@@ -48,7 +48,7 @@
             <h1></h1>
             <div style="text-align:center;"></div>
             <div id="orderDetails">
-                <!-- Tutaj znajdują się domyślne dane lub puste, możesz je dostosować -->
+
                 <p> <span id="orderDescription"></span></p>
             </div>
 
@@ -65,15 +65,12 @@
 </body>
 
 <script>
-    // Tutaj dodaj resztę kodu JavaScript, tak jak wcześniej
     document.getElementById("checkButton").addEventListener("click", function() {
         var inputValue = document.getElementById("checkInput").value;
 
-        // Wysłanie danych do API
         fetch('/order/checkOrder/' + inputValue)
             .then(response => response.json())
             .then(data => {
-                // Obsługa zwrotu z API
                 displayOrderData(data);
             })
             .catch(error => {
@@ -82,13 +79,11 @@
     });
 
     function displayOrderData(orderData) {
-        // Przetworzenie danych z API i wyświetlenie ich w odpowiednim miejscu na stronie
         var orderDetailsDiv = document.getElementById("orderDetails");
         var text = "Twoje zlecenie: ";
         orderDetailsDiv.innerHTML = '<h1>' + text + '</h1>';
         var planowanaDataUkonczenia = new Date(orderData.endDate);
         var formattedEndDate = planowanaDataUkonczenia.toLocaleString();
-        // Dodanie elementów opisujących zlecenie
         orderDetailsDiv.innerHTML += '<p><strong>Opis:</strong> ' + orderData.description + '</p>';
         orderDetailsDiv.innerHTML += '<p><strong>Klient:</strong> ' + orderData.clientName + '</p>';
         orderDetailsDiv.innerHTML += '<p><strong>Planowana data ukończenia:</strong> ' + formattedEndDate + '</p>';

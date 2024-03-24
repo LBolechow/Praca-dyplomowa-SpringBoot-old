@@ -112,16 +112,9 @@ public class ChatController {
 
     @GetMapping("/api/employee/conversations")
     public ResponseEntity<List<Message>> getAllEmployeeConversationMessages(Authentication authentication) {
-        // Pobierz użytkownika na podstawie danych z autoryzacji
         User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-
-        // Znajdź wszystkie konwersacje, w których uczestniczy użytkownik
         List<Conversation> conversations = conversationRepository.findByParticipants_Id(usr.getId());
-
-        // Lista do agregacji wiadomości ze wszystkich konwersacji
         List<Message> allMessages = new ArrayList<>();
-
-        // Dla każdej konwersacji pobierz wiadomości i dodaj je do listy allMessages
         conversations.forEach(conversation -> {
             List<Message> messages = messageRepository.findByConversation(conversation);
             allMessages.addAll(messages);
@@ -245,7 +238,6 @@ public class ChatController {
         Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
         if (conversationOptional.isPresent()) {
             Conversation conversation = conversationOptional.get();
-            // Tu zakładam, że masz sposób na pobranie uczestników konwersacji z obiektu konwersacji
             List<User> participants = conversation.getParticipants();
             if (participants.isEmpty())
             {

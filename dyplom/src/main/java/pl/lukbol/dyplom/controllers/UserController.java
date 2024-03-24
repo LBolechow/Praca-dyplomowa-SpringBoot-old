@@ -107,7 +107,7 @@ public class UserController {
     @GetMapping("/panel_administratora")
     public ModelAndView displayAllUsers(Authentication authentication, @RequestParam(name = "page", defaultValue = "0") int page,
                                         @RequestParam(name = "size", defaultValue = "10") int size) {
-        ModelAndView modelAndView = new ModelAndView("admin"); // Your HTML file name without the extension
+        ModelAndView modelAndView = new ModelAndView("admin");
         Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userRepository.findAll(pageable);
 
@@ -166,7 +166,6 @@ public class UserController {
         usr.setPassword(passwordEncoder.encode(password));
         usr.setName(username);
 
-        // Set the 'enabled' property to true
         usr.setEnabled(true);
 
         userRepository.save(usr);
@@ -289,13 +288,10 @@ public class UserController {
         }
     }
     private void sendResetEmail(String to, String newPassword) {
-        // Utwórz wiadomość e-mail
         SimpleMailMessage message = new SimpleMailMessage();
         message.setSubject("Twoje nowe hasło");
         message.setText("Twoje nowe hasło to: " + newPassword);
         message.setTo(to);
-
-        // Wyślij wiadomość e-mail
         mailSender.send(message);
     }
 }

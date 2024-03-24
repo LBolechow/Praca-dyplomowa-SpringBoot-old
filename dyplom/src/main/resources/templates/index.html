@@ -24,10 +24,10 @@
             color: black; /* Czarny tekst */
         }
         .status-Gotowe {
-            color: green; /* Zielony tekst */
+            color: #1E90FF; /* Zielony tekst */
         }
         .status-Wydane {
-            color: red; /* Czerwony tekst */
+            color: #3CB371; /* Czerwony tekst */
         }
     </style>
 </head>
@@ -90,7 +90,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <!-- Użyj Thymeleafa do dynamicznego generowania wierszy -->
                         <tr th:each="order : ${userOrders}">
                             <td th:text="${order.description}" style="text-align: center;"></td>
                             <td th:text="${order.employeeName}"></td>
