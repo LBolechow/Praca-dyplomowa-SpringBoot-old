@@ -1,16 +1,20 @@
 Opis aplikacji:
-
+```
 Aplikacja internetowa wspomagająca proces realizacji zleceń w zakładzie krawieckim. Zaprojektowana funkcjonalność zwiększa wygodę oraz efektywność pracy poprzez usprawnienie i automatyzację procesu realizacji zleceń, od momentu ich przyjęcia do wydania. Aplikacja usprawnia także komunikację z klientem oraz między pracownikami, co przyczynia się do lepszej organizacji pracy i szybszego reagowania na zmieniające się potrzeby.
+```
+
 Zakres funkcjonalność dostępnych dla niezalogowanego użytkownika:
+```
 •	Rejestracja oraz logowanie: aplikacja umożliwia logowanie przy użyciu indywidualnie utworzonego konta lub poprzez wykorzystanie konta Google.
 •	Sprawdzenie statusu zlecenia: Podczas zlecania wykonania usługi w zakładzie krawieckim, klient otrzyma kod, który następnie może wprowadzić na stronie. Spowoduje to wyświetlenie danych oraz statusu jego zlecenia.
 •	Przegląd cennika.
-
+```
 Funkcjonalności dostępne dla wszystkich zalogowanych użytkowników:
+```
 •	Panel zarządzania kontem: wyświetlane tu będą podstawowe dane logowania konta oraz interfejs umożliwiający ich modyfikację.
 •	Wyświetlanie powiadomień: użytkownicy będą mieli możliwość przeglądania powiadomień wysłanych do nich przez system lub administratora.
 •	Przegląd cennika.
-
+```
 Funkcjonalności dla roli klienta:
 •	Komunikacja z pracownikami: możliwość wysłania wiadomości do pracowników poprzez dedykowany panel wiadomości.
 •	Pełna lista zleceń: użytkownikowi będą wyświetlane wszystkie jego zlecenia, zarówno będące w trakcie, jak i ukończone.
