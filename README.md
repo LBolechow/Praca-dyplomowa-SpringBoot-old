@@ -7,9 +7,9 @@ Zakres funkcjonalność dostępnych dla niezalogowanego użytkownika:
 >•	Przegląd cennika.
 
 Funkcjonalności dostępne dla wszystkich zalogowanych użytkowników:
->•	Panel zarządzania kontem: wyświetlane tu będą podstawowe dane logowania konta oraz interfejs umożliwiający ich modyfikację.
->•	Wyświetlanie powiadomień: użytkownicy będą mieli możliwość przeglądania powiadomień wysłanych do nich przez system lub administratora.
->•	Przegląd cennika.
+>•	Panel zarządzania kontem: wyświetlane tu będą podstawowe dane logowania konta oraz interfejs umożliwiający ich modyfikację.  
+>•	Wyświetlanie powiadomień: użytkownicy będą mieli możliwość przeglądania powiadomień wysłanych do nich przez system lub administratora.  
+>•	Przegląd cennika.  
 
 Funkcjonalności dla roli klienta:
 >•	Komunikacja z pracownikami: możliwość wysłania wiadomości do pracowników poprzez dedykowany panel wiadomości.
