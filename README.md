@@ -35,6 +35,7 @@ Technologie:
 >•	JavaScript z biblioteką jQuery
 
 Przykłady niektórych funkcjonalności:
+
 ![obraz](https://github.com/LBolechow/Praca-dyplomowa/assets/110845720/50017498-7796-4f5d-8ab3-6e08478e2360)
 ![obraz](https://github.com/LBolechow/Praca-dyplomowa/assets/110845720/22b5baa6-a3b4-42c4-b64e-0911d0132694)
 ![obraz](https://github.com/LBolechow/Praca-dyplomowa/assets/110845720/2622900c-389c-422e-853a-5aac370f9c5e)
