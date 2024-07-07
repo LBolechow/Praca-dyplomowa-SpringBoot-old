@@ -29,14 +29,15 @@ public class NotificationController {
 
     private NotificationService notificationService;
 
-    public NotificationController(UserRepository userRepository, NotificationRepository notificationRepository) {
+    public NotificationController(UserRepository userRepository, NotificationRepository notificationRepository, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
+        this.notificationService = notificationService;
     }
     @DeleteMapping(value="/removeAlerts", consumes = {"*/*"})
     public ResponseEntity<String> removeAlerts(Authentication authentication) {
-        String userEmail = checkmail(authentication.getPrincipal());
-        notificationService.removeAlerts(userEmail);
+        User usr = userRepository.findByEmail(checkmail(authentication.getPrincipal()));
+        notificationService.removeAlerts(usr);
         return ResponseEntity.ok("Powiadomienia zostały usunięte.");
     }
     @PostMapping("/create-notification")

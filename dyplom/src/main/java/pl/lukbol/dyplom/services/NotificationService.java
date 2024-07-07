@@ -24,8 +24,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public void removeAlerts(String userEmail) {
-        User usr = userRepository.findByEmail(userEmail);
+    public void removeAlerts(User usr) {
         if (usr != null) {
             usr.getNotifications().clear();
             notificationRepository.deleteAllByUserId(usr.getId());

@@ -17,6 +17,7 @@ import pl.lukbol.dyplom.repositories.ConversationRepository;
 import pl.lukbol.dyplom.repositories.MessageRepository;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
+import pl.lukbol.dyplom.services.ChatService;
 import pl.lukbol.dyplom.services.MessageService;
 import pl.lukbol.dyplom.services.UserService;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
@@ -38,21 +39,21 @@ public class ChatController {
 
     private ConversationRepository conversationRepository;
 
-    public ChatController(UserRepository userRepository, ConversationRepository conversationRepository, MessageRepository messageRepository) {
+    private ChatService chatService;
+
+    public ChatController(UserRepository userRepository, ConversationRepository conversationRepository, MessageRepository messageRepository, ChatService chatService) {
         this.userRepository = userRepository;
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
+        this.chatService = chatService;
     }
 
     @MessageMapping("/sendToConversation/{conversationId}")
     @SendTo("/topic/employees")
-    @Transactional
     public Message sendMessageToClient(@DestinationVariable Long conversationId, Message message) {
         Conversation conversation = conversationRepository.findById(conversationId).orElse(null);
         if (conversation != null) {
-            messageService.sendMessage(message.getSender(), conversation, message.getContent(), message.getMessageDate());
-
-            return message;
+            return chatService.sendMessageToClient(conversation, message);
         } else {
             System.out.println("Konwersacja o ID " + conversationId + " nie istnieje.");
             return null;
@@ -61,70 +62,18 @@ public class ChatController {
 
     @MessageMapping("/sendToEmployees")
     @SendTo("/topic/employees")
-    @Transactional
     public Message sendMessageToEmployees(Message message) {
-        String clientEmail = message.getSender().getEmail();
-
-        User client = userRepository.findByEmail(clientEmail);
-
-        List<Conversation> conversations = conversationRepository.findConversationByClient_Id(client.getId());
-
-        if (conversations == null || conversations.isEmpty()) {
-            conversations = new ArrayList<>();
-
-
-            Conversation conversation = new Conversation();
-            conversation.setClient(client);
-            conversation.setName(client.getName());
-            conversation.setOdczyt(false);
-            conversation = conversationRepository.save(conversation);
-            conversations.add(conversation);
-            client.setConversations(conversations);
-            userRepository.save(client);
-
-        }
-
-        for (Conversation conversation : conversations) {
-            messageService.sendMessage(message.getSender(), conversation, message.getContent(), message.getMessageDate());
-            conversation.getSeenByUserIds().clear();
-            conversation.setOdczyt(false);
-            conversationRepository.save(conversation);
-        }
-        return message;
+      return chatService.sendMessageToEmployees(message);
     }
 
     @GetMapping("/api/conversation")
     public ResponseEntity<List<Message>> getClientConversation(Authentication authentication) {
-        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-
-        List<Conversation> conversations = conversationRepository.findConversationByClient_Id(usr.getId());
-        if (!conversations.isEmpty()) {
-            List<Message> messages = messageRepository.findByConversation(conversations.get(0));
-            if (!messages.isEmpty()) {
-                return ResponseEntity.ok(messages);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.getClientConversation(authentication);
     }
 
     @GetMapping("/api/employee/conversations")
     public ResponseEntity<List<Message>> getAllEmployeeConversationMessages(Authentication authentication) {
-        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-        List<Conversation> conversations = conversationRepository.findByParticipants_Id(usr.getId());
-        List<Message> allMessages = new ArrayList<>();
-        conversations.forEach(conversation -> {
-            List<Message> messages = messageRepository.findByConversation(conversation);
-            allMessages.addAll(messages);
-        });
-
-        if (!allMessages.isEmpty()) {
-            return ResponseEntity.ok(allMessages);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.getAllEmployeeConversationMessages(authentication);
     }
 
     @GetMapping("/get_conversations")
@@ -163,127 +112,38 @@ public class ChatController {
     }
 
     @PostMapping("/api/createConversation")
-    public ResponseEntity<Map<String, Object>> createConversation(Authentication authentication, @RequestParam("name") String name,
+    public ResponseEntity<Map<String, Object>> createConversation(Authentication authentication,
+                                                                  @RequestParam("name") String name,
                                                                   @RequestParam("participantIds") String participantIds) {
-        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-        try {
-            List<Long> participant = Arrays.stream(participantIds.split(","))
-                    .map(Long::valueOf)
-                    .collect(Collectors.toList());
-            List<User> participants = userRepository.findByIdIn(participant);
-            participants.add(usr);
-            Conversation newConversation = new Conversation(name, participants, new ArrayList<>(), false);
-            conversationRepository.save(newConversation);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Konwersacja utworzona pomyślnie.");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Błąd podczas tworzenia konwersacji: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        return chatService.createConversation(authentication, name, participantIds);
     }
 
     @PostMapping("/markConversationAsRead/{conversationId}")
     public ResponseEntity<?> markAllMessagesAsRead(Authentication authentication, @PathVariable Long conversationId) {
-        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
-        User usr = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-        if (conversationOptional.isPresent()) {
-            Conversation conversation = conversationOptional.get();
-            Set<String> users = conversation.getSeenByUserIds();
-            users.add(usr.getId().toString());
-            conversation.setSeenByUserIds(users);
-            conversationRepository.save(conversation);
-
-            return ResponseEntity.ok("Wiadomości zostały oznaczone jako przeczytane.");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.markConversationAsRead(authentication, conversationId);
     }
 
     @PutMapping("/clearSeenByUserIds/{conversationId}")
     public ResponseEntity<?> clearSeenByUserIds(@PathVariable Long conversationId) {
-        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
-
-        if (conversationOptional.isPresent()) {
-            Conversation conversation = conversationOptional.get();
-            conversation.getSeenByUserIds().clear();
-            conversationRepository.save(conversation);
-
-            return ResponseEntity.ok("Lista przeczytanych została wyczyszczona.");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.clearSeenByUserIds(conversationId);
     }
 
     @GetMapping("/checkIfConversationRead/{conversationId}")
     public ResponseEntity<Boolean> checkIfConversationRead(Authentication authentication, @PathVariable Long conversationId) {
-        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
-        User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
-
-        if (conversationOptional.isPresent() && user != null) {
-            Conversation conversation = conversationOptional.get();
-            Set<String> seenByUserIds = conversation.getSeenByUserIds();
-            boolean isRead = seenByUserIds.contains(user.getId().toString());
-            return ResponseEntity.ok(isRead);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.checkIfConversationRead(authentication, conversationId);
     }
     @GetMapping("/getConversationParticipants/{conversationId}")
     public ResponseEntity<List<User>> getConversationParticipants(@PathVariable Long conversationId) {
-        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
-        if (conversationOptional.isPresent()) {
-            Conversation conversation = conversationOptional.get();
-            List<User> participants = conversation.getParticipants();
-            if (participants.isEmpty())
-            {
-                participants.add(conversation.getClient());
-            }
-            return ResponseEntity.ok(participants);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.getConversationParticipants(conversationId);
     }
     @GetMapping("/checkSeen/{conversationId}")
     public ResponseEntity<List<User>> getParticipantsBySeen(@PathVariable Long conversationId) {
-        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
-        if (conversationOptional.isPresent()) {
-            Conversation conversation = conversationOptional.get();
-            List<User> participants = conversation.getParticipants();
-            Set<String> seenList = conversation.getSeenByUserIds();
-            List<User> seenParticipants = participants.stream()
-                    .filter(user -> seenList.contains(user.getId().toString()))
-                    .collect(Collectors.toList());
-
-
-            return ResponseEntity.ok(seenParticipants);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.getParticipantsBySeen(conversationId);
     }
 
     @PostMapping("/hide/{conversationId}")
     public ResponseEntity<?> hideConversation(@PathVariable Long conversationId) {
-        Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
-
-        if (conversationOptional.isPresent()) {
-            Conversation conversation = conversationOptional.get();
-            if (conversation.isOdczyt()) {
-                conversation.setOdczyt(false);
-                conversationRepository.save(conversation);
-                return ResponseEntity.ok().body("Przywrócono konwersację.");
-            } else {
-                conversation.setOdczyt(true);
-                conversationRepository.save(conversation);
-                return ResponseEntity.ok().body("Ukryto konwersację.");
-            }
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return chatService.hideConversation(conversationId);
     }
 }
 
