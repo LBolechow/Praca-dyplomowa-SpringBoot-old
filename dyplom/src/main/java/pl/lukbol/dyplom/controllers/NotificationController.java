@@ -13,6 +13,7 @@ import pl.lukbol.dyplom.classes.Notification;
 import pl.lukbol.dyplom.classes.User;
 import pl.lukbol.dyplom.repositories.NotificationRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
+import pl.lukbol.dyplom.services.NotificationService;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
 
 import java.util.*;
@@ -26,38 +27,30 @@ public class NotificationController {
 
     private NotificationRepository notificationRepository;
 
+    private NotificationService notificationService;
+
     public NotificationController(UserRepository userRepository, NotificationRepository notificationRepository) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
     }
-
-    @Transactional
     @DeleteMapping(value="/removeAlerts", consumes = {"*/*"})
-    public ResponseEntity<?> removeAlerts(Authentication authentication) {
-        User usr = userRepository.findByEmail(checkmail(authentication.getPrincipal()));
-        usr.getNotifications().clear();
-        notificationRepository.deleteAllByUserId(usr.getId());
-        userRepository.save(usr);
-
-        return ResponseEntity.ok().body("Powiadomienia zostały usunięte.");
+    public ResponseEntity<String> removeAlerts(Authentication authentication) {
+        String userEmail = checkmail(authentication.getPrincipal());
+        notificationService.removeAlerts(userEmail);
+        return ResponseEntity.ok("Powiadomienia zostały usunięte.");
     }
     @PostMapping("/create-notification")
     public ResponseEntity<Map<String, Object>> createNotification(Authentication authentication, @RequestParam("text") String message,
                                                                   @RequestParam("participantIds") String participantIds) {
 
-        User usr = userRepository.findByEmail(checkmail(authentication.getPrincipal()));
+        String userEmail = checkmail(authentication.getPrincipal());
         try {
-            List<Long> participant = Arrays.stream(participantIds.split(","))
+            List<Long> participantIdsList = Arrays.stream(participantIds.split(","))
                     .map(Long::valueOf)
                     .collect(Collectors.toList());
-            List<User> participants = userRepository.findByIdIn(participant);
-            for (User user : participants) {
 
-                List<Notification> a = user.getNotifications();
-                a.add(new Notification(message, new Date(), user, usr.getName()));
-                user.setNotifications(a);
-                userRepository.save(user);
-            }
+            notificationService.createNotification(userEmail, message, participantIdsList);
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Notyfikacja utworzona pomyślnie.");

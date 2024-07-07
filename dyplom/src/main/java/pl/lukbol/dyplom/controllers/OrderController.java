@@ -105,7 +105,7 @@ public class OrderController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @Transactional
+
     @PostMapping(value = "/order/edit/{id}", consumes = {"application/json"})
     @ResponseBody
     public void editOrder(@PathVariable Long id, @RequestBody Map<String, Object> request) {
@@ -164,13 +164,12 @@ public class OrderController {
     }
 
     @GetMapping("/order/checkOrder/{idCode}")
-    public ResponseEntity<Order> getOrderDetails(@PathVariable String idCode) {
-        Order order = orderService.getOrderDetails(idCode);
-
+    public ResponseEntity<Order> getOrderForClient(@PathVariable String idCode) {
+        Order order = orderRepository.findByIdCode(idCode);
         if (order != null) {
-            return ResponseEntity.ok(order);
+            return new ResponseEntity<>(order, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

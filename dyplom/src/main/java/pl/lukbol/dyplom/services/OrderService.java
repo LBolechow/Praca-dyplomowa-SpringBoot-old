@@ -16,12 +16,11 @@ import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
 import pl.lukbol.dyplom.utilities.DateUtils;
 import pl.lukbol.dyplom.utilities.GenerateCode;
+import pl.lukbol.dyplom.utilities.OrderUtils;
+
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -35,165 +34,21 @@ public class OrderService {
 
     private MaterialRepository materialRepository;
 
-    private String formatDate(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(date);
+    private OrderUtils orderUtils;
+
+    public OrderService(UserRepository userRepository, OrderRepository orderRepository, MaterialRepository materialRepository, OrderUtils orderUtils) {
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
+        this.materialRepository = materialRepository;
+        this.orderUtils = orderUtils;
     }
-
-
-    private String formatTime(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        return sdf.format(date);
-    }
-
-    private Date parseDateString(String dateString) {
+    public Date parseDateString(String dateString) {
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             return formatter.parse(dateString);
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private List<User> findAvailableUsersWithEndDateTime(Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
-        List<String> roleNamesToSearch = Arrays.asList("ROLE_EMPLOYEE", "ROLE_ADMIN");
-
-        List<User> availableUsers = new ArrayList<>();
-
-        List<User> allUsers = userRepository.findAll();  // Zakładam, że masz metodę findAll w userRepository
-
-        for (User user : allUsers) {
-            boolean isAvailable = true;
-
-            Collection<Role> userRoles = user.getRoles();
-            List<String> userRoleNames = userRoles.stream()
-                    .map(Role::getName)
-                    .collect(Collectors.toList());
-
-            if (userRoleNames.stream().anyMatch(roleNamesToSearch::contains)) {
-
-                List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
-
-                for (Order order : userOrders) {
-                    Date orderStartDate = order.getStartDate();
-                    Date orderEndDate = order.getEndDate();
-
-                    if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
-                            (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
-                            (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
-                        isAvailable = false;
-                        break;
-                    }
-                }
-
-                if (isAvailable) {
-                    availableUsers.add(user);
-                }
-            }
-        }
-
-        return availableUsers;
-    }
-
-    private boolean isWorkingDay(Calendar calendar) {
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        return dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY;
-    }
-
-    private List<User> findAvailableUserWithEndDateTime(Long employeeId, Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
-        List<String> roleNamesToSearch = Arrays.asList("ROLE_EMPLOYEE", "ROLE_ADMIN");
-
-        List<User> availableUsers = new ArrayList<>();
-
-        Optional<User> optionalUser = userRepository.findById(employeeId);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-
-            boolean isAvailable = true;
-
-            Collection<Role> userRoles = user.getRoles();
-            List<String> userRoleNames = userRoles.stream()
-                    .map(Role::getName)
-                    .collect(Collectors.toList());
-
-            if (userRoleNames.stream().anyMatch(roleNamesToSearch::contains)) {
-
-                List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
-
-                for (Order order : userOrders) {
-                    Date orderStartDate = order.getStartDate();
-                    Date orderEndDate = order.getEndDate();
-
-                    if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
-                            (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
-                            (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
-                        isAvailable = false;
-                        break;
-                    }
-                }
-
-                if (isAvailable) {
-                    availableUsers.add(user);
-                }
-            }
-        }
-
-        return availableUsers;
-    }
-
-    private List<User> findAvailableUsersWithoutEmployee(Long orderId, Date taskStartDateTime, Date taskEndDateTime, int durationMinutes) {
-        List<String> roleNamesToSearch = Arrays.asList("ROLE_EMPLOYEE", "ROLE_ADMIN");
-
-        List<User> availableUsers = new ArrayList<>();
-
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-
-        if (optionalOrder.isPresent()) {
-            Order order = optionalOrder.get();
-
-            String employeeNameOnOrder = order.getEmployeeName();
-
-            List<User> allUsersExceptEmployee = userRepository.findAllByNameNot(employeeNameOnOrder);
-
-            for (User user : allUsersExceptEmployee) {
-                boolean isAvailable = true;
-
-                Collection<Role> userRoles = user.getRoles();
-                List<String> userRoleNames = userRoles.stream()
-                        .map(Role::getName)
-                        .collect(Collectors.toList());
-
-                if (userRoleNames.stream().anyMatch(roleNamesToSearch::contains)) {
-                    List<Order> userOrders = orderRepository.findByEmployeeNameAndEndDateAfterAndStartDateBefore(user.getName(), taskStartDateTime, taskEndDateTime);
-
-                    for (Order userOrder : userOrders) {
-                        Date orderStartDate = userOrder.getStartDate();
-                        Date orderEndDate = userOrder.getEndDate();
-
-                        if ((taskEndDateTime.after(orderStartDate) && taskEndDateTime.before(orderEndDate)) ||
-                                (taskStartDateTime.after(orderStartDate) && taskStartDateTime.before(orderEndDate)) ||
-                                (taskStartDateTime.before(orderStartDate) && taskEndDateTime.after(orderEndDate))) {
-                            isAvailable = false;
-                            break;
-                        }
-                    }
-
-                    if (isAvailable) {
-                        availableUsers.add(user);
-                    }
-                }
-            }
-        }
-
-        return availableUsers;
-    }
-
-
-    public OrderService(UserRepository userRepository, OrderRepository orderRepository, MaterialRepository materialRepository) {
-        this.userRepository = userRepository;
-        this.orderRepository = orderRepository;
-        this.materialRepository = materialRepository;
     }
 
     @Transactional
@@ -208,9 +63,9 @@ public class OrderService {
         String email = (String) request.get("email");
         String phoneNumber = (String) request.get("phoneNumber");
         String startDateString = (String) request.get("startDate");
-        Date startDate = parseDateString(startDateString);
+        Date startDate = orderUtils.parseDateString(startDateString);
         String endDateString = (String) request.get("endDate");
-        Date endDate = parseDateString(endDateString);
+        Date endDate = orderUtils.parseDateString(endDateString);
         String hour = (String) request.get("hours");
         double hours = Double.parseDouble(hour);
         List<String> items = (List<String>) request.get("items");
@@ -237,7 +92,7 @@ public class OrderService {
     }
 
 
-    @Transactional
+
     public List<Map<String, Object>> getDailyOrders(String start, String end, String userEmail, boolean isAdmin) {
         LocalDateTime startDateTime;
         LocalDateTime endDateTime;
@@ -255,20 +110,24 @@ public class OrderService {
             endDateTime = LocalDateTime.now().with(LocalTime.of(23, 59, 59));
         }
 
+        ZoneId zoneId = ZoneId.of("Europe/Warsaw");
+        ZonedDateTime zonedStartDateTime = startDateTime.atZone(zoneId);
+        ZonedDateTime zonedEndDateTime = endDateTime.atZone(zoneId);
+
         List<Order> orders;
         User user = userRepository.findByEmail(userEmail);
 
         if (isAdmin) {
             orders = orderRepository.findByEndDateBetween(
-                    Date.from(startDateTime.atZone(ZoneId.of("Europe/Warsaw")).toInstant()),
-                    Date.from(endDateTime.atZone(ZoneId.of("Europe/Warsaw")).toInstant())
+                    Date.from(zonedStartDateTime.toInstant()),
+                    Date.from(zonedEndDateTime.toInstant())
             );
         } else {
             String username = user.getName();
             orders = orderRepository.findByEmployeeNameAndEndDateBetween(
                     username,
-                    Date.from(startDateTime.atZone(ZoneId.of("Europe/Warsaw")).toInstant()),
-                    Date.from(endDateTime.atZone(ZoneId.of("Europe/Warsaw")).toInstant())
+                    Date.from(zonedStartDateTime.toInstant()),
+                    Date.from(zonedEndDateTime.toInstant())
             );
         }
 
@@ -278,8 +137,25 @@ public class OrderService {
             Map<String, Object> orderData = new HashMap<>();
             orderData.put("id", order.getId());
             orderData.put("title", order.getDescription());
-            orderData.put("start", order.getStartDate().toInstant().plusSeconds(3600).toEpochMilli());
-            orderData.put("end", order.getEndDate().toInstant().plusSeconds(3600).toEpochMilli());
+
+            // Convert the start and end times to ZonedDateTime
+            ZonedDateTime startZonedDateTime = order.getStartDate().toInstant().atZone(zoneId);
+            ZonedDateTime endZonedDateTime = order.getEndDate().toInstant().atZone(zoneId);
+
+            // Manually adjust for DST
+            if (startZonedDateTime.toLocalDateTime().isBefore(LocalDate.of(startZonedDateTime.getYear(), 3, 31).atTime(2, 0)) ||
+                    startZonedDateTime.toLocalDateTime().isAfter(LocalDate.of(startZonedDateTime.getYear(), 10, 30).atTime(2, 0))) {
+                // Winter time (Standard Time)
+                startZonedDateTime = startZonedDateTime.plusSeconds(3600);
+                endZonedDateTime = endZonedDateTime.plusSeconds(3600);
+            } else {
+                // Summer time (Daylight Saving Time)
+                startZonedDateTime = startZonedDateTime.plusSeconds(7200);
+                endZonedDateTime = endZonedDateTime.plusSeconds(7200);
+            }
+
+            orderData.put("start", startZonedDateTime.toEpochSecond() * 1000);
+            orderData.put("end", endZonedDateTime.toEpochSecond() * 1000);
             orderData.put("clientName", order.getClientName());
             orderData.put("employeeName", order.getEmployeeName());
             orderData.put("status", order.getStatus());
@@ -289,7 +165,6 @@ public class OrderService {
         return ordersData;
     }
 
-    @Transactional
     public List<Order> getUserOrders(String userEmail) {
         User user = userRepository.findByEmail(userEmail);
 
@@ -330,10 +205,10 @@ public class OrderService {
                 orderDetails.put("clientName", order.getClientName());
                 orderDetails.put("email", order.getClientEmail());
                 orderDetails.put("phoneNumber", order.getPhoneNumber());
-                orderDetails.put("startDate", formatDate(order.getStartDate()));
-                orderDetails.put("startTime", formatTime(order.getStartDate()));
-                orderDetails.put("endDate", formatDate(order.getEndDate()));
-                orderDetails.put("endTime", formatTime(order.getEndDate()));
+                orderDetails.put("startDate", orderUtils.formatDate(order.getStartDate()));
+                orderDetails.put("startTime", orderUtils.formatTime(order.getStartDate()));
+                orderDetails.put("endDate", orderUtils.formatDate(order.getEndDate()));
+                orderDetails.put("endTime", orderUtils.formatTime(order.getEndDate()));
                 orderDetails.put("employee", usr != null ? usr.getName() : "");
                 orderDetails.put("hours", order.getDuration());
                 orderDetails.put("price", order.getPrice());
@@ -373,11 +248,11 @@ public class OrderService {
             order.setPhoneNumber((String) request.get("phoneNumber"));
 
             String startDateString = (String) request.get("startDate");
-            Date startDate = parseDateString(startDateString);
+            Date startDate = orderUtils.parseDateString(startDateString);
             order.setStartDate(startDate);
 
             String endDateString = (String) request.get("endDate");
-            Date endDate = parseDateString(endDateString);
+            Date endDate = orderUtils.parseDateString(endDateString);
             order.setEndDate(endDate);
 
             double hours = Double.parseDouble((String) request.get("hours"));
@@ -389,7 +264,7 @@ public class OrderService {
             String status = (String) request.get("status");
             order.setStatus(status);
 
-            // Dodanie nowych materiałów
+
             List<String> items = (List<String>) request.get("items");
             List<Material> newMaterials = new ArrayList<>();
             for (String item : items) {
@@ -402,7 +277,7 @@ public class OrderService {
         }
     }
 
-    @Transactional
+
     public ResponseEntity<Map<String, Object>> checkAvailability(
             @RequestParam double durationHours,
             @RequestParam(required = false, defaultValue = "8") int startHour) {
@@ -422,7 +297,7 @@ public class OrderService {
             currentDateTime.set(Calendar.SECOND, 0);
 
             while (currentDateTime.get(Calendar.HOUR_OF_DAY) < 16) {
-                if (isWorkingDay(currentDateTime)) {
+                if (orderUtils.isWorkingDay(currentDateTime)) {
                     Calendar endDateTime = (Calendar) currentDateTime.clone();
                     int durationMinutes = (int) (durationHours * 60);
                     endDateTime.add(Calendar.MINUTE, durationMinutes);
@@ -433,16 +308,16 @@ public class OrderService {
                     }
 
                     if (endDateTime.after(Calendar.getInstance())) {
-                        List<User> availableUsers = findAvailableUsersWithEndDateTime(currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
+                        List<User> availableUsers = orderUtils.findAvailableUsersWithEndDateTime(currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
 
                         if (!availableUsers.isEmpty()) {
                             User suggestedUser = availableUsers.get(0);
 
                             response.put("status", "success");
-                            response.put("startDate", formatDate(currentDateTime.getTime()));
-                            response.put("startTime", formatTime(currentDateTime.getTime()));
-                            response.put("endDate", formatDate(endDateTime.getTime()));
-                            response.put("endTime", formatTime(endDateTime.getTime()));
+                            response.put("startDate", orderUtils.formatDate(currentDateTime.getTime()));
+                            response.put("startTime", orderUtils.formatTime(currentDateTime.getTime()));
+                            response.put("endDate", orderUtils.formatDate(endDateTime.getTime()));
+                            response.put("endTime", orderUtils.formatTime(endDateTime.getTime()));
                             response.put("suggestedUser", suggestedUser.getName());
                             response.put("durationMinutes", durationMinutes);
 
@@ -489,7 +364,7 @@ public class OrderService {
                 }
 
                 while (true) {
-                    if (isWorkingDay(currentDateTime)) {
+                    if (orderUtils.isWorkingDay(currentDateTime)) {
                         Calendar endDateTime = (Calendar) currentDateTime.clone();
                         int durationMinutes = (int) (durationHours * 60);
                         endDateTime.add(Calendar.MINUTE, durationMinutes);
@@ -502,16 +377,16 @@ public class OrderService {
                         }
                         User user = userRepository.findByName(order.getEmployeeName());
 
-                        List<User> availableUsers = findAvailableUserWithEndDateTime(user.getId(), currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
+                        List<User> availableUsers = orderUtils.findAvailableUserWithEndDateTime(user.getId(), currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
 
                         if (!availableUsers.isEmpty()) {
                             User suggestedUser = availableUsers.get(0);
 
                             response.put("status", "success");
-                            response.put("startDate", formatDate(currentDateTime.getTime()));
-                            response.put("startTime", formatTime(currentDateTime.getTime()));
-                            response.put("endDate", formatDate(endDateTime.getTime()));
-                            response.put("endTime", formatTime(endDateTime.getTime()));
+                            response.put("startDate", orderUtils.formatDate(currentDateTime.getTime()));
+                            response.put("startTime", orderUtils.formatTime(currentDateTime.getTime()));
+                            response.put("endDate", orderUtils.formatDate(endDateTime.getTime()));
+                            response.put("endTime", orderUtils.formatTime(endDateTime.getTime()));
                             response.put("suggestedUser", suggestedUser.getName());
                             response.put("durationMinutes", durationMinutes);
 
@@ -557,7 +432,7 @@ public class OrderService {
                 }
 
                 while (true) {
-                    if (isWorkingDay(currentDateTime)) {
+                    if (orderUtils.isWorkingDay(currentDateTime)) {
                         Calendar endDateTime = (Calendar) currentDateTime.clone();
                         int durationMinutes = (int) (durationHours * 60);
                         endDateTime.add(Calendar.MINUTE, durationMinutes);
@@ -569,16 +444,16 @@ public class OrderService {
                             continue;
                         }
 
-                        List<User> availableUsers = findAvailableUsersWithoutEmployee(order.getId(), currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
+                        List<User> availableUsers = orderUtils.findAvailableUsersWithoutEmployee(order.getId(), currentDateTime.getTime(), endDateTime.getTime(), durationMinutes);
 
                         if (!availableUsers.isEmpty()) {
                             User suggestedUser = availableUsers.get(0);
 
                             response.put("status", "success");
-                            response.put("startDate", formatDate(currentDateTime.getTime()));
-                            response.put("startTime", formatTime(currentDateTime.getTime()));
-                            response.put("endDate", formatDate(endDateTime.getTime()));
-                            response.put("endTime", formatTime(endDateTime.getTime()));
+                            response.put("startDate", orderUtils.formatDate(currentDateTime.getTime()));
+                            response.put("startTime", orderUtils.formatTime(currentDateTime.getTime()));
+                            response.put("endDate", orderUtils.formatDate(endDateTime.getTime()));
+                            response.put("endTime", orderUtils.formatTime(endDateTime.getTime()));
                             response.put("suggestedUser", suggestedUser.getName());
                             response.put("durationMinutes", durationMinutes);
                             return response;
@@ -616,7 +491,7 @@ public class OrderService {
             throw new UserNotFoundException(id);
         }
     }
-    @Transactional
+
     public List<Order> searchOrdersByStartDateBetweenWithMaterials(LocalDate fromDate, LocalDate toDate, Authentication authentication) {
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
@@ -644,6 +519,7 @@ public class OrderService {
 
         return filteredOrders;
     }
+
     public void updateMaterialCheckedState(Long materialId, boolean checked) {
         Optional<Material> optionalMaterial = materialRepository.findById(materialId);
 
@@ -652,9 +528,7 @@ public class OrderService {
             materialRepository.save(material);
         });
     }
-    public Order getOrderDetails(String idCode) {
-        return orderRepository.findByIdCode(idCode);
-    }
+
 }
 
 
