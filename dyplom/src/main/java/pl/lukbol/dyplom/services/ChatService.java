@@ -36,11 +36,13 @@ public class ChatService {
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
     }
+
     @Transactional
     public Message sendMessageToClient(Conversation conversation, Message message) {
         messageService.sendMessage(message.getSender(), conversation, message.getContent(), message.getMessageDate());
         return message;
     }
+
     @Transactional
     public Message sendMessageToEmployees(Message message) {
         String clientEmail = message.getSender().getEmail();
@@ -72,6 +74,7 @@ public class ChatService {
         }
         return message;
     }
+
     public ResponseEntity<List<Message>> getClientConversation(Authentication authentication) {
         User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
 
@@ -87,6 +90,7 @@ public class ChatService {
             return ResponseEntity.notFound().build();
         }
     }
+
     public ResponseEntity<List<Message>> getAllEmployeeConversationMessages(Authentication authentication) {
         User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
         List<Conversation> conversations = conversationRepository.findByParticipants_Id(user.getId());
@@ -103,6 +107,7 @@ public class ChatService {
             return ResponseEntity.notFound().build();
         }
     }
+
     @Transactional
     public ResponseEntity<Map<String, Object>> createConversation(Authentication authentication, String name, String participantIds) {
         User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
@@ -159,6 +164,7 @@ public class ChatService {
             return ResponseEntity.notFound().build();
         }
     }
+
     public ResponseEntity<Boolean> checkIfConversationRead(Authentication authentication, Long conversationId) {
         Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
         User user = userRepository.findByEmail(AuthenticationUtils.checkmail(authentication.getPrincipal()));
@@ -172,6 +178,7 @@ public class ChatService {
             return ResponseEntity.notFound().build();
         }
     }
+
     public ResponseEntity<List<User>> getConversationParticipants(Long conversationId) {
         Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
         if (conversationOptional.isPresent()) {
@@ -185,6 +192,7 @@ public class ChatService {
             return ResponseEntity.notFound().build();
         }
     }
+
     public ResponseEntity<List<User>> getParticipantsBySeen(Long conversationId) {
         Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);
         if (conversationOptional.isPresent()) {
@@ -200,6 +208,7 @@ public class ChatService {
             return ResponseEntity.notFound().build();
         }
     }
+
     @Transactional
     public ResponseEntity<?> hideConversation(Long conversationId) {
         Optional<Conversation> conversationOptional = conversationRepository.findById(conversationId);

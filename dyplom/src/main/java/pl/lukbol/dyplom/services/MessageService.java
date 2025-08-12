@@ -8,8 +8,6 @@ import pl.lukbol.dyplom.classes.Message;
 import pl.lukbol.dyplom.classes.User;
 import pl.lukbol.dyplom.repositories.ConversationRepository;
 import pl.lukbol.dyplom.repositories.MessageRepository;
-import pl.lukbol.dyplom.repositories.RoleRepository;
-import pl.lukbol.dyplom.repositories.UserRepository;
 
 import java.util.Date;
 import java.util.List;
@@ -24,6 +22,7 @@ public class MessageService {
         this.messageRepository = messageRepository;
         this.conversationRepository = conversationRepository;
     }
+
     @Transactional
     public Message sendMessage(User sender, Conversation conversation, String content, Date messageDate) {
         Message message = new Message(sender, content, conversation, messageDate);

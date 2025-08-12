@@ -6,48 +6,57 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class UrlController {
-    @RequestMapping(value="/register")
+    @RequestMapping(value = "/register")
     public ModelAndView getRegister() {
         return new ModelAndView("register");
     }
 
-    @RequestMapping(value="/login")
+    @RequestMapping(value = "/login")
     public ModelAndView getLogin() {
         return new ModelAndView("login");
     }
-    @RequestMapping(value="/")
-    public ModelAndView getEmpty() {return new ModelAndView("login");}
-    @RequestMapping(value="/profile")
+
+    @RequestMapping(value = "/")
+    public ModelAndView getEmpty() {
+        return new ModelAndView("login");
+    }
+
+    @RequestMapping(value = "/profile")
     public ModelAndView getProfile() {
         return new ModelAndView("profile");
     }
-    @RequestMapping(value="/price_list")
+
+    @RequestMapping(value = "/price_list")
     public ModelAndView getPrices() {
         return new ModelAndView("price_list");
     }
 
-    @RequestMapping(value="/daily")
+    @RequestMapping(value = "/daily")
     public ModelAndView getDailies() {
         return new ModelAndView("daily");
     }
-    @RequestMapping(value="/locked")
+
+    @RequestMapping(value = "/locked")
     public ModelAndView getLocked() {
         return new ModelAndView("locked");
     }
 
-    @RequestMapping(value="/clientChat")
+    @RequestMapping(value = "/clientChat")
     public ModelAndView getClientChat() {
         return new ModelAndView("clientChat");
     }
-    @RequestMapping(value="/employeeChat")
+
+    @RequestMapping(value = "/employeeChat")
     public ModelAndView getEmployeeChat() {
         return new ModelAndView("employeeChat");
     }
-    @RequestMapping(value="/materials")
+
+    @RequestMapping(value = "/materials")
     public ModelAndView getMaterialsList() {
         return new ModelAndView("materials");
     }
-    @RequestMapping(value="/ordersList")
+
+    @RequestMapping(value = "/ordersList")
     public ModelAndView getOrderByCode() {
         return new ModelAndView("orders");
     }

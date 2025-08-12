@@ -1,8 +1,6 @@
 package pl.lukbol.dyplom.controllers;
 
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,45 +8,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import pl.lukbol.dyplom.classes.*;
-import pl.lukbol.dyplom.exceptions.UserNotFoundException;
-import pl.lukbol.dyplom.repositories.MaterialRepository;
+import pl.lukbol.dyplom.classes.Order;
 import pl.lukbol.dyplom.repositories.OrderRepository;
-import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.OrderService;
 import pl.lukbol.dyplom.utilities.AuthenticationUtils;
-import pl.lukbol.dyplom.utilities.DateUtils;
-import pl.lukbol.dyplom.utilities.GenerateCode;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.DateTimeParseException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 public class OrderController {
-    private UserRepository userRepository;
 
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    private MaterialRepository materialRepository;
+    private final OrderService orderService;
 
-    private OrderService orderService;
-
-
-    public OrderController(UserRepository userRepository, OrderRepository orderRepository, MaterialRepository materialRepository, OrderService orderService) {
-        this.userRepository = userRepository;
-        this.orderRepository = orderRepository;
-        this.materialRepository = materialRepository;
-        this.orderService = orderService;
-
-    }
 
     @GetMapping("/currentDate")
     public Map<String, Object> getCurrentDate() {
@@ -67,6 +45,7 @@ public class OrderController {
 
         return "index";
     }
+
     @GetMapping(value = "/order/getDailyOrders")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getDailyOrders(
@@ -91,10 +70,11 @@ public class OrderController {
     }
 
     @PostMapping(value = "/order/add", consumes = {"application/json"})
-    public ResponseEntity<Order> addOrder(Authentication authentication, @RequestBody Map<String, Object> request) {
+    public ResponseEntity<Order> addOrder(@RequestBody Map<String, Object> request) {
         Order newOrder = orderService.addOrder(request);
         return ResponseEntity.ok(newOrder);
     }
+
     @GetMapping("/order/getOrderDetails/{id}")
     public ResponseEntity<Map<String, Object>> getOrderDetails(@PathVariable Long id) {
         Map<String, Object> orderDetails = orderService.getOrderDetails(id);
@@ -126,6 +106,7 @@ public class OrderController {
 
         return orderService.checkAvailabilityNextDay(orderId, durationHours);
     }
+
     @GetMapping("/order/otherEmployee/{orderId}")
     public ResponseEntity<Map<String, Object>> checkAvailabilityOtherEmployee(
             @PathVariable Long orderId,
@@ -140,6 +121,7 @@ public class OrderController {
 
         orderService.deleteOrder(id);
     }
+
     @GetMapping("/order/search")
     public ResponseEntity<List<Order>> searchOrdersByStartDateBetweenWithMaterials(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,

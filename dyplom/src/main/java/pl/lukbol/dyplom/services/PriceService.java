@@ -2,9 +2,6 @@ package pl.lukbol.dyplom.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import pl.lukbol.dyplom.classes.Price;
 import pl.lukbol.dyplom.exceptions.UserNotFoundException;
 import pl.lukbol.dyplom.repositories.PriceRepository;
@@ -13,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 @Service
 public class PriceService {
 
@@ -22,10 +20,12 @@ public class PriceService {
         this.priceRepository = priceRepository;
 
     }
+
     public List<Price> getAllPrices() {
         List<Price> prices = priceRepository.findAll();
         return prices;
     }
+
     @Transactional
     public Map<String, Object> addPrice(String item, String price) {
         Price newPrice = new Price(item, price);
@@ -35,6 +35,7 @@ public class PriceService {
         response.put("message", "Poprawnie utworzono użytkownika.");
         return response;
     }
+
     @Transactional
     public void deleteUser(Long id) {
 
@@ -46,6 +47,7 @@ public class PriceService {
             throw new UserNotFoundException(id);
         }
     }
+
     @Transactional
     public void updatePrice(Long id, String newItem, String newPrice) {
         Price price = priceRepository.findById(id)

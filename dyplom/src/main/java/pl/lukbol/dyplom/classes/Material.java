@@ -2,64 +2,35 @@ package pl.lukbol.dyplom.classes;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Builder;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name="materials")
+@Table(name = "materials")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Material {
+
     @Id
     @GeneratedValue
-    private  Long id;
+    private Long id;
 
     private String item;
 
     private boolean checked;
-
-    public Material() {
-    }
-
-    public Material(String item, Order order, Boolean checked) {
-        this.item = item;
-        this.order = order;
-        this.checked=checked;
-    }
 
     @ManyToOne
     @JoinColumn(name = "order_id")
     @JsonBackReference
     private Order order;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getItem() {
-        return item;
-    }
-
-    public void setItem(String item) {
+    public Material(String item, Order order, boolean checked) {
         this.item = item;
-    }
-
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
         this.order = order;
-    }
-    public boolean isChecked() {
-        return checked;
-    }
-
-    public void setChecked(boolean checked) {
         this.checked = checked;
     }
 }

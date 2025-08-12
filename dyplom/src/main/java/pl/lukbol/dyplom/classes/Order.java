@@ -2,12 +2,18 @@ package pl.lukbol.dyplom.classes;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name="orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -23,8 +29,6 @@ public class Order {
 
     private String phoneNumber;
 
-
-
     private String employeeName;
 
     private Date startDate;
@@ -39,22 +43,12 @@ public class Order {
 
     private String idCode;
 
-    private String getIdCode() {
-        return idCode;
-    }
-
-    public void setIdCode(String idCode) {
-        this.idCode = idCode;
-    }
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Material> materials;
 
-
-    public Order() {}
-
-    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, String status, int price, double duration, List<Material> materials,String idCode) {
+    public Order(String description, String clientName, String clientEmail, String phoneNumber, String employeeName, Date startDate, Date endDate, String status, int price, double duration, List<Material> materials, String idCode) {
         this.description = description;
         this.clientName = clientName;
         this.clientEmail = clientEmail;
@@ -66,100 +60,7 @@ public class Order {
         this.price = price;
         this.duration = duration;
         this.materials = materials;
-        this.idCode= idCode;
-    }
-    public String getPhoneNumber() {
-        return phoneNumber;
+        this.idCode = idCode;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getClientName() {
-        return clientName;
-    }
-
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
-    }
-
-    public String getEmployeeName() {
-        return employeeName;
-    }
-
-    public void setEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public List<Material> getMaterials() {
-        return materials;
-    }
-
-    public void setMaterials(List<Material> materials) {
-        this.materials = materials;
-    }
-
-    public String getClientEmail() {
-        return clientEmail;
-    }
-
-    public void setClientEmail(String clientEmail) {
-        this.clientEmail = clientEmail;
-    }
-
-    public double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(double duration) {
-        this.duration = duration;
-    }
 }

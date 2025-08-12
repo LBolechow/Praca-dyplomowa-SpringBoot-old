@@ -9,6 +9,7 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> findByConversation(Conversation conversation);
+
     Message findTopByConversationOrderByMessageDateDesc(Conversation conversation);
 
 

@@ -5,14 +5,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pl.lukbol.dyplom.classes.Order;
 
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-public interface OrderRepository extends JpaRepository<Order, Long>
-{
+public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAll();
 
     List<Order> findByEndDate(Date endDate);
@@ -26,6 +22,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>
             "WHERE o.startDate BETWEEN :startDate AND :endDate")
     List<Order> findByStartDateBetweenWithMaterials(
             @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
     List<Order> findByEmployeeNameAndEndDateAfterAndStartDateBefore(String name, Date taskEndDateTime, Date taskEndDateTime1);
 
     @Query("SELECT o FROM Order o WHERE o.clientEmail = :userEmail")
@@ -37,6 +34,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate
     );
+
     @Query("SELECT o FROM Order o WHERE o.employeeName = :employeeName AND o.startDate BETWEEN :startDate AND :endDate")
     List<Order> findByEmployeeNameAndStartDateBetweenWithMaterials(
             @Param("employeeName") String employeeName,

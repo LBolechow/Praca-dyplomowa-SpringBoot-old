@@ -1,39 +1,26 @@
 package pl.lukbol.dyplom.controllers;
 
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.lukbol.dyplom.classes.Conversation;
 import pl.lukbol.dyplom.classes.Message;
 import pl.lukbol.dyplom.classes.User;
 import pl.lukbol.dyplom.repositories.ConversationRepository;
 import pl.lukbol.dyplom.repositories.MessageRepository;
-import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 import pl.lukbol.dyplom.services.ChatService;
-import pl.lukbol.dyplom.services.MessageService;
-import pl.lukbol.dyplom.services.UserService;
-import pl.lukbol.dyplom.utilities.AuthenticationUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ChatController {
 
-    @Autowired
-    private MessageService messageService;
-
     private UserRepository userRepository;
-    @Autowired
-    private UserController userController;
 
     private MessageRepository messageRepository;
 
@@ -63,7 +50,7 @@ public class ChatController {
     @MessageMapping("/sendToEmployees")
     @SendTo("/topic/employees")
     public Message sendMessageToEmployees(Message message) {
-      return chatService.sendMessageToEmployees(message);
+        return chatService.sendMessageToEmployees(message);
     }
 
     @GetMapping("/api/conversation")
@@ -132,10 +119,12 @@ public class ChatController {
     public ResponseEntity<Boolean> checkIfConversationRead(Authentication authentication, @PathVariable Long conversationId) {
         return chatService.checkIfConversationRead(authentication, conversationId);
     }
+
     @GetMapping("/getConversationParticipants/{conversationId}")
     public ResponseEntity<List<User>> getConversationParticipants(@PathVariable Long conversationId) {
         return chatService.getConversationParticipants(conversationId);
     }
+
     @GetMapping("/checkSeen/{conversationId}")
     public ResponseEntity<List<User>> getParticipantsBySeen(@PathVariable Long conversationId) {
         return chatService.getParticipantsBySeen(conversationId);
