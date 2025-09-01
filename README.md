@@ -1,56 +1,61 @@
-Opis aplikacji:
->Aplikacja internetowa wspomagająca proces realizacji zleceń w zakładzie krawieckim. Zaprojektowana funkcjonalność zwiększa wygodę oraz efektywność pracy poprzez usprawnienie i automatyzację procesu realizacji zleceń, od momentu ich przyjęcia do wydania.
->Aplikacja usprawnia także komunikację z klientem oraz między pracownikami, co przyczynia się do lepszej organizacji pracy i szybszego reagowania na zmieniające się potrzeby.
+# Tailoring Workshop Order Management Application
 
-Zakres funkcjonalność dostępnych dla niezalogowanego użytkownika:
->•	Rejestracja oraz logowanie: aplikacja umożliwia logowanie przy użyciu indywidualnie utworzonego konta lub poprzez wykorzystanie konta Google.
->
->•	Sprawdzenie statusu zlecenia: Podczas zlecania wykonania usługi w zakładzie krawieckim, klient otrzyma kod, który następnie może wprowadzić na stronie. Spowoduje to wyświetlenie danych oraz statusu jego zlecenia.
->
->•	Przegląd cennika.
+## Application Description
+Web application supporting the order fulfillment process in a tailoring workshop. The designed functionality increases convenience and work efficiency by streamlining and automating the order process from acceptance to delivery.  
+The application also improves communication with clients and among employees, contributing to better organization and faster response to changing needs.  
 
-Funkcjonalności dostępne dla wszystkich zalogowanych użytkowników:
->•	Panel zarządzania kontem: wyświetlane tu będą podstawowe dane logowania konta oraz interfejs umożliwiający ich modyfikację.
->
->•	Wyświetlanie powiadomień: użytkownicy będą mieli możliwość przeglądania powiadomień wysłanych do nich przez system lub administratora.
->
->•	Przegląd cennika.  
+---
 
-Funkcjonalności dla roli klienta:
->•	Komunikacja z pracownikami: możliwość wysłania wiadomości do pracowników poprzez dedykowany panel wiadomości.
->
->•	Pełna lista zleceń: użytkownikowi będą wyświetlane wszystkie jego zlecenia, zarówno będące w trakcie, jak i ukończone.
+## Features Available to Unauthenticated Users
+- **Registration and Login:** Users can log in using a custom account or via their Google account.  
+- **Order Status Check:** When placing an order in the tailoring workshop, the client receives a code. Entering this code on the website displays the details and status of the order.  
+- **Price List Overview.**  
 
-Funkcjonalności przewidziane dla roli pracownika: 
->•	Lista zleceń wyświetlana w dwóch formatach: 30-dniowy - pokazujący zlecenia z całego miesiąca oraz dzienny, wyświetlający zlecenia jako bloki godzinowe. Pracownik będzie widział tylko zlecenia do których jest przypisany.
->
->•	Zarządzanie zleceniami: podczas dodawania zlecenia system będzie wyszukiwał i proponował dostępne wolne terminy w harmonogramie oraz sugerował pracownika do realizacji zadania. Po zakończeniu procesu przyjmowania zlecenia, system wygeneruje unikalny kod i przedstawi go w formie do wydrukowania dla klienta. Podczas modyfikacji aplikacja zapewni możliwość automatycznego przeniesienia zlecenia na inny wolny termin u wcześniej przypisanego do zadania pracownika lub wolny termin u innego pracownika.
->
->•	Komunikacja z klientem oraz z między pracownikami: funkcjonalność ta pozwoli na odpowiadanie klientom oraz na komunikację z innymi pracownikami,
->
->•	Podgląd wymaganych materiałów: aplikacja umożliwi użytkownikowi przegląd wymaganych materiałów ze zleceń z wybranych terminów. Pracownik będzie mógł także oznaczać, czy w zakładzie krawieckim znajdują się wymagane do realizacji zleceń materiały. Dla roli pracownika, wyświetlane są tylko te zlecenia i materiały do nich, do których realizacji został przydzielony.
+---
 
-Funkcjonalność dla roli administratora:
->•	Administrator będzie posiadał uprawnienia pozwalające mu wykonywać takie same czynności jak pracownik,
->
->•	W harmonogramie zleceń oraz podglądzie wymaganych materiałów administrator będzie widział zlecenia wszystkich pracowników oraz materiały ze wszystkich zleceń,
->
->•	Zarządzanie cennikiem: administrator będzie w stanie móc modyfikować pozycje w cenniku,
->
->•	Zarządzanie kontami: administrator będzie miał możliwość dodawania, modyfikowania i usuwania kont użytkowników. Wśród jego uprawnień znajduje się także modyfikowanie ról.
->
->•	Tworzenie powiadomień: użytkownik z rolą administratora będzie mógł tworzyć powiadomienia dla wybranych pracowników.  
+## Features Available to All Authenticated Users
+- **Account Management Panel:** Displays basic account information and allows users to modify it.  
+- **Notifications Display:** Users can view notifications sent by the system or administrator.  
+- **Price List Overview.**  
 
-Technologie:
->•	Spring Boot
->
->•	PostgreSQL
->
->•	HTML i CSS wraz z biblioteką Bootstrap
->
->•	JavaScript z biblioteką jQuery
+---
 
-Przykłady wyglądu interfejsu użytkownika aplikacji:
+## Features for Client Role
+- **Communication with Employees:** Ability to send messages to employees through a dedicated messaging panel.  
+- **Full Order List:** Users can see all their orders, both ongoing and completed.  
+
+---
+
+## Features for Employee Role
+- **Order List:** Displayed in two formats:  
+  - **30-day view:** Shows all orders in the month.  
+  - **Daily view:** Shows orders in hourly blocks.  
+  Employees see only orders assigned to them.  
+
+- **Order Management:** While adding an order, the system suggests available time slots and assigns an employee. Upon order creation, a unique code is generated and presented in a printable format for the client. During modification, orders can be automatically rescheduled to a free slot with the same or another employee.  
+
+- **Communication:** Employees can respond to clients and communicate with other employees.  
+
+- **Materials Overview:** Employees can view required materials for selected orders and mark availability in the workshop. Employees see only the orders and materials assigned to them.  
+
+---
+
+## Features for Administrator Role
+- **All Employee Features:** Administrators have the same capabilities as employees.  
+- **Full Schedule & Materials Overview:** Administrators see all orders and all required materials.  
+- **Price List Management:** Administrators can modify price list entries.  
+- **Account Management:** Administrators can add, modify, and delete user accounts, including role management.  
+- **Notifications Creation:** Administrators can create notifications for selected employees.  
+
+---
+
+## Technologies Used
+- **Spring Boot**  
+- **PostgreSQL**  
+- **HTML & CSS** with Bootstrap  
+- **JavaScript** with jQuery
+
+Examples:
 
 ![obraz](https://github.com/LBolechow/Praca-dyplomowa/assets/110845720/50017498-7796-4f5d-8ab3-6e08478e2360)
 ![obraz](https://github.com/LBolechow/Praca-dyplomowa/assets/110845720/22b5baa6-a3b4-42c4-b64e-0911d0132694)
