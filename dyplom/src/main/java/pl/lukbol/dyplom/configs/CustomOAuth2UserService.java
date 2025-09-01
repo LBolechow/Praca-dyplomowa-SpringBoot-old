@@ -21,14 +21,12 @@ import pl.lukbol.dyplom.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private static final String ATTR_NAME = "name";
-    private static final String ATTR_EMAIL = "email";
-    private static final String USER_NOT_FOUND_MSG = "User not found !";
     @Autowired
     private UserRepository userRepository;
 
@@ -37,21 +35,27 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         return getGrantedAuthorities(getPrivileges(roles));
     }
-
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        System.out.println("logging in via oauth2");
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oauth2User = delegate.loadUser(userRequest);
-        String name = (String) oauth2User.getAttributes().get(ATTR_NAME);
-        String email = (String) oauth2User.getAttributes().get(ATTR_EMAIL);
-        User user = userRepository.findOptionalByEmail(email).orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_MSG));
+
+        // Retrieve the user's name and email from the OAuth2 provider
+        String name = (String) oauth2User.getAttributes().get("name");
+        String email = (String) oauth2User.getAttributes().get("email");
+        User user = userRepository.findOptionalByEmail(email).orElseThrow(()-> new UsernameNotFoundException("User not found !"));
+        System.out.println("logging in via oauth3");
         List<GrantedAuthority> authorities = new ArrayList<>();
         List<Role> roles = user.getRoles().stream().toList();
-        for (int i = 0; i < roles.size(); i++) {
+        for(int i=0; i<roles.size();i++){
             authorities.add(new SimpleGrantedAuthority(roles.get(i).getName()));
         }
+        System.out.println("logging in via oauth4");
         return new DefaultOAuth2User(authorities, oauth2User.getAttributes(), email);
+
     }
+
 
 
     private List<String> getPrivileges(Collection<Role> roles) {

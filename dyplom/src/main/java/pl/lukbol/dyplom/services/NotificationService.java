@@ -33,7 +33,6 @@ public class NotificationService {
             throw new UserNotFoundException(usr.getId());
         }
     }
-
     @Transactional
     public void createNotification(String userEmail, String message, List<Long> participantIds) {
         User sender = userRepository.findByEmail(userEmail);

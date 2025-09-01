@@ -2,6 +2,7 @@ package pl.lukbol.dyplom.configs;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +25,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    private final String USER_NOT_FOUND_EXCEPTION = "User not found !";
-
     @Autowired
     private RoleRepository roleRepository;
 
@@ -34,10 +33,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return getGrantedAuthorities(getPrivileges(roles));
     }
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findOptionalByEmail(email).orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND_EXCEPTION));
+        User user = userRepository.findOptionalByEmail(email).orElseThrow(()-> new UsernameNotFoundException("User not found !"));
+        System.out.println("logging in via form");
+
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getPassword(), true, true, true,
                 true, getAuthorities(user.getRoles()));

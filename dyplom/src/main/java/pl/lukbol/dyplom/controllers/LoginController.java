@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -21,50 +22,42 @@ import org.springframework.web.servlet.ModelAndView;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
 
+import java.util.Collections;
+
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
-    private final UserRepository iUserRepository;
-    private final RoleRepository iRoleRepository;
-    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
     @Autowired
     private AuthenticationManager authenticationManager;
+    private final UserRepository iUserRepository;
+    private final RoleRepository iRoleRepository;
+
     private SecurityContextRepository securityContextRepository =
             new HttpSessionSecurityContextRepository();
+    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
     @PostMapping("/login")
-    public ModelAndView login(
-            @RequestParam String email,
-            @RequestParam String password,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-
-        final String VIEW_PROFILE = "profile";
-        final String VIEW_LOGIN = "login";
-        final String ERROR_INVALID_CREDENTIALS = "Podano nieprawidłowe dane logowania";
-
+    public ModelAndView login(@RequestParam String email, @RequestParam String password , HttpServletRequest request, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
-
         try {
             Authentication authentication = authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             SecurityContext context = securityContextHolderStrategy.createEmptyContext();
             context.setAuthentication(authentication);
             securityContextHolderStrategy.setContext(context);
-
             securityContextRepository.saveContext(context, request, response);
-
-            return new ModelAndView(VIEW_PROFILE);
-
-        } catch (AuthenticationException e) {
-            ModelAndView modelAndView = new ModelAndView(VIEW_LOGIN);
+            return new ModelAndView("profile");
+        }
+        catch (AuthenticationException e) {
+            ModelAndView modelAndView = new ModelAndView("login");
             if (e instanceof BadCredentialsException) {
-                modelAndView.addObject("error", ERROR_INVALID_CREDENTIALS);
+                modelAndView.addObject("error", "Podano nieprawidłowe dane logowania");
             }
+
             return modelAndView;
         }
     }
+
 
 
 }

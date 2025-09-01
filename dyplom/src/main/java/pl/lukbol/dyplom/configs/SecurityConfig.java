@@ -30,51 +30,54 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import pl.lukbol.dyplom.configs.CustomOAuth2UserService;
 import pl.lukbol.dyplom.classes.Role;
 import pl.lukbol.dyplom.classes.User;
+import pl.lukbol.dyplom.configs.CustomUserDetailsService;
 import pl.lukbol.dyplom.repositories.RoleRepository;
 import pl.lukbol.dyplom.repositories.UserRepository;
-import pl.lukbol.dyplom.utilities.SecurityPaths;
-
 import java.security.SecureRandom;
+import java.util.Base64;
+
+
+
 import java.util.*;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
 
-    private static final String ROLE_NAME = "ROLE_CLIENT";
-    private final CustomUserDetailsService customerUserDetailsService;
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final SecurityPaths securityPaths;
-    @Autowired
-    private final RoleRepository roleRepository;
+    private final CustomUserDetailsService customerUserDetailsService ;
+    private final CustomOAuth2UserService customOAuth2UserService ;
+
     String generatedPassword = generateRandomPassword();
     @Value("/profile")
     private String successUrl;
     @Value("/login")
     private String failureUrl;
-    @Autowired
-    private UserRepository userRepository;
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     protected SecurityFilterChain chains(HttpSecurity http) throws Exception {
 
-
         http
+                //.cors()
+                //.and()
                 .csrf().disable()
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(securityPaths.CLIENT_EMPLOYEE_ADMIN_PATHS).hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
-                        .requestMatchers(securityPaths.ADMIN_PATHS).hasRole("ADMIN")
-                        .requestMatchers(securityPaths.ADMIN_EMPLOYEE_PATHS).hasAnyRole("ADMIN", "EMPLOYEE")
-                        .requestMatchers(securityPaths.PERMIT_ALL_PATHS).permitAll()
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/user", "/profile/**",  "/currentDate", "/clientChat", "/ws-chat/**", "/ws-chat", "/api/conversation", "/sendToEmployees", "/topic/employees", "/app", "/topic/**", "/employeeChat", "/conversation/**", "/sendToConversation/**", "/api/conversation/**/latest-message", "/index", "/user/activateMail", "/user/checkCode", "/user/orders", "/removeAlerts", "/create-notification").hasAnyRole("CLIENT", "EMPLOYEE", "ADMIN")
+                        .requestMatchers("/admin/**", "/search-users", "/panel_administratora","/users/delete/**", "/users/update/**", "/users/add", "/add-price", "/delete-price/{id}", "/update-price/{id}").hasRole("ADMIN")
+                        .requestMatchers("/order/add",  "/users", "/caldendar", "/daily", "/daily/**", "/order/getDailyOrders", "/users/findByRole", "/order/checkAvailability", "/order/getOrderDetails/{id}", "/order/edit/{id}", "/order/checkAvailabilityNextDay", "/order/delete/{id}", "/materials", "/order/search", "/material/{id}", "/order/otherEmployee/{orderId}", "/user/employees-and-admins", "/users/employees-and-admins", "/api/createConversation", "/api/employee/conversations", "/clearSeenByUserIds/", "/markConversationAsRead/{conversationId}", "/checkIfConversationRead/{conversationId}", "/get_conversations", "/getConversationParticipants/{conversationId}", "/hide/{conversationId}", "/checkSeen/{conversationId}").hasAnyRole("ADMIN", "EMPLOYEE")
+
+                        .requestMatchers( "/register", "/error", "/webjars/**", "/githubprivacyerror.html","/css/**", "/static/**", "/images/**",
+                                "/fonts/**", "/scripts/**", "/error", "/login", "/", "/user2", "/favicon", "/usersonline", "/user/profile/{id}", "/get_message", "/favicon.ico", "/price_list", "/locked", "/api/conversation", "/ordersList", "/order", "/order/**", "/order/checkOrder/{idCode}", "/prices", "/send-new-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/*").permitAll()
+                        // .anyRequest().authenticated()
+
+                        .and()
                 )
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
@@ -82,30 +85,37 @@ public class SecurityConfig {
                 .logout(l -> l
                         .logoutSuccessUrl("/").permitAll()
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .oidcUserService(this.oidcUserService())
-                        )
-                        .successHandler(successHandler())
-                        .failureHandler(failureHandler())
-                )
-                .formLogin(form -> form
+                //.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                //and()
+                .oauth2Login().userInfoEndpoint().oidcUserService(this.oidcUserService()).and()
+                .successHandler(successHandler())
+                .failureHandler(failureHandler())
+                .and()
+                .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/profile")
                         .defaultSuccessUrl("/profile")
                         .permitAll()
-                )
-                .httpBasic()
+                ).
+                httpBasic().and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .and()
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                )
-                .securityContext(securityContext -> securityContext
-                        .securityContextRepository(new HttpSessionSecurityContextRepository())
-                );
+                .securityContext()
+                .securityContextRepository(new HttpSessionSecurityContextRepository())
+                .and();
+        // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
+
+
     }
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private final RoleRepository roleRepository;
 
     @Transactional
     private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
@@ -121,7 +131,7 @@ public class SecurityConfig {
                     .findFirst()
                     .orElseGet(() -> {
                         User newUser = new User(finalOidcUser.getFullName(), email, passwordEncoder().encode(generatedPassword), false);
-                        newUser.setRoles(Arrays.asList(roleRepository.findByName(ROLE_NAME)));
+                        newUser.setRoles(Arrays.asList(roleRepository.findByName("ROLE_CLIENT")));
                         userRepository.save(newUser);
                         return newUser;
                     });
@@ -145,7 +155,6 @@ public class SecurityConfig {
     private boolean emailExists(String email) {
         return userRepository.findByEmail(email) != null;
     }
-
     @Bean
     public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -164,9 +173,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception
+    { return authenticationConfiguration.getAuthenticationManager();}
 
     @Bean
     SecurityContextRepository securityContextRepository() {
