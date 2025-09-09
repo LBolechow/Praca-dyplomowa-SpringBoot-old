@@ -1,4 +1,6 @@
-# Tailoring Workshop Order Management Application
+# Tailoring Workshop Order Management Application - Old Version
+## New version, see [Old version](https://github.com/LBolechow/Praca-dyplomowa-SpringBoot-old) (In progress)
+
 
 ## Application Description
 Web application supporting the order fulfillment process in a tailoring workshop. The designed functionality increases convenience and work efficiency by streamlining and automating the order process from acceptance to delivery.  
