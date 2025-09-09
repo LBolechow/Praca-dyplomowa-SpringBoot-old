@@ -1,5 +1,6 @@
 # Tailoring Workshop Order Management Application - Old Version
-## New version, see [Old version](https://github.com/LBolechow/Praca-dyplomowa-SpringBoot-old) (In progress)
+(In progress)
+## New version, see [New version](https://github.com/LBolechow/Thesis-SpringBoot-fullRefactor) 
 
 
 ## Application Description
